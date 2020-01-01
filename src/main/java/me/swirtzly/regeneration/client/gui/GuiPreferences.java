@@ -1,11 +1,12 @@
 package me.swirtzly.regeneration.client.gui;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import me.swirtzly.regeneration.RegenConfig;
 import me.swirtzly.regeneration.RegenerationMod;
 import me.swirtzly.regeneration.client.gui.parts.BlankContainer;
 import me.swirtzly.regeneration.client.gui.parts.InventoryTabRegeneration;
 import me.swirtzly.regeneration.client.skinhandling.SkinChangingHandler;
-import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.traits.DnaHandler;
 import me.swirtzly.regeneration.common.types.TypeHandler;
 import me.swirtzly.regeneration.network.MessageChangeType;
@@ -17,7 +18,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.client.config.GuiButtonExt;
@@ -29,8 +29,8 @@ public class GuiPreferences extends ContainerScreen {
 
     public static final int ID = 1;
     private static final ResourceLocation BACKGROUND = new ResourceLocation(RegenerationMod.MODID, "textures/gui/pref_back.png");
-    private static TypeHandler.RegenType SELECTED_TYPE = CapabilityRegeneration.getForPlayer(Minecraft.getMinecraft().player).getType();
-    private static SkinChangingHandler.EnumChoices CHOICES = CapabilityRegeneration.getForPlayer(Minecraft.getMinecraft().player).getPreferredModel();
+    private static TypeHandler.RegenType SELECTED_TYPE = RegenCap.get(Minecraft.getInstance().player).getType();
+    private static SkinChangingHandler.EnumChoices CHOICES = RegenCap.get(Minecraft.getInstance().player).getPreferredModel();
 
 
     public GuiPreferences() {
@@ -62,28 +62,28 @@ public class GuiPreferences extends ContainerScreen {
         addButton(forceAlex);
         addButton(forceSteve);
 
-        buttonList.add(btnRegenType);
-        buttonList.add(btnOpenFolder);
-        buttonList.add(btnClose);
-        buttonList.add(btnColor);
-        buttonList.add(btnSkinType);
+        addButton(btnRegenType);
+        addButton(btnOpenFolder);
+        addButton(btnClose);
+        addButton(btnColor);
+        addButton(btnSkinType);
 
-        SELECTED_TYPE = CapabilityRegeneration.getForPlayer(Minecraft.getMinecraft().player).getType();
+        SELECTED_TYPE = RegenCap.get(Minecraft.getInstance().player).getType();
     }
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-        Minecraft.getMinecraft().getTextureManager().bindTexture(BACKGROUND);
-        drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
+        Minecraft.getInstance().getTextureManager().bindTexture(BACKGROUND);
+        blit(guiLeft, guiTop, 0, 0, xSize, ySize);
         int cx = (width - xSize) / 2;
         int cy = (height - ySize) / 2;
 
         GlStateManager.pushMatrix();
         //RenderUtil.drawRect(width / 2, height / 2 - 50, width / 2 - 80, height / 2 + 35, 0.0F, 0.0F, 0.0F, 1);
-        InventoryScreen.drawEntityOnScreen(width / 2 - 75, height / 2 + 45, 55, (float) (guiLeft + 51) - mouseX, (float) (guiTop + 75 - 50) - mouseY, Minecraft.getMinecraft().player);
+        InventoryScreen.drawEntityOnScreen(width / 2 - 75, height / 2 + 45, 55, (float) (guiLeft + 51) - mouseX, (float) (guiTop + 75 - 50) - mouseY, Minecraft.getInstance().player);
         GlStateManager.popMatrix();
 
-        drawCenteredString(Minecraft.getMinecraft().fontRenderer, new TranslationTextComponent("regeneration.gui.preferences").getUnformattedComponentText(), width / 2, height / 2 - 80, Color.WHITE.getRGB());
+        drawCenteredString(Minecraft.getInstance().fontRenderer, new TranslationTextComponent("regeneration.gui.preferences").getUnformattedComponentText(), width / 2, height / 2 - 80, Color.WHITE.getRGB());
 
         String str = "Banana Phone";
         int length = mc.fontRenderer.getStringWidth(str);
@@ -91,15 +91,15 @@ public class GuiPreferences extends ContainerScreen {
         if (RegenConfig.infiniteRegeneration)
             str = new TranslationTextComponent("regeneration.gui.infinite_regenerations").getFormattedText(); // TODO this should be optimized
         else
-            str = new TranslationTextComponent("regeneration.gui.remaining_regens.status").getFormattedText() + " " + CapabilityRegeneration.getForPlayer(Minecraft.getMinecraft().player).getRegenerationsLeft();
+            str = new TranslationTextComponent("regeneration.gui.remaining_regens.status").getFormattedText() + " " + RegenCap.get(Minecraft.getInstance().player).getRegenerationsLeft();
 
         length = mc.fontRenderer.getStringWidth(str);
         fontRenderer.drawStringWithShadow(str, cx + 170 - length / 2, cy + 21, Color.WHITE.getRGB());
 
-        TranslationTextComponent traitLang = new TranslationTextComponent(DnaHandler.getDnaEntry(CapabilityRegeneration.getForPlayer(mc.player).getDnaType()).getLangKey());
+        TranslationTextComponent traitLang = new TranslationTextComponent(DnaHandler.getDnaEntry(RegenCap.get(mc.player).getDnaType()).getLangKey());
         fontRenderer.drawStringWithShadow(traitLang.getUnformattedText(), cx + 170 - length / 2, cy + 40, Color.WHITE.getRGB());
 
-        TranslationTextComponent traitLangDesc = new TranslationTextComponent(DnaHandler.getDnaEntry(CapabilityRegeneration.getForPlayer(mc.player).getDnaType()).getLocalDesc());
+        TranslationTextComponent traitLangDesc = new TranslationTextComponent(DnaHandler.getDnaEntry(RegenCap.get(mc.player).getDnaType()).getLocalDesc());
         fontRenderer.drawStringWithShadow(traitLangDesc.getUnformattedText(), cx + 170 - length / 2, cy + 50, Color.WHITE.getRGB());
 
     }
@@ -109,7 +109,7 @@ public class GuiPreferences extends ContainerScreen {
         super.actionPerformed(button);
         switch (button.id) {
             case 98:
-                Minecraft.getMinecraft().displayGuiScreen(null);
+                Minecraft.getInstance().displayGuiScreen(null);
                 break;
 
             case 44:
@@ -122,11 +122,11 @@ public class GuiPreferences extends ContainerScreen {
                 NetworkHandler.INSTANCE.sendToServer(new MessageChangeType(SELECTED_TYPE));
                 break;
             case 99:
-                Minecraft.getMinecraft().player.openGui(RegenerationMod.INSTANCE, GuiCustomizer.ID, Minecraft.getMinecraft().world, 0, 0, 0);
+                Minecraft.getInstance().player.openGui(RegenerationMod.INSTANCE, GuiCustomizer.ID, Minecraft.getInstance().world, 0, 0, 0);
                 break;
 
             case 100:
-                Minecraft.getMinecraft().player.openGui(RegenerationMod.INSTANCE, GuiSkinChange.ID, Minecraft.getMinecraft().world, 0, 0, 0);
+                Minecraft.getInstance().player.openGui(RegenerationMod.INSTANCE, GuiSkinChange.ID, Minecraft.getInstance().world, 0, 0, 0);
                 break;
 
             case 22:

@@ -4,7 +4,7 @@ import me.swirtzly.regeneration.client.animation.AnimationContext;
 import me.swirtzly.regeneration.client.animation.RenderCallbackEvent;
 import me.swirtzly.regeneration.client.skinhandling.SkinChangingHandler;
 import me.swirtzly.regeneration.client.skinhandling.SkinInfo;
-import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.types.TypeFiery;
 import me.swirtzly.regeneration.common.types.TypeHandler;
@@ -14,7 +14,7 @@ import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelPlayer;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -64,7 +64,7 @@ public class TypeFieryRenderer extends ATypeRenderer<TypeFiery> {
         GlStateManager.enableBlend();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         GlStateManager.blendFunc(770, 1);
-        Vec3d color = CapabilityRegeneration.getForPlayer(entityPlayer).getPrimaryColor();
+        Vec3d color = RegenCap.get(entityPlayer).getPrimaryColor();
         float opacity = MathHelper.clamp(MathHelper.sin((entityPlayer.ticksExisted + partialTicks) / 10F) * 0.1F + 0.1F, 0.11F, 1F);
         GlStateManager.color((float) color.x, (float) color.y, (float) color.z, opacity);
 
@@ -87,7 +87,7 @@ public class TypeFieryRenderer extends ATypeRenderer<TypeFiery> {
     }
 
     public static void renderConeAtArms(PlayerEntity player) {
-        IRegeneration capability = CapabilityRegeneration.getForPlayer(player);
+        IRegeneration capability = RegenCap.get(player);
         double x = TypeHandler.getTypeInstance(capability.getType()).getAnimationProgress(capability);
         double p = 109.89010989010987; // see the wiki for the explanation of these "magic" numbers
         double r = 0.09890109890109888;
@@ -140,7 +140,7 @@ public class TypeFieryRenderer extends ATypeRenderer<TypeFiery> {
     @Override
     public boolean onAnimateRegen(AnimationContext animationContext) {
         PlayerEntity player = animationContext.getEntityPlayer();
-        IRegeneration data = CapabilityRegeneration.getForPlayer(player);
+        IRegeneration data = RegenCap.get(player);
         ModelBiped playerModel = animationContext.getModelBiped();
         double animationProgress = data.getAnimationTicks();
         double arm_shake = player.getRNG().nextDouble();

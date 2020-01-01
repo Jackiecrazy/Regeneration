@@ -7,7 +7,7 @@ import me.swirtzly.regeneration.common.tiles.TileEntityHandInJar;
 import me.swirtzly.regeneration.handlers.RegenObjects;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.util.ResourceLocation;
@@ -39,18 +39,18 @@ public class RenderTileEntityHand extends TileEntityRenderer<TileEntityHandInJar
 
         if (te.getHand().getItem() == RegenObjects.Items.HAND) {
             String handType = ItemHand.getSkinType(te.getHand());
-            Minecraft.getMinecraft().getTextureManager().bindTexture(getOrCreateTexture(te));
+            Minecraft.getInstance().getTextureManager().bindTexture(getOrCreateTexture(te));
             GlStateManager.rotate(180, 1, 0, 0);
             GlStateManager.translate(0.5, -1.5, -0.5);
             if (handType.equals("ALEX")) {
                 ALEX_ARM.render(null, 0, 0, 0, 0, 0, 0.0625F);
                 if (te.getLindosAmont() >= 100) {
-                    renderOverlay(Minecraft.getMinecraft().player, 0, 0, 0, 0, 0, 0, 0.0625F, ALEX_ARM);
+                    renderOverlay(Minecraft.getInstance().player, 0, 0, 0, 0, 0, 0, 0.0625F, ALEX_ARM);
                 }
             } else {
                 STEVE_ARM.render(null, 0, 0, 0, 0, 0, 0.0625F);
                 if (te.getLindosAmont() >= 100) {
-                    renderOverlay(Minecraft.getMinecraft().player, 0, 0, 0, 0, 0, 0, 0.0625F, STEVE_ARM);
+                    renderOverlay(Minecraft.getInstance().player, 0, 0, 0, 0, 0, 0, 0.0625F, STEVE_ARM);
                 }
             }
         } else {
@@ -70,7 +70,7 @@ public class RenderTileEntityHand extends TileEntityRenderer<TileEntityHandInJar
         if (!TEXTURES.containsKey(tileEntityHandInJar)) {
             try {
                 BufferedImage image = SkinChangingHandler.toImage(ItemHand.getTextureString(tileEntityHandInJar.getHand()));
-                ResourceLocation res = Minecraft.getMinecraft().getTextureManager().getDynamicTextureLocation("hand_", new DynamicTexture(image));
+                ResourceLocation res = Minecraft.getInstance().getTextureManager().getDynamicTextureLocation("hand_", new DynamicTexture(image));
                 TEXTURES.put(tileEntityHandInJar, res);
                 return res;
             } catch (IOException e) {

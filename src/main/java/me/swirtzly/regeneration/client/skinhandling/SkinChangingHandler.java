@@ -5,7 +5,7 @@ import me.swirtzly.regeneration.RegenConfig;
 import me.swirtzly.regeneration.RegenerationMod;
 import me.swirtzly.regeneration.client.image.ImageBufferDownloadAlt;
 import me.swirtzly.regeneration.client.image.ImageDownloadAlt;
-import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.types.IRegenType;
 import me.swirtzly.regeneration.common.types.TypeHandler;
@@ -91,10 +91,10 @@ public class SkinChangingHandler {
     }
 
     public static void sendSkinUpdate(Random random, PlayerEntity player) {
-        if (Minecraft.getMinecraft().player.getUniqueID() != player.getUniqueID()) //Not our Player
+        if (Minecraft.getInstance().player.getUniqueID() != player.getUniqueID()) //Not our Player
             return;
 
-        IRegeneration cap = CapabilityRegeneration.getForPlayer(player);
+        IRegeneration cap = RegenCap.get(player);
 
         if (RegenConfig.skins.changeMySkin) {
 
@@ -141,7 +141,7 @@ public class SkinChangingHandler {
 
 
     public static SkinInfo update(AbstractClientPlayerEntity player) {
-        IRegeneration data = CapabilityRegeneration.getForPlayer(player);
+        IRegeneration data = RegenCap.get(player);
         SkinInfo skinData = PlayerDataPool.get(player);
         boolean shouldBeMojang = data.getEncodedSkin().toLowerCase().equals("none") || data.getEncodedSkin().equals(" ") || data.getEncodedSkin().equals("");
         if (shouldBeMojang) {
@@ -159,7 +159,7 @@ public class SkinChangingHandler {
             bufferedImage = ClientUtil.ImageFixer.convertSkinTo64x64(bufferedImage);
             if (bufferedImage != null) {
                 DynamicTexture tex = new DynamicTexture(bufferedImage);
-                ResourceLocation location = Minecraft.getMinecraft().getTextureManager().getDynamicTextureLocation(player.getName().toLowerCase() + "_skin_" + System.currentTimeMillis(), tex);
+                ResourceLocation location = Minecraft.getInstance().getTextureManager().getDynamicTextureLocation(player.getName().toLowerCase() + "_skin_" + System.currentTimeMillis(), tex);
                 RegenerationMod.LOG.warn("Generating Skin file for " + player.getName() + " || " + location);
                 skinData.setTextureLocation(location);
             }
@@ -179,7 +179,7 @@ public class SkinChangingHandler {
                 return DefaultPlayerSkin.getDefaultSkinLegacy();
             }
             if (bufferedImage != null) {
-                return Minecraft.getMinecraft().getTextureManager().getDynamicTextureLocation("gui_skin_" + System.currentTimeMillis(), new DynamicTexture(bufferedImage));
+                return Minecraft.getInstance().getTextureManager().getDynamicTextureLocation("gui_skin_" + System.currentTimeMillis(), new DynamicTexture(bufferedImage));
             } else {
                 return DefaultPlayerSkin.getDefaultSkinLegacy();
             }
@@ -199,13 +199,13 @@ public class SkinChangingHandler {
      * @throws IOException
      */
     private static ResourceLocation getMojangSkin(AbstractClientPlayerEntity player) {
-        Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> map = Minecraft.getMinecraft().getSkinManager().loadSkinFromCache(player.getGameProfile());
+        Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> map = Minecraft.getInstance().getSkinManager().loadSkinFromCache(player.getGameProfile());
         if (map.isEmpty()) {
-            map = Minecraft.getMinecraft().getSessionService().getTextures(Minecraft.getMinecraft().getSessionService().fillProfileProperties(player.getGameProfile(), false), false);
+            map = Minecraft.getInstance().getSessionService().getTextures(Minecraft.getInstance().getSessionService().fillProfileProperties(player.getGameProfile(), false), false);
         }
         if (map.containsKey(MinecraftProfileTexture.Type.SKIN)) {
             MinecraftProfileTexture profile = map.get(MinecraftProfileTexture.Type.SKIN);
-            File dir = new File((File) ObfuscationReflectionHelper.getPrivateValue(SkinManager.class, Minecraft.getMinecraft().getSkinManager(), 2), profile.getHash().substring(0, 2));
+            File dir = new File((File) ObfuscationReflectionHelper.getPrivateValue(SkinManager.class, Minecraft.getInstance().getSkinManager(), 2), profile.getHash().substring(0, 2));
             File file = new File(dir, profile.getHash());
             if (file.exists())
                 file.delete();
@@ -218,7 +218,7 @@ public class SkinChangingHandler {
     }
 
     private static ITextureObject loadTexture(File file, ResourceLocation resource, ResourceLocation def, String par1Str, AbstractClientPlayerEntity player) {
-        TextureManager texturemanager = Minecraft.getMinecraft().getTextureManager();
+        TextureManager texturemanager = Minecraft.getInstance().getTextureManager();
         ITextureObject object = texturemanager.getTexture(resource);
         if (object == null) {
             object = new ImageDownloadAlt(file, par1Str, def, new ImageBufferDownloadAlt(true));
@@ -252,13 +252,13 @@ public class SkinChangingHandler {
     }
 
     public static SkinInfo.SkinType getSkinType(AbstractClientPlayerEntity player, boolean forceMojang) {
-        Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> map = Minecraft.getMinecraft().getSkinManager().loadSkinFromCache(player.getGameProfile());
+        Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> map = Minecraft.getInstance().getSkinManager().loadSkinFromCache(player.getGameProfile());
         if (map.isEmpty()) {
-            map = Minecraft.getMinecraft().getSessionService().getTextures(Minecraft.getMinecraft().getSessionService().fillProfileProperties(player.getGameProfile(), false), false);
+            map = Minecraft.getInstance().getSessionService().getTextures(Minecraft.getInstance().getSessionService().fillProfileProperties(player.getGameProfile(), false), false);
         }
         MinecraftProfileTexture profile = map.get(MinecraftProfileTexture.Type.SKIN);
 
-        IRegeneration data = CapabilityRegeneration.getForPlayer(player);
+        IRegeneration data = RegenCap.get(player);
 
 
         if (data.getEncodedSkin().toLowerCase().equals("none") || forceMojang) {
@@ -278,7 +278,7 @@ public class SkinChangingHandler {
     @SubscribeEvent
     public void onRenderPlayer(RenderPlayerEvent.Post e) {
         AbstractClientPlayerEntity player = (AbstractClientPlayerEntity) e.getEntityPlayer();
-        IRegeneration cap = CapabilityRegeneration.getForPlayer(player);
+        IRegeneration cap = RegenCap.get(player);
         IRegenType type = TypeHandler.getTypeInstance(cap.getType());
 
         if (cap.getState() == PlayerUtil.RegenState.REGENERATING) {
@@ -289,7 +289,7 @@ public class SkinChangingHandler {
 
     @SubscribeEvent
     public void clickTick(TickEvent.ClientTickEvent e) {
-        if (Minecraft.getMinecraft().world == null) {
+        if (Minecraft.getInstance().world == null) {
             PlayerDataPool.wipeAllData();
         }
     }
@@ -304,7 +304,7 @@ public class SkinChangingHandler {
     public void onRenderPlayer(RenderPlayerEvent.Pre e) {
         if (MinecraftForgeClient.getRenderPass() == -1) return;
         AbstractClientPlayerEntity player = (AbstractClientPlayerEntity) e.getEntityPlayer();
-        IRegeneration cap = CapabilityRegeneration.getForPlayer(player);
+        IRegeneration cap = RegenCap.get(player);
         IRegenType type = TypeHandler.getTypeInstance(cap.getType());
         SkinInfo skinData = PlayerDataPool.get(player);
 

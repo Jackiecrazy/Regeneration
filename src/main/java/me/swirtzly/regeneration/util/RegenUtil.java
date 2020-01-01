@@ -1,7 +1,7 @@
 package me.swirtzly.regeneration.util;
 
 import me.swirtzly.regeneration.RegenConfig;
-import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.handlers.RegenObjects;
 import net.minecraft.block.BlockState;
@@ -108,7 +108,7 @@ public class RegenUtil {
     }
 
     public static void resetNextSkin(PlayerEntity player) {
-        IRegeneration data = CapabilityRegeneration.getForPlayer(player);
+        IRegeneration data = RegenCap.get(player);
         data.setNextSkin("NONE");
         data.synchronise();
     }

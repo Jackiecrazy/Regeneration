@@ -4,7 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.item.ItemStack;
@@ -43,7 +43,7 @@ public abstract class AbstractTab extends Button {
             int yPos = y + (enabled ? 3 : 0);
 
             mc.renderEngine.bindTexture(texture);
-            this.drawTexturedModalRect(x, yPos, xOffset * 28, yTexPos, 28, ySize);
+            this.blit(x, yPos, xOffset * 28, yTexPos, 28, ySize);
 
             RenderHelper.enableGUIStandardItemLighting();
             zLevel = 100.0F;

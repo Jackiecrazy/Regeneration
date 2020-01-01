@@ -1,7 +1,7 @@
 package me.swirtzly.regeneration.network;
 
 import io.netty.buffer.ByteBuf;
-import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -38,7 +38,7 @@ public class MessageSaveStyle implements IMessage {
         @Override
         public IMessage onMessage(MessageSaveStyle message, MessageContext ctx) {
             ctx.getServerHandler().player.getServerWorld().addScheduledTask(() -> {
-                IRegeneration cap = CapabilityRegeneration.getForPlayer(ctx.getServerHandler().player);
+                IRegeneration cap = RegenCap.get(ctx.getServerHandler().player);
                 cap.setStyle(message.style);
                 cap.synchronise();
             });

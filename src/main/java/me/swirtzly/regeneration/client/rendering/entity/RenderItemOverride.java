@@ -5,7 +5,7 @@ import me.swirtzly.regeneration.common.entity.EntityItemOverride;
 import me.swirtzly.regeneration.handlers.RegenObjects;
 import me.swirtzly.regeneration.util.RenderUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
@@ -51,7 +51,7 @@ public class RenderItemOverride extends EntityRenderer<EntityItemOverride> {
     public void doRender(EntityItemOverride entity, double x, double y, double z, float entityYaw, float partialTicks) {
         if (entity.getItem().isEmpty())
             return;
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
         float f = 0.2f;
         Random rand = entity.world.rand;
 
@@ -73,7 +73,7 @@ public class RenderItemOverride extends EntityRenderer<EntityItemOverride> {
                 GlStateManager.pushMatrix();
                 GlStateManager.translate(0, 0.4F, 0);
                 GlStateManager.scale(0.60F, 0.60F, 0.60F);
-                this.renderLivingLabel(entity, new TranslationTextComponent("right.click", Minecraft.getMinecraft().gameSettings.keyBindUseItem.getDisplayName()).getUnformattedComponentText(), x, y + 0.4 + offset, z, 46);
+                this.renderLivingLabel(entity, new TranslationTextComponent("right.click", Minecraft.getInstance().gameSettings.keyBindUseItem.getDisplayName()).getUnformattedComponentText(), x, y + 0.4 + offset, z, 46);
                 GlStateManager.popMatrix();
             }
         }
@@ -82,7 +82,7 @@ public class RenderItemOverride extends EntityRenderer<EntityItemOverride> {
 
         GlStateManager.translate(x, y + 0.17F, z);
         GlStateManager.rotate(-entity.rotationYaw, 0, 1, 0);
-        Minecraft.getMinecraft().getRenderItem().renderItem(entity.getItem(), ItemCameraTransforms.TransformType.GROUND);
+        Minecraft.getInstance().getRenderItem().renderItem(entity.getItem(), ItemCameraTransforms.TransformType.GROUND);
         GlStateManager.popMatrix();
     }
 

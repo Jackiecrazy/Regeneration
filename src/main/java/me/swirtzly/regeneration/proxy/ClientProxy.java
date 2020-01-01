@@ -53,7 +53,7 @@ public class ClientProxy extends CommonProxy {
         RegenKeyBinds.init();
 
         // Render layers ===========================================
-        Map<String, PlayerRenderer> skinMap = Minecraft.getMinecraft().getRenderManager().getSkinMap();
+        Map<String, PlayerRenderer> skinMap = Minecraft.getInstance().getRenderManager().getSkinMap();
         for (PlayerRenderer renderPlayer : skinMap.values()) {
             renderPlayer.addLayer(new LayerRegeneration(renderPlayer)); // Add Regeneration Layer
             renderPlayer.addLayer(new LayerHands(renderPlayer));

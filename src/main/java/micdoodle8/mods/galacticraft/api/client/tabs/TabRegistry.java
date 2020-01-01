@@ -79,7 +79,7 @@ public class TabRegistry {
     public static void addTabsToList(List<Button> buttonList) {
         for (AbstractTab tab : TabRegistry.tabList) {
             if (tab.shouldAddToList()) {
-                buttonList.add(tab);
+                addButton(tab);
             }
         }
 

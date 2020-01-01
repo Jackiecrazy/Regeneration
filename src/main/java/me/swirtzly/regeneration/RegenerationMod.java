@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import me.swirtzly.regeneration.client.gui.GuiHandler;
 import me.swirtzly.regeneration.common.RegenPermission;
 import me.swirtzly.regeneration.common.advancements.RegenTriggers;
-import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.capability.RegenerationStorage;
 import me.swirtzly.regeneration.common.commands.RegenDebugCommand;
@@ -36,14 +36,12 @@ import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@Mod(modid = RegenerationMod.MODID, name = RegenerationMod.NAME, version = RegenerationMod.VERSION, updateJSON = RegenerationMod.UPDATE_URL, dependencies = RegenerationMod.DEPS)
+@Mod(RegenerationMod.MODID)
 public class RegenerationMod {
 
     public static final String MODID = "regeneration";
     public static final String NAME = "Regeneration";
     public static final String VERSION = "2.0.7";
-    public static final String UPDATE_URL = "https://raw.githubusercontent.com/Swirtzly/Regeneration/skins/update.json";
-    public static final String DEPS = "required:forge@[14.23.5.2768,);after:tardis@[0.0.7,];after:lucraftcore@[1.12.2-2.4.0,]";
 
     public static final ResourceLocation LOOT_FILE = new ResourceLocation(MODID, "fob_watch_loot");
 
@@ -64,24 +62,10 @@ public class RegenerationMod {
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         proxy.preInit();
-        CapabilityManager.INSTANCE.register(IRegeneration.class, new RegenerationStorage(), CapabilityRegeneration::new);
+        CapabilityManager.INSTANCE.register(IRegeneration.class, new RegenerationStorage(), RegenCap::new);
 
         ActingForwarder.init();
         RegenTriggers.init();
-
-        if (EnumCompatModids.TARDIS.isLoaded()) {
-            LOG.info("Tardis mod Detected - Enabling Compatibility");
-            ActingForwarder.register(TardisModHandler.class, Side.SERVER);
-            TardisModHandler.registerEventBus();
-
-        }
-
-        if (EnumCompatModids.LCCORE.isLoaded()) {
-            LOG.info("Lucraft Core Detected - Enabling Compatibility");
-            ActingForwarder.register(LucraftCoreHandler.class, Side.SERVER);
-            LucraftCoreHandler.registerEventBus();
-        }
-
         GameRegistry.registerTileEntity(TileEntityHandInJar.class, new ResourceLocation(MODID, "handinjar"));
     }
 

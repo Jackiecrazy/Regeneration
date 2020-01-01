@@ -2,7 +2,7 @@ package me.swirtzly.regeneration.client.gui.parts;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraftforge.fml.client.config.GuiButtonExt;
 import net.minecraftforge.fml.client.config.GuiUtils;
@@ -78,7 +78,7 @@ public class ButtonHoverText extends GuiButtonExt {
         }
 
         this.zLevel = 900.0F;
-        Minecraft.getMinecraft().getRenderItem().zLevel = 900.0F;
+        Minecraft.getInstance().getRenderItem().zLevel = 900.0F;
         int j1 = -267386864;
         this.drawGradientRect(j2 - 3, k2 - 4, j2 + k + 3, k2 - 3, j1, j1);
         this.drawGradientRect(j2 - 3, k2 + i1 + 3, j2 + k + 3, k2 + i1 + 4, j1, j1);
@@ -104,7 +104,7 @@ public class ButtonHoverText extends GuiButtonExt {
         }
 
         this.zLevel = 0.0F;
-        Minecraft.getMinecraft().getRenderItem().zLevel = 0.0F;
+        Minecraft.getInstance().getRenderItem().zLevel = 0.0F;
         GlStateManager.enableLighting();
         GlStateManager.enableDepth();
         RenderHelper.enableStandardItemLighting();

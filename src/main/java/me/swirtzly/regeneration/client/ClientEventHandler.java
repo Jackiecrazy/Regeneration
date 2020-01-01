@@ -8,7 +8,7 @@ import me.swirtzly.regeneration.client.animation.ModelRotationEvent;
 import me.swirtzly.regeneration.client.animation.RenderCallbackEvent;
 import me.swirtzly.regeneration.client.gui.GuiPreferences;
 import me.swirtzly.regeneration.client.gui.parts.InventoryTabRegeneration;
-import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.types.TypeHandler;
 import me.swirtzly.regeneration.handlers.RegenObjects;
@@ -22,7 +22,7 @@ import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelPlayer;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
 import net.minecraft.potion.Effects;
@@ -62,8 +62,8 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public static void onColorFog(EntityViewRenderEvent.RenderFogEvent.FogColors e) {
-        if (Minecraft.getMinecraft().getRenderViewEntity() instanceof PlayerEntity) {
-            IRegeneration data = CapabilityRegeneration.getForPlayer(Minecraft.getMinecraft().player);
+        if (Minecraft.getInstance().getRenderViewEntity() instanceof PlayerEntity) {
+            IRegeneration data = RegenCap.get(Minecraft.getInstance().player);
             if (data.getType() == TypeHandler.RegenType.LAY_FADE && data.getState() == REGENERATING) {
                 e.setRed((float) data.getPrimaryColor().x);
                 e.setGreen((float) data.getPrimaryColor().y);
@@ -75,24 +75,24 @@ public class ClientEventHandler {
     @SubscribeEvent
     public static void onAction(GuiScreenEvent.ActionPerformedEvent event) {
         if (event.getButton() instanceof InventoryTabRegeneration) {
-            Minecraft.getMinecraft().displayGuiScreen(new GuiPreferences());
+            Minecraft.getInstance().displayGuiScreen(new GuiPreferences());
         }
     }
 
     @SubscribeEvent
     public static void onClientUpdate(LivingEvent.LivingUpdateEvent e) {
-        if (!(e.getEntity() instanceof PlayerEntity) || Minecraft.getMinecraft().player == null)
+        if (!(e.getEntity() instanceof PlayerEntity) || Minecraft.getInstance().player == null)
             return;
 
         PlayerEntity player = (PlayerEntity) e.getEntity();
-        UUID clientUUID = Minecraft.getMinecraft().player.getUniqueID();
-        IRegeneration cap = CapabilityRegeneration.getForPlayer(player);
+        UUID clientUUID = Minecraft.getInstance().player.getUniqueID();
+        IRegeneration cap = RegenCap.get(player);
 
         //Horrible Sound repairs
-        Minecraft.getMinecraft().addScheduledTask(() -> {
+        Minecraft.getInstance().addScheduledTask(() -> {
             if (player.ticksExisted == 50) {
                 if (SIDE != null) {
-                    SIDE = Minecraft.getMinecraft().gameSettings.mainHand;
+                    SIDE = Minecraft.getInstance().gameSettings.mainHand;
                 }
 
                 if (cap.areHandsGlowing()) {
@@ -120,7 +120,7 @@ public class ClientEventHandler {
         if (EnumCompatModids.LCCORE.isLoaded()) return;
         if (ev.getEntity() instanceof PlayerEntity) {
             PlayerEntity player = (PlayerEntity) ev.getEntity();
-            IRegeneration data = CapabilityRegeneration.getForPlayer(player);
+            IRegeneration data = RegenCap.get(player);
             AnimationContext context = new AnimationContext(ev.model, player, ev.limbSwing, ev.limbSwingAmount, ev.ageInTicks, ev.netHeadYaw, ev.headPitch);
             if (data.getState() == REGENERATING) {
                 ev.setCanceled(TypeHandler.getTypeInstance(data.getType()).getRenderer().onAnimateRegen(context));
@@ -137,8 +137,8 @@ public class ClientEventHandler {
         if (event.getType() != RenderGameOverlayEvent.ElementType.ALL)
             return;
 
-        ClientPlayerEntity player = Minecraft.getMinecraft().player;
-        IRegeneration cap = CapabilityRegeneration.getForPlayer(player);
+        ClientPlayerEntity player = Minecraft.getInstance().player;
+        IRegeneration cap = RegenCap.get(player);
 
         String warning = null;
         switch (cap.getState()) {
@@ -172,12 +172,12 @@ public class ClientEventHandler {
         }
 
         if (warning != null)
-            Minecraft.getMinecraft().fontRenderer.drawString(warning, new ScaledResolution(Minecraft.getMinecraft()).getScaledWidth() / 2 - Minecraft.getMinecraft().fontRenderer.getStringWidth(warning) / 2, 4, 0xffffffff);
+            Minecraft.getInstance().fontRenderer.drawString(warning, new ScaledResolution(Minecraft.getInstance()).getScaledWidth() / 2 - Minecraft.getInstance().fontRenderer.getStringWidth(warning) / 2, 4, 0xffffffff);
     }
 
     @SubscribeEvent
     public static void onPlaySound(PlaySoundEvent e) {
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.world == null)
             return;
 
@@ -185,13 +185,13 @@ public class ClientEventHandler {
             ISound sound = PositionedSoundRecord.getRecord(SoundEvents.ENTITY_GENERIC_EXPLODE, 1F, 0.2F);
             mc.world.playerEntities.forEach(player -> {
                 if (mc.player != player && mc.player.getDistance(player) < 40) {
-                    if (CapabilityRegeneration.getForPlayer(player).getState().equals(REGENERATING)) {
+                    if (RegenCap.get(player).getState().equals(REGENERATING)) {
                         e.setResultSound(sound);
                     }
                 }
             });
 
-            if (CapabilityRegeneration.getForPlayer(Minecraft.getMinecraft().player).getState() == REGENERATING) {
+            if (RegenCap.get(Minecraft.getInstance().player).getState() == REGENERATING) {
                 e.setResultSound(sound);
             }
         }
@@ -201,9 +201,9 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public static void onSetupFogDensity(EntityViewRenderEvent.RenderFogEvent.FogDensity event) {
-        if (Minecraft.getMinecraft().getRenderViewEntity() instanceof PlayerEntity) {
-            PlayerEntity player = (PlayerEntity) Minecraft.getMinecraft().getRenderViewEntity();
-            IRegeneration data = CapabilityRegeneration.getForPlayer(player);
+        if (Minecraft.getInstance().getRenderViewEntity() instanceof PlayerEntity) {
+            PlayerEntity player = (PlayerEntity) Minecraft.getInstance().getRenderViewEntity();
+            IRegeneration data = RegenCap.get(player);
 
             if (data.getState() == GRACE_CRIT) {
                 GlStateManager.setFog(GlStateManager.FogMode.EXP);
@@ -215,7 +215,7 @@ public class ClientEventHandler {
             if (data.getType() == TypeHandler.RegenType.LAY_FADE && data.getAnimationTicks() > 0) {
                 GlStateManager.setFog(GlStateManager.FogMode.EXP);
                 event.setCanceled(true);
-                float opacity = MathHelper.clamp(MathHelper.sin((player.ticksExisted + Minecraft.getMinecraft().getRenderPartialTicks()) / 10F) * 0.1F + 0.1F, 0.11F, 1F);
+                float opacity = MathHelper.clamp(MathHelper.sin((player.ticksExisted + Minecraft.getInstance().getRenderPartialTicks()) / 10F) * 0.1F + 0.1F, 0.11F, 1F);
                 event.setDensity(opacity);
             }
         }
@@ -224,9 +224,9 @@ public class ClientEventHandler {
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public static void onClientChatRecieved(ClientChatReceivedEvent e) {
-        ClientPlayerEntity player = Minecraft.getMinecraft().player;
+        ClientPlayerEntity player = Minecraft.getInstance().player;
         if (e.getType() != ChatType.CHAT) return;
-        if (CapabilityRegeneration.getForPlayer(player).getState() != POST) return;
+        if (RegenCap.get(player).getState() != POST) return;
 
         if (player.world.rand.nextBoolean()) {
             String message = e.getMessage().getUnformattedText();
@@ -268,7 +268,7 @@ public class ClientEventHandler {
     public static void onDeath(LivingDeathEvent e) {
         if (e.getEntityLiving() instanceof PlayerEntity) {
             PlayerEntity player = (PlayerEntity) e.getEntityLiving();
-            if (player.getUniqueID().equals(Minecraft.getMinecraft().player.getUniqueID())) {
+            if (player.getUniqueID().equals(Minecraft.getInstance().player.getUniqueID())) {
                 ClientUtil.sendSkinResetPacket();
             }
         }
@@ -276,14 +276,14 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public static void onRenderHand(RenderHandEvent e) {
-        Minecraft mc = Minecraft.getMinecraft();
-        ClientPlayerEntity player = Minecraft.getMinecraft().player;
+        Minecraft mc = Minecraft.getInstance();
+        ClientPlayerEntity player = Minecraft.getInstance().player;
 
         float factor = 0.2F;
         if (player.getHeldItemMainhand().getItem() != Items.AIR || mc.gameSettings.thirdPersonView > 0)
             return;
 
-        IRegeneration cap = CapabilityRegeneration.getForPlayer(player);
+        IRegeneration cap = RegenCap.get(player);
         boolean flag = cap.getType() == TypeHandler.RegenType.LAY_FADE && cap.getState() == REGENERATING;
         e.setCanceled(flag);
 
@@ -317,7 +317,7 @@ public class ClientEventHandler {
     public static void onRenderCallBack(RenderCallbackEvent event) {
         if (event.getEntityLiving() instanceof PlayerEntity) {
             PlayerEntity player = (PlayerEntity) event.getEntityLiving();
-            IRegeneration data = CapabilityRegeneration.getForPlayer(player);
+            IRegeneration data = RegenCap.get(player);
             TypeHandler.RegenType type = data.getType();
             if (data.getState() == REGENERATING) {
                 TypeHandler.getTypeInstance(type).getRenderer().onRenderCallBack(event);

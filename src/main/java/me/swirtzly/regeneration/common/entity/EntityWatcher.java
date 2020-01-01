@@ -19,7 +19,7 @@ public class EntityWatcher extends CreatureEntity {
 
     public EntityWatcher(World worldIn) {
         super(worldIn);
-        this.tasks.addTask(8, new WaterAvoidingRandomWalkingGoal(this, 0.1D));
+        this.goalSelector.addTask(8, new WaterAvoidingRandomWalkingGoal(this, 0.1D));
         this.targetTasks.addTask(1, new NearestAttackableTargetGoal<>(this, PlayerEntity.class, true));
         this.tasks.addTask(8, new CreepTowardPlayer(this, 0.25D, false));
     }

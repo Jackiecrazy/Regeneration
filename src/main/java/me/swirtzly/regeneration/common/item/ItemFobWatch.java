@@ -2,7 +2,7 @@ package me.swirtzly.regeneration.common.item;
 
 import me.swirtzly.regeneration.RegenConfig;
 import me.swirtzly.regeneration.RegenerationMod;
-import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.entity.EntityItemOverride;
 import me.swirtzly.regeneration.handlers.RegenObjects;
@@ -46,28 +46,28 @@ public class ItemFobWatch extends ItemOverrideBase {
     }
 
     public static int getEngrave(ItemStack stack) {
-        return getStackTag(stack).getInteger("engrave");
+        return getStackTag(stack).getInt("engrave");
     }
 
     public static void setEngrave(ItemStack stack, int engrave) {
-        getStackTag(stack).setInteger("engrave", engrave);
+        getStackTag(stack).putInt("engrave", engrave);
     }
 
     public static CompoundNBT getStackTag(ItemStack stack) {
-        if (stack.getTagCompound() == null) {
-            stack.setTagCompound(new CompoundNBT());
-            stack.getTagCompound().setInteger("open", 0);
-            stack.getTagCompound().setInteger("engrave", itemRand.nextInt(2));
+        if (stack.getTag() == null) {
+            stack.putCompound(new CompoundNBT());
+            stack.getTag().putInt("open", 0);
+            stack.getTag().putInt("engrave", itemRand.nextInt(2));
         }
-        return stack.getTagCompound();
+        return stack.getTag();
     }
 
     public static int getOpen(ItemStack stack) {
-        return getStackTag(stack).getInteger("open");
+        return getStackTag(stack).getInt("open");
     }
 
     public static void setOpen(ItemStack stack, int amount) {
-        getStackTag(stack).setInteger("open", amount);
+        getStackTag(stack).putInt("open", amount);
     }
 
     @Override
@@ -82,11 +82,11 @@ public class ItemFobWatch extends ItemOverrideBase {
 
     @Override
     public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
-        if (stack.getTagCompound() == null) {
-            stack.setTagCompound(new CompoundNBT());
-            stack.getTagCompound().setBoolean("live", false);
+        if (stack.getTag() == null) {
+            stack.putCompound(new CompoundNBT());
+            stack.getTag().putBoolean("live", false);
         } else {
-            stack.getTagCompound().setBoolean("live", false);
+            stack.getTag().putBoolean("live", false);
         }
 
         if (getOpen(stack) == 1) {
@@ -100,10 +100,10 @@ public class ItemFobWatch extends ItemOverrideBase {
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
-        IRegeneration cap = CapabilityRegeneration.getForPlayer(player);
+        IRegeneration cap = RegenCap.get(player);
         ItemStack stack = player.getHeldItem(hand);
 
-        if (!player.isSneaking()) { // transferring watch->player
+        if (!player.isCrouching()) { // transferring watch->player
             if (stack.getItemDamage() == RegenConfig.regenCapacity)
                 return msgUsageFailed(player, "regeneration.messages.transfer.empty_watch", stack);
             else if (cap.getRegenerationsLeft() == RegenConfig.regenCapacity)

@@ -50,7 +50,7 @@ public class PlayerUtil {
     }
 
     public static void sendMessageToAll(TranslationTextComponent translation) {
-        List<ServerPlayerEntity> players = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers();
+        List<ServerPlayerEntity> players = FMLCommonHandler.instance().getInstanceServerInstance().getPlayerList().getPlayers();
         players.forEach(playerMP -> sendMessage(playerMP, translation, false));
     }
 

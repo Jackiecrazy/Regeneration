@@ -8,6 +8,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.UsernameCache;
@@ -23,14 +24,13 @@ import java.util.UUID;
 public class ItemHand extends Item {
 
     public ItemHand() {
-        setMaxStackSize(1);
-
+        super(new Item.Properties().maxStackSize(1));
         addPropertyOverride(new ResourceLocation("skin_type"), (stack, worldIn, entityIn) -> getSkinType(stack).equals("ALEX") ? 1 : 0);
 
     }
 
     public static void setTimeCreated(ItemStack stack, long created) {
-        getStackTag(stack).setLong("created", created);
+        getStackTag(stack).putLong("created", created);
     }
 
     public static long getTimeCreated(ItemStack stack) {
@@ -38,7 +38,7 @@ public class ItemHand extends Item {
     }
 
     public static void setTextureString(ItemStack stack, String textureString) {
-        getStackTag(stack).setString("textureString", textureString);
+        getStackTag(stack).putString("textureString", textureString);
     }
 
     public static String getTextureString(ItemStack stack) {
@@ -46,7 +46,7 @@ public class ItemHand extends Item {
     }
 
     public static void setSkinType(ItemStack stack, String skinType) {
-        getStackTag(stack).setString("skinType", skinType);
+        getStackTag(stack).putString("skinType", skinType);
     }
 
     public static String getSkinType(ItemStack stack) {
@@ -54,7 +54,7 @@ public class ItemHand extends Item {
     }
 
     public static void setTrait(ItemStack stack, String trait) {
-        getStackTag(stack).setString("trait", trait);
+        getStackTag(stack).putString("trait", trait);
     }
 
     public static String getTrait(ItemStack stack) {
@@ -63,7 +63,7 @@ public class ItemHand extends Item {
 
 
     public static void setOwner(ItemStack stack, UUID owner) {
-        getStackTag(stack).setUniqueId("owner", owner);
+        getStackTag(stack).putUniqueId("owner", owner);
     }
 
     public static UUID getOwner(ItemStack stack) {
@@ -71,35 +71,32 @@ public class ItemHand extends Item {
     }
 
     public static CompoundNBT getStackTag(ItemStack stack) {
-        if (stack.getTagCompound() == null) {
-            stack.setTagCompound(new CompoundNBT());
-            stack.getTagCompound().setString("textureString", "NONE");
-            stack.getTagCompound().setString("skinType", SkinInfo.SkinType.ALEX.name());
-            stack.getTagCompound().setUniqueId("owner", UUID.fromString("96511168-1bb3-4ff0-a894-271e42606a39"));
-            stack.getTagCompound().setLong("created", 0);
-            stack.getTagCompound().setString("trait", DnaHandler.DNA_BORING.resourceLocation.toString());
+        if (stack.getTag() == null) {
+            stack.setTag(new CompoundNBT());
+            stack.getTag().putString("textureString", "NONE");
+            stack.getTag().putString("skinType", SkinInfo.SkinType.ALEX.name());
+            stack.getTag().putUniqueId("owner", UUID.fromString("96511168-1bb3-4ff0-a894-271e42606a39"));
+            stack.getTag().putLong("created", 0);
+            stack.getTag().putString("trait", DnaHandler.DNA_BORING.resourceLocation.toString());
         }
-        return stack.getTagCompound();
+        return stack.getTag();
     }
 
     @Override
-    public String getItemStackDisplayName(ItemStack stack) {
-        return new TranslationTextComponent("item.hand.name", UsernameCache.getLastKnownUsername(getOwner(stack))).getUnformattedComponentText();
+    public ITextComponent getDisplayName(ItemStack stack) {
+        return new TranslationTextComponent("item.hand.name", UsernameCache.getLastKnownUsername(getOwner(stack)));
     }
 
-    @Override
-    public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
-        super.onUpdate(stack, worldIn, entityIn, itemSlot, isSelected);
-    }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
+    public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        super.addInformation(stack, world, tooltip, flagIn);
         Date date = new Date(ItemHand.getTimeCreated(stack));
         DateFormat formatter = new SimpleDateFormat("dd/MM/YYYY @ HH:mm");
         formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
         String dateFormatted = formatter.format(date);
-        tooltip.add(new TranslationTextComponent("nbt.created", dateFormatted).getUnformattedComponentText());
-        tooltip.add("Trait: " + new TranslationTextComponent(DnaHandler.getDnaEntry(new ResourceLocation(getTrait(stack))).getLangKey()).getUnformattedComponentText());
+        tooltip.add(new TranslationTextComponent("nbt.created", dateFormatted));
+        tooltip.add(new TranslationTextComponent(DnaHandler.getDnaEntry(new ResourceLocation(getTrait(stack))).getLangKey()));
     }
+
 }

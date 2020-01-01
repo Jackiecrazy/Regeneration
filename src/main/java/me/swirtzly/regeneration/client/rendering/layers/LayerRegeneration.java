@@ -1,6 +1,6 @@
 package me.swirtzly.regeneration.client.rendering.layers;
 
-import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.types.IRegenType;
 import me.swirtzly.regeneration.common.types.TypeHandler;
@@ -8,7 +8,7 @@ import me.swirtzly.regeneration.util.PlayerUtil;
 import me.swirtzly.regeneration.util.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelPlayer;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.entity.player.PlayerEntity;
@@ -38,7 +38,7 @@ public class LayerRegeneration implements LayerRenderer<PlayerEntity> {
         Vec3d primaryColor = handler.getPrimaryColor();
         Vec3d secondaryColor = handler.getSecondaryColor();
 
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
         Random rand = player.world.rand;
         float factor = 0.2F;
 
@@ -56,7 +56,7 @@ public class LayerRegeneration implements LayerRenderer<PlayerEntity> {
 
     @Override
     public void doRenderLayer(PlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
-        IRegeneration cap = CapabilityRegeneration.getForPlayer(player);
+        IRegeneration cap = RegenCap.get(player);
         IRegenType type = TypeHandler.getTypeInstance(cap.getType());
         if (cap.getState() == PlayerUtil.RegenState.REGENERATING) {
             type.getRenderer().onRenderRegenerationLayer(type, playerRenderer, cap, player, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale);

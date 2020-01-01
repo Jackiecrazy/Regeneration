@@ -40,7 +40,7 @@ public class MessageRemovePlayer implements IMessage {
     public static class Handler implements IMessageHandler<MessageRemovePlayer, IMessage> {
         @Override
         public IMessage onMessage(MessageRemovePlayer message, MessageContext ctx) {
-            Minecraft.getMinecraft().addScheduledTask(() -> PlayerDataPool.removePlayer(message.playerUUID));
+            Minecraft.getInstance().addScheduledTask(() -> PlayerDataPool.removePlayer(message.playerUUID));
             return null;
         }
     }

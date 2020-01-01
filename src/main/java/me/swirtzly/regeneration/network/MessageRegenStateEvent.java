@@ -1,7 +1,7 @@
 package me.swirtzly.regeneration.network;
 
 import io.netty.buffer.ByteBuf;
-import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.handlers.ActingForwarder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
@@ -33,9 +33,9 @@ public class MessageRegenStateEvent implements IMessage {
 
     @Override
     public void fromBytes(ByteBuf buf) {
-        if (Minecraft.getMinecraft().player == null)
+        if (Minecraft.getInstance().player == null)
             return;
-        player = Minecraft.getMinecraft().player.world.getPlayerEntityByUUID(UUID.fromString(ByteBufUtils.readUTF8String(buf)));
+        player = Minecraft.getInstance().player.world.getPlayerEntityByUUID(UUID.fromString(ByteBufUtils.readUTF8String(buf)));
         event = ByteBufUtils.readUTF8String(buf);
     }
 
@@ -43,7 +43,7 @@ public class MessageRegenStateEvent implements IMessage {
 
         @Override
         public IMessage onMessage(MessageRegenStateEvent message, MessageContext ctx) {
-            Minecraft.getMinecraft().addScheduledTask(() -> ActingForwarder.onClient(ActingForwarder.RegenEvent.valueOf(message.event), CapabilityRegeneration.getForPlayer(message.player)));
+            Minecraft.getInstance().addScheduledTask(() -> ActingForwarder.onClient(ActingForwarder.RegenEvent.valueOf(message.event), RegenCap.get(message.player)));
             return null;
         }
     }

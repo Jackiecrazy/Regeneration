@@ -1,7 +1,7 @@
 package me.swirtzly.regeneration.common;
 
 import me.swirtzly.regeneration.RegenerationMod;
-import me.swirtzly.regeneration.compat.lucraft.PlayerCanRegenEvent;
+import me.swirtzly.regeneration.compat.PlayerCanRegenEvent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;

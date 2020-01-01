@@ -1,6 +1,6 @@
 package me.swirtzly.regeneration.common.commands;
 
-import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.traits.DnaHandler;
 import me.swirtzly.regeneration.util.PlayerUtil;
@@ -27,7 +27,7 @@ public class RegenDebugCommand extends CommandBase {
             throw new WrongUsageException("regeneration.commands.debug.usage");
 
         PlayerEntity player = getCommandSenderAsPlayer(sender);
-        IRegeneration cap = CapabilityRegeneration.getForPlayer(player);
+        IRegeneration cap = RegenCap.get(player);
 
         switch (args[0]) {
             case "glow":

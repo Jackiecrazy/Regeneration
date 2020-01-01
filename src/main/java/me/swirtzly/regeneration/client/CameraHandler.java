@@ -1,6 +1,6 @@
 package me.swirtzly.regeneration.client;
 
-import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.util.PlayerUtil;
 import net.minecraft.client.GameSettings;
@@ -31,11 +31,11 @@ public class CameraHandler {
     @SubscribeEvent
     public static void onView(EntityViewRenderEvent.CameraSetup event) {
 
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
         ClientPlayerEntity player = mc.player;
         GameSettings gameSettings = mc.gameSettings;
 
-        IRegeneration data = CapabilityRegeneration.getForPlayer(player);
+        IRegeneration data = RegenCap.get(player);
 
         boolean allowFreemode = data.getState() == PlayerUtil.RegenState.REGENERATING || data.isSyncingToJar();
 

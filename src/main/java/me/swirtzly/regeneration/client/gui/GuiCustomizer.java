@@ -4,7 +4,7 @@ import me.swirtzly.regeneration.RegenerationMod;
 import me.swirtzly.regeneration.client.gui.parts.BlankContainer;
 import me.swirtzly.regeneration.client.gui.parts.GuiColorSlider;
 import me.swirtzly.regeneration.client.gui.parts.InventoryTabRegeneration;
-import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.types.IRegenType;
 import me.swirtzly.regeneration.common.types.TypeHandler;
@@ -49,7 +49,7 @@ public class GuiCustomizer extends ContainerScreen {
         int cx = (width - xSize) / 2;
         int cy = (height - ySize) / 2;
 
-        IRegeneration cap = CapabilityRegeneration.getForPlayer(mc.player);
+        IRegeneration cap = RegenCap.get(mc.player);
         initialPrimary = cap.getPrimaryColor();
         initialSecondary = cap.getSecondaryColor();
 
@@ -65,9 +65,9 @@ public class GuiCustomizer extends ContainerScreen {
         btnBack = new GuiButtonExt(99, cx + 10, cy + 145, btnW + 90, btnH, new TranslationTextComponent("regeneration.gui.back").getFormattedText());
 
         btnReset.enabled = false;
-        buttonList.add(btnReset);
-        buttonList.add(btnDefault);
-        buttonList.add(btnBack);
+        addButton(btnReset);
+        addButton(btnDefault);
+        addButton(btnBack);
 
         slidePrimaryRed = new GuiColorSlider(5, cx + 10, cy + 65, sliderW, sliderH, new TranslationTextComponent("regeneration.gui.red").getFormattedText(), "", 0, 1, primaryRed, true, true, this::onChangeSliderValue);
         slidePrimaryGreen = new GuiColorSlider(6, cx + 10, cy + 84, sliderW, sliderH, new TranslationTextComponent("regeneration.gui.green").getFormattedText(), "", 0, 1, primaryGreen, true, true, this::onChangeSliderValue);
@@ -77,13 +77,13 @@ public class GuiCustomizer extends ContainerScreen {
         slideSecondaryGreen = new GuiColorSlider(9, cx + 96, cy + 84, sliderW, sliderH, new TranslationTextComponent("regeneration.gui.green").getFormattedText(), "", 0, 1, secondaryGreen, true, true, this::onChangeSliderValue);
         slideSecondaryBlue = new GuiColorSlider(10, cx + 96, cy + 103, sliderW, sliderH, new TranslationTextComponent("regeneration.gui.blue").getFormattedText(), "", 0, 1, secondaryBlue, true, true, this::onChangeSliderValue);
 
-        buttonList.add(slidePrimaryRed);
-        buttonList.add(slidePrimaryGreen);
-        buttonList.add(slidePrimaryBlue);
+        addButton(slidePrimaryRed);
+        addButton(slidePrimaryGreen);
+        addButton(slidePrimaryBlue);
 
-        buttonList.add(slideSecondaryRed);
-        buttonList.add(slideSecondaryGreen);
-        buttonList.add(slideSecondaryBlue);
+        addButton(slideSecondaryRed);
+        addButton(slideSecondaryGreen);
+        addButton(slideSecondaryBlue);
 
     }
 
@@ -91,13 +91,13 @@ public class GuiCustomizer extends ContainerScreen {
         btnReset.enabled = true;
 
         CompoundNBT nbt = new CompoundNBT();
-        nbt.setFloat("PrimaryRed", (float) slidePrimaryRed.getValue());
-        nbt.setFloat("PrimaryGreen", (float) slidePrimaryGreen.getValue());
-        nbt.setFloat("PrimaryBlue", (float) slidePrimaryBlue.getValue());
+        nbt.putFloat("PrimaryRed", (float) slidePrimaryRed.getValue());
+        nbt.putFloat("PrimaryGreen", (float) slidePrimaryGreen.getValue());
+        nbt.putFloat("PrimaryBlue", (float) slidePrimaryBlue.getValue());
 
-        nbt.setFloat("SecondaryRed", (float) slideSecondaryRed.getValue());
-        nbt.setFloat("SecondaryGreen", (float) slideSecondaryGreen.getValue());
-        nbt.setFloat("SecondaryBlue", (float) slideSecondaryBlue.getValue());
+        nbt.putFloat("SecondaryRed", (float) slideSecondaryRed.getValue());
+        nbt.putFloat("SecondaryGreen", (float) slideSecondaryGreen.getValue());
+        nbt.putFloat("SecondaryBlue", (float) slideSecondaryBlue.getValue());
 
         NetworkHandler.INSTANCE.sendToServer(new MessageSaveStyle(nbt));
     }
@@ -115,7 +115,7 @@ public class GuiCustomizer extends ContainerScreen {
 
             btnReset.enabled = false;
         } else if (button.id == btnDefault.id) {
-            IRegenType type = TypeHandler.getTypeInstance(CapabilityRegeneration.getForPlayer(mc.player).getType());
+            IRegenType type = TypeHandler.getTypeInstance(RegenCap.get(mc.player).getType());
             slidePrimaryRed.setValue(type.getDefaultPrimaryColor().x);
             slidePrimaryGreen.setValue(type.getDefaultPrimaryColor().y);
             slidePrimaryBlue.setValue(type.getDefaultPrimaryColor().z);
@@ -126,14 +126,14 @@ public class GuiCustomizer extends ContainerScreen {
 
             onChangeSliderValue(null);
         } else if (button.id == btnBack.id) {
-            Minecraft.getMinecraft().player.openGui(RegenerationMod.INSTANCE, GuiPreferences.ID, Minecraft.getMinecraft().world, 0, 0, 0);
+            Minecraft.getInstance().player.openGui(RegenerationMod.INSTANCE, GuiPreferences.ID, Minecraft.getInstance().world, 0, 0, 0);
         }
     }
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-        Minecraft.getMinecraft().getTextureManager().bindTexture(background);
-        drawTexturedModalRect(guiLeft, guiTop, 0, 0, 256, 173);
+        Minecraft.getInstance().getTextureManager().bindTexture(background);
+        blit(guiLeft, guiTop, 0, 0, 256, 173);
 
         int cx = (width - xSize) / 2;
         int cy = (height - ySize) / 2;
@@ -155,7 +155,7 @@ public class GuiCustomizer extends ContainerScreen {
         length = mc.fontRenderer.getStringWidth(str);
         fontRenderer.drawString(str, cx + 131 - length / 2, cy + 49, RenderUtil.calculateColorBrightness(secondaryColor) > 0.179 ? 0x0 : 0xFFFFFF);
 
-        drawCenteredString(Minecraft.getMinecraft().fontRenderer, new TranslationTextComponent("regeneration.gui.color_gui").getUnformattedText(), width / 2, height / 2 - 80, Color.WHITE.getRGB());
+        drawCenteredString(Minecraft.getInstance().fontRenderer, new TranslationTextComponent("regeneration.gui.color_gui").getUnformattedText(), width / 2, height / 2 - 80, Color.WHITE.getRGB());
 
     }
 

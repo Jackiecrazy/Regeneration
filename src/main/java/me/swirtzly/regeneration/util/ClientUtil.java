@@ -2,7 +2,7 @@ package me.swirtzly.regeneration.util;
 
 import me.swirtzly.regeneration.client.MovingSoundBase;
 import me.swirtzly.regeneration.client.skinhandling.SkinChangingHandler;
-import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.network.MessageUpdateSkin;
 import me.swirtzly.regeneration.network.NetworkHandler;
@@ -12,6 +12,7 @@ import net.minecraft.client.gui.toasts.SystemToast;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelPlayer;
 import net.minecraft.client.model.ModelRenderer;
+import net.minecraft.client.renderer.entity.model.PlayerModel;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
@@ -32,11 +33,11 @@ public class ClientUtil {
     public static String keyBind = "???"; //WAFFLE there was a weird thing with this somewhere that I still need to fix
 
     public static void createToast(TranslationTextComponent title, TranslationTextComponent subtitle) {
-        Minecraft.getMinecraft().getToastGui().add(new SystemToast(SystemToast.Type.TUTORIAL_HINT, title, subtitle));
+        Minecraft.getInstance().getToastGui().add(new SystemToast(SystemToast.Type.TUTORIAL_HINT, title, subtitle));
     }
 
     public static void playPositionedSoundRecord(SoundEvent sound, float pitch, float volume) {
-        Minecraft.getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.getRecord(sound, pitch, volume));
+        Minecraft.getInstance().getSoundHandler().playSound(PositionedSoundRecord.getRecord(sound, pitch, volume));
     }
 
     /**
@@ -44,17 +45,17 @@ public class ClientUtil {
      * back to the ones supplied by Mojang
      */
     public static void sendSkinResetPacket() {
-        NetworkHandler.INSTANCE.sendToServer(new MessageUpdateSkin("none", SkinChangingHandler.getSkinType(Minecraft.getMinecraft().player, true).getMojangType().equals("slim")));
+        NetworkHandler.INSTANCE.sendToServer(new MessageUpdateSkin("none", SkinChangingHandler.getSkinType(Minecraft.getInstance().player, true).getMojangType().equals("slim")));
     }
 
     public static void sendSkinChange(boolean isAlex) {
-        IRegeneration data = CapabilityRegeneration.getForPlayer(Minecraft.getMinecraft().player);
+        IRegeneration data = RegenCap.get(Minecraft.getInstance().player);
         NetworkHandler.INSTANCE.sendToServer(new MessageUpdateSkin(data.getEncodedSkin(), isAlex));
     }
 
     @SideOnly(Side.CLIENT)
     public static void playSound(Object entity, ResourceLocation soundName, SoundCategory category, boolean repeat, Supplier<Boolean> stopCondition, float volume) {
-        Minecraft.getMinecraft().getSoundHandler().playSound(new MovingSoundBase(entity, new SoundEvent(soundName), category, repeat, stopCondition, volume));
+        Minecraft.getInstance().getSoundHandler().playSound(new MovingSoundBase(entity, new SoundEvent(soundName), category, repeat, stopCondition, volume));
     }
 
     /**
@@ -62,7 +63,7 @@ public class ClientUtil {
      *
      * @param biped
      */
-    public static void copyAnglesToWear(ModelPlayer biped) {
+    public static void copyAnglesToWear(PlayerModel biped) {
         ModelBase.copyModelAngles(biped.bipedRightArm, biped.bipedRightArmwear);
         ModelBase.copyModelAngles(biped.bipedLeftArm, biped.bipedLeftArmwear);
         ModelBase.copyModelAngles(biped.bipedRightLeg, biped.bipedRightLegwear);

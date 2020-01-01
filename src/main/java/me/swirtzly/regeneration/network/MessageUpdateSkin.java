@@ -2,7 +2,7 @@ package me.swirtzly.regeneration.network;
 
 import io.netty.buffer.ByteBuf;
 import me.swirtzly.regeneration.client.skinhandling.SkinInfo;
-import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -44,7 +44,7 @@ public class MessageUpdateSkin implements IMessage {
         public IMessage onMessage(MessageUpdateSkin message, MessageContext ctx) {
             ctx.getServerHandler().player.getServerWorld().addScheduledTask(() -> {
                 ServerPlayerEntity player = ctx.getServerHandler().player;
-                IRegeneration cap = CapabilityRegeneration.getForPlayer(player);
+                IRegeneration cap = RegenCap.get(player);
                 cap.setEncodedSkin(message.encodedSkin);
                 cap.setSkinType(message.isAlex ? SkinInfo.SkinType.ALEX.name() : SkinInfo.SkinType.STEVE.name());
                 cap.synchronise();

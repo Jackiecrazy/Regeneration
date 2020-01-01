@@ -1,12 +1,12 @@
 package me.swirtzly.regeneration.client.rendering.layers;
 
 import me.swirtzly.regeneration.client.rendering.types.TypeFieryRenderer;
-import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.types.TypeHandler;
 import me.swirtzly.regeneration.util.PlayerUtil;
 import net.minecraft.client.model.ModelBiped;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.entity.player.PlayerEntity;
@@ -23,7 +23,7 @@ public class LayerHands implements LayerRenderer<PlayerEntity> {
     public void doRenderLayer(PlayerEntity entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
         GlStateManager.pushMatrix();
 
-        IRegeneration data = CapabilityRegeneration.getForPlayer(entitylivingbaseIn);
+        IRegeneration data = RegenCap.get(entitylivingbaseIn);
 
         if (this.livingEntityRenderer.getMainModel().isChild) {
             GlStateManager.translate(0.0F, 0.75F, 0.0F);
@@ -50,9 +50,9 @@ public class LayerHands implements LayerRenderer<PlayerEntity> {
     public void renderHand(PlayerEntity player, HandSide handSide, EnumHandRenderType type) {
         GlStateManager.pushMatrix();
 
-        IRegeneration data = CapabilityRegeneration.getForPlayer(player);
+        IRegeneration data = RegenCap.get(player);
 
-        if (player.isSneaking()) {
+        if (player.isCrouching()) {
             GlStateManager.translate(0.0F, 0.2F, 0.0F);
         }
 

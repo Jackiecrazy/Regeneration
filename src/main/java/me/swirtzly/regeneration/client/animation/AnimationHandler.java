@@ -1,6 +1,6 @@
 package me.swirtzly.regeneration.client.animation;
 
-import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.item.ItemFobWatch;
 import me.swirtzly.regeneration.util.ClientUtil;
@@ -17,7 +17,7 @@ public class AnimationHandler {
         ItemStack stack = player.getHeldItemMainhand();
         ItemStack offStack = player.getHeldItemOffhand();
         ModelBiped modelBiped = animationContext.getModelBiped();
-        IRegeneration data = CapabilityRegeneration.getForPlayer(player);
+        IRegeneration data = RegenCap.get(player);
 
         //==============FOB WATCH & JAR START==============
         boolean isOpen;
@@ -70,7 +70,7 @@ public class AnimationHandler {
         }
 
         //STRUGGLE IN CRITICAL
-        if (CapabilityRegeneration.getForPlayer(player).getState() == PlayerUtil.RegenState.GRACE_CRIT) {
+        if (RegenCap.get(player).getState() == PlayerUtil.RegenState.GRACE_CRIT) {
             modelBiped.bipedBody.rotateAngleX = 0.5F;
             modelBiped.bipedRightArm.rotateAngleX = (float) Math.toRadians(-25);
             modelBiped.bipedRightArm.rotateAngleY = (float) Math.toRadians(-55);

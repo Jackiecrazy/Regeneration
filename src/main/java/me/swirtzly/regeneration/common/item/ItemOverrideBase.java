@@ -33,8 +33,8 @@ public class ItemOverrideBase extends Item implements IEntityOverride {
 
     @Override
     public boolean shouldDie(ItemStack stack) {
-        if (stack.getTagCompound() != null) {
-            return !stack.getTagCompound().hasKey("live");
+        if (stack.getTag() != null) {
+            return !stack.getTag().hasKey("live");
         }
         return true;
     }

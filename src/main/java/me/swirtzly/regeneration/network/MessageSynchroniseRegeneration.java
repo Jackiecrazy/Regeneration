@@ -1,7 +1,7 @@
 package me.swirtzly.regeneration.network;
 
 import io.netty.buffer.ByteBuf;
-import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -37,9 +37,9 @@ public class MessageSynchroniseRegeneration implements IMessage {
 
     @Override
     public void fromBytes(ByteBuf buf) {
-        if (Minecraft.getMinecraft().player == null)
+        if (Minecraft.getInstance().player == null)
             return;
-        player = Minecraft.getMinecraft().player.world.getPlayerEntityByUUID(UUID.fromString(ByteBufUtils.readUTF8String(buf)));
+        player = Minecraft.getInstance().player.world.getPlayerEntityByUUID(UUID.fromString(ByteBufUtils.readUTF8String(buf)));
         data = ByteBufUtils.readTag(buf);
     }
 
@@ -49,7 +49,7 @@ public class MessageSynchroniseRegeneration implements IMessage {
         public IMessage onMessage(MessageSynchroniseRegeneration message, MessageContext ctx) {
             PlayerEntity player = message.player;
             if (player != null)
-                Minecraft.getMinecraft().addScheduledTask(() -> CapabilityRegeneration.getForPlayer(player).deserializeNBT(message.data));
+                Minecraft.getInstance().addScheduledTask(() -> RegenCap.get(player).deserializeNBT(message.data));
             return null;
         }
     }

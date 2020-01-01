@@ -74,7 +74,7 @@ public class EntityItemOverride extends Entity {
      */
     @Override
     protected void readEntityFromNBT(CompoundNBT compound) {
-        CompoundNBT nbttagcompound = compound.getCompoundTag("Item");
+        CompoundNBT nbttagcompound = compound.getTagTag("Item");
         this.setItem(new ItemStack(nbttagcompound));
 
         if (this.getItem().isEmpty())
@@ -90,10 +90,10 @@ public class EntityItemOverride extends Entity {
     @Override
     protected void writeEntityToNBT(CompoundNBT compound) {
         if (!this.getItem().isEmpty())
-            compound.setTag("Item", this.getItem().writeToNBT(new CompoundNBT()));
+            compound.put("Item", this.getItem().writeToNBT(new CompoundNBT()));
 
-        compound.setFloat("Height", getHeight());
-        compound.setFloat("Width", getWidth());
+        compound.putFloat("Height", getHeight());
+        compound.putFloat("Width", getWidth());
     }
 
     public ItemStack getItem() {

@@ -22,23 +22,23 @@ public class RegenerationProvider implements ICapabilitySerializable<CompoundNBT
 
     @Override
     public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable Direction facing) {
-        return CapabilityRegeneration.CAPABILITY != null && capability == CapabilityRegeneration.CAPABILITY;
+        return RegenCap.CAPABILITY != null && capability == RegenCap.CAPABILITY;
     }
 
     @Nullable
     @Override
     public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable Direction facing) {
-        return capability == CapabilityRegeneration.CAPABILITY ? CapabilityRegeneration.CAPABILITY.cast(this.capability) : null;
+        return capability == RegenCap.CAPABILITY ? RegenCap.CAPABILITY.cast(this.capability) : null;
     }
 
     @Override
     public CompoundNBT serializeNBT() {
-        return (CompoundNBT) CapabilityRegeneration.CAPABILITY.getStorage().writeNBT(CapabilityRegeneration.CAPABILITY, capability, null);
+        return (CompoundNBT) RegenCap.CAPABILITY.getStorage().writeNBT(RegenCap.CAPABILITY, capability, null);
     }
 
     @Override
     public void deserializeNBT(CompoundNBT nbt) {
-        CapabilityRegeneration.CAPABILITY.getStorage().readNBT(CapabilityRegeneration.CAPABILITY, capability, null, nbt);
+        RegenCap.CAPABILITY.getStorage().readNBT(RegenCap.CAPABILITY, capability, null, nbt);
     }
 
 }

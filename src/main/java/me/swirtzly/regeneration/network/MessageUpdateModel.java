@@ -1,7 +1,7 @@
 package me.swirtzly.regeneration.network;
 
 import io.netty.buffer.ByteBuf;
-import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -34,7 +34,7 @@ public class MessageUpdateModel implements IMessage {
         @Override
         public IMessage onMessage(MessageUpdateModel message, MessageContext ctx) {
             ctx.getServerHandler().player.getServerWorld().addScheduledTask(() -> {
-                IRegeneration data = CapabilityRegeneration.getForPlayer(ctx.getServerHandler().player);
+                IRegeneration data = RegenCap.get(ctx.getServerHandler().player);
                 data.setPreferredModel(message.preferred);
                 data.synchronise();
             });

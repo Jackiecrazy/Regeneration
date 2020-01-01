@@ -1,7 +1,7 @@
 package me.swirtzly.regeneration.common.traits;
 
 import me.swirtzly.regeneration.RegenerationMod;
-import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.traits.negative.DnaHunger;
 import me.swirtzly.regeneration.common.traits.negative.DnaHydrophobic;
@@ -76,7 +76,7 @@ public class DnaHandler {
 
     @SubscribeEvent
     public static void onXpPickup(PlayerPickupXpEvent e) {
-        IRegeneration data = CapabilityRegeneration.getForPlayer(e.getEntityPlayer());
+        IRegeneration data = RegenCap.get(e.getEntityPlayer());
         IDna dna = DnaHandler.getDnaEntry(data.getDnaType());
         if (dna.getRegistryName().equals(DnaHandler.DNA_DUMB.getRegistryName()) && data.isDnaActive()) {
             e.getOrb().xpValue *= 0.5;
@@ -87,7 +87,7 @@ public class DnaHandler {
     public static void onJump(LivingEvent.LivingJumpEvent event) {
         if (event.getEntityLiving() instanceof PlayerEntity) {
             PlayerEntity player = (PlayerEntity) event.getEntityLiving();
-            IRegeneration data = CapabilityRegeneration.getForPlayer(player);
+            IRegeneration data = RegenCap.get(player);
             if (player.world.isRemote) return;
             if (data.isDnaActive() && data.getDnaType().equals(DNA_ATHLETE.getRegistryName())) {
                 player.motionY += 0.1D;
@@ -104,7 +104,7 @@ public class DnaHandler {
             if (attacked instanceof PlayerEntity && source.getImmediateSource() instanceof AbstractArrowEntity) {
                 if (!attacked.world.isRemote) {
                     PlayerEntity player = (PlayerEntity) attacked;
-                    boolean flag = CapabilityRegeneration.getForPlayer(player).getDnaType().toString().equals(DNA_REPEL_ARROW.getRegistryName().toString());
+                    boolean flag = RegenCap.get(player).getDnaType().toString().equals(DNA_REPEL_ARROW.getRegistryName().toString());
                     event.setCanceled(flag);
                 }
             }

@@ -5,7 +5,7 @@ import me.swirtzly.regeneration.client.gui.parts.HIJContainer;
 import me.swirtzly.regeneration.common.tiles.TileEntityHandInJar;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
@@ -24,7 +24,7 @@ public class GuiHij extends ContainerScreen {
     private float mousePosY;
 
     public GuiHij(IInventory playerInv, IInventory handInv, TileEntityHandInJar jar) {
-        super(new HIJContainer(playerInv, handInv, Minecraft.getMinecraft().player));
+        super(new HIJContainer(playerInv, handInv, Minecraft.getInstance().player));
         this.playerInventory = playerInv;
         this.handInventory = handInv;
         this.allowUserInput = false;
@@ -42,7 +42,7 @@ public class GuiHij extends ContainerScreen {
         this.mc.getTextureManager().bindTexture(TEXTURE);
         int i = (this.width - this.xSize) / 2;
         int j = (this.height - this.ySize) / 2;
-        this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
+        this.blit(i, j, 0, 0, this.xSize, this.ySize);
     }
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {

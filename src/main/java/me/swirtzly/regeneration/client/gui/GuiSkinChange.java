@@ -5,7 +5,7 @@ import me.swirtzly.regeneration.client.gui.parts.BlankContainer;
 import me.swirtzly.regeneration.client.gui.parts.InventoryTabRegeneration;
 import me.swirtzly.regeneration.client.image.ImageDownloadAlt;
 import me.swirtzly.regeneration.client.skinhandling.SkinChangingHandler;
-import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.network.MessageNextSkin;
 import me.swirtzly.regeneration.network.NetworkHandler;
 import me.swirtzly.regeneration.util.ClientUtil;
@@ -14,7 +14,7 @@ import micdoodle8.mods.galacticraft.api.client.tabs.TabRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.client.config.GuiButtonExt;
@@ -34,8 +34,8 @@ public class GuiSkinChange extends ContainerScreen {
     public static final int ID = 3;
     private static final ResourceLocation background = new ResourceLocation(RegenerationMod.MODID, "textures/gui/customizer_background_small.png");
     public static boolean isAlex = true;
-    private static ResourceLocation PLAYER_TEXTURE = Minecraft.getMinecraft().player.getLocationSkin();
-    private static SkinChangingHandler.EnumChoices choices = CapabilityRegeneration.getForPlayer(Minecraft.getMinecraft().player).getPreferredModel();
+    private static ResourceLocation PLAYER_TEXTURE = Minecraft.getInstance().player.getLocationSkin();
+    private static SkinChangingHandler.EnumChoices choices = RegenCap.get(Minecraft.getInstance().player).getPreferredModel();
     private static List<File> skins = FileUtil.listAllSkins(choices);
     private static int position = 0;
 
@@ -45,7 +45,7 @@ public class GuiSkinChange extends ContainerScreen {
         xSize = 176;
         ySize = 186;
 
-        choices = CapabilityRegeneration.getForPlayer(Minecraft.getMinecraft().player).getPreferredModel();
+        choices = RegenCap.get(Minecraft.getInstance().player).getPreferredModel();
         skins = FileUtil.listAllSkins(choices);
         if (skins.size() > 0) {
             PLAYER_TEXTURE = SkinChangingHandler.createGuiTexture(skins.get(position));
@@ -95,13 +95,13 @@ public class GuiSkinChange extends ContainerScreen {
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-        Minecraft.getMinecraft().getTextureManager().bindTexture(background);
-        drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
+        Minecraft.getInstance().getTextureManager().bindTexture(background);
+        blit(guiLeft, guiTop, 0, 0, xSize, ySize);
         GlStateManager.pushMatrix();
-        Minecraft.getMinecraft().getTextureManager().bindTexture(PLAYER_TEXTURE);
+        Minecraft.getInstance().getTextureManager().bindTexture(PLAYER_TEXTURE);
         playerModelAlex.isChild = false;
         playerModelSteve.isChild = false;
-        float rotation = Minecraft.getMinecraft().player.ticksExisted * 2;
+        float rotation = Minecraft.getInstance().player.ticksExisted * 2;
         switch (choices) {
             case ALEX:
                 drawModelToGui(playerModelAlex, width / 2, height / 2 - 45, 1.0f, rotation);
@@ -116,11 +116,11 @@ public class GuiSkinChange extends ContainerScreen {
         }
         GlStateManager.popMatrix();
 
-        drawCenteredString(Minecraft.getMinecraft().fontRenderer, new TranslationTextComponent("regeneration.gui.next_incarnation").getUnformattedText(), width / 2, height / 2 - 80, Color.WHITE.getRGB());
+        drawCenteredString(Minecraft.getInstance().fontRenderer, new TranslationTextComponent("regeneration.gui.next_incarnation").getUnformattedText(), width / 2, height / 2 - 80, Color.WHITE.getRGB());
 
         String skinName = skins.get(position).getName();
         skinName = skinName.substring(0, 1).toUpperCase() + skinName.substring(1);
-        drawCenteredString(Minecraft.getMinecraft().fontRenderer, skinName.replaceAll(".png", ""), width / 2, height / 2 + 15, Color.WHITE.getRGB());
+        drawCenteredString(Minecraft.getInstance().fontRenderer, skinName.replaceAll(".png", ""), width / 2, height / 2 + 15, Color.WHITE.getRGB());
 
     }
 
@@ -139,12 +139,12 @@ public class GuiSkinChange extends ContainerScreen {
 
         switch (button.id) {
             case 66:
-                Minecraft.getMinecraft().player.openGui(RegenerationMod.INSTANCE, GuiPreferences.ID, Minecraft.getMinecraft().world, 0, 0, 0);
+                Minecraft.getInstance().player.openGui(RegenerationMod.INSTANCE, GuiPreferences.ID, Minecraft.getInstance().world, 0, 0, 0);
                 break;
 
             case 55:
                 //Next
-                if (!PLAYER_TEXTURE.equals(Minecraft.getMinecraft().player.getLocationSkin())) {
+                if (!PLAYER_TEXTURE.equals(Minecraft.getInstance().player.getLocationSkin())) {
                     if (position >= skins.size() - 1) {
                         position = 0;
                     } else {
@@ -157,7 +157,7 @@ public class GuiSkinChange extends ContainerScreen {
 
             case 44:
                 //Previous
-                if (!PLAYER_TEXTURE.equals(Minecraft.getMinecraft().player.getLocationSkin())) {
+                if (!PLAYER_TEXTURE.equals(Minecraft.getInstance().player.getLocationSkin())) {
                     if (position > 0) {
                         position--;
                     } else {
@@ -182,7 +182,7 @@ public class GuiSkinChange extends ContainerScreen {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                Minecraft.getMinecraft().displayGuiScreen(null);
+                Minecraft.getInstance().displayGuiScreen(null);
                 break;
         }
     }

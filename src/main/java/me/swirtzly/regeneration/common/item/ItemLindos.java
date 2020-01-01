@@ -2,7 +2,7 @@ package me.swirtzly.regeneration.common.item;
 
 import me.swirtzly.regeneration.common.advancements.RegenTriggers;
 import me.swirtzly.regeneration.common.block.BlockHandInJar;
-import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.entity.EntityItemOverride;
 import me.swirtzly.regeneration.common.tiles.TileEntityHandInJar;
@@ -41,7 +41,7 @@ public class ItemLindos extends ItemOverrideBase {
             @SideOnly(Side.CLIENT)
             public float apply(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
 
-                if (stack.getTagCompound() != null) {
+                if (stack.getTag() != null) {
                     int amount = getAmount(stack);
 
                     if (!hasWater(stack)) {
@@ -75,19 +75,19 @@ public class ItemLindos extends ItemOverrideBase {
     }
 
     public static CompoundNBT getStackTag(ItemStack stack) {
-        if (stack.getTagCompound() == null) {
-            stack.setTagCompound(new CompoundNBT());
-            stack.getTagCompound().setInteger("amount", 0);
+        if (stack.getTag() == null) {
+            stack.putCompound(new CompoundNBT());
+            stack.getTag().putInt("amount", 0);
         }
-        return stack.getTagCompound();
+        return stack.getTag();
     }
 
     public static int getAmount(ItemStack stack) {
-        return getStackTag(stack).getInteger("amount");
+        return getStackTag(stack).getInt("amount");
     }
 
     public static void setAmount(ItemStack stack, int amount) {
-        getStackTag(stack).setInteger("amount", MathHelper.clamp(amount, 0, 100));
+        getStackTag(stack).putInt("amount", MathHelper.clamp(amount, 0, 100));
     }
 
     public static boolean hasWater(ItemStack stack) {
@@ -95,7 +95,7 @@ public class ItemLindos extends ItemOverrideBase {
     }
 
     public static void setWater(ItemStack stack, boolean water) {
-        getStackTag(stack).setBoolean("water", water);
+        getStackTag(stack).putBoolean("water", water);
     }
 
     @Override
@@ -109,17 +109,17 @@ public class ItemLindos extends ItemOverrideBase {
     @Override
     public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
 
-        if (stack.getTagCompound() == null) {
-            stack.setTagCompound(new CompoundNBT());
-            stack.getTagCompound().setBoolean("live", true);
+        if (stack.getTag() == null) {
+            stack.putCompound(new CompoundNBT());
+            stack.getTag().putBoolean("live", true);
         } else {
-            stack.getTagCompound().setBoolean("live", true);
+            stack.getTag().putBoolean("live", true);
         }
 
         if (!worldIn.isRemote) {
             //Entiies around
             worldIn.getEntitiesWithinAABB(PlayerEntity.class, entityIn.getEntityBoundingBox().expand(10, 10, 10)).forEach(player -> {
-                IRegeneration data = CapabilityRegeneration.getForPlayer((PlayerEntity) entityIn);
+                IRegeneration data = RegenCap.get((PlayerEntity) entityIn);
                 if (data.getState() == PlayerUtil.RegenState.REGENERATING) {
                     if (worldIn.rand.nextInt(100) > 50 && isSelected) {
                         setAmount(stack, getAmount(stack) + 1);
@@ -131,7 +131,7 @@ public class ItemLindos extends ItemOverrideBase {
             if (entityIn instanceof PlayerEntity) {
                 PlayerEntity player = (PlayerEntity) entityIn;
                 if (isSelected) {
-                    if (CapabilityRegeneration.getForPlayer(player).areHandsGlowing() && player.ticksExisted % 40 == 0) {
+                    if (RegenCap.get(player).areHandsGlowing() && player.ticksExisted % 40 == 0) {
                         setAmount(stack, getAmount(stack) + 2);
                     }
                 }
@@ -154,7 +154,7 @@ public class ItemLindos extends ItemOverrideBase {
             BlockState iblockstate = worldIn.getBlockState(blockPos);
             Material material = iblockstate.getMaterial();
 
-            if (iblockstate.getBlock() instanceof BlockHandInJar && player.isSneaking()) {
+            if (iblockstate.getBlock() instanceof BlockHandInJar && player.isCrouching()) {
                 if (worldIn.getTileEntity(blockPos) instanceof TileEntityHandInJar) {
                     TileEntityHandInJar jar = (TileEntityHandInJar) worldIn.getTileEntity(blockPos);
                     setAmount(itemStack, getAmount(itemStack) + jar.getLindosAmont());
@@ -183,7 +183,7 @@ public class ItemLindos extends ItemOverrideBase {
     @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity player, Hand handIn) {
         ItemStack stack = player.getHeldItem(handIn);
-        IRegeneration cap = CapabilityRegeneration.getForPlayer(player);
+        IRegeneration cap = RegenCap.get(player);
         if (!worldIn.isRemote) {
 
             //If the player is in POST or Regenerating, stop them from drinking it
@@ -229,7 +229,7 @@ public class ItemLindos extends ItemOverrideBase {
         ItemStack itemStack = itemOverride.getItem();
         if (itemStack.getItem() == this) {
             if (itemOverride.isInWater()) {
-                if (itemStack.getTagCompound() != null) {
+                if (itemStack.getTag() != null) {
                     setWater(itemStack, true);
                 }
             }

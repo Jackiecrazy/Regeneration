@@ -1,7 +1,7 @@
 package me.swirtzly.regeneration.client;
 
 import me.swirtzly.regeneration.RegenerationMod;
-import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.network.MessageTriggerForcedRegen;
 import me.swirtzly.regeneration.network.MessageTriggerRegeneration;
@@ -47,17 +47,17 @@ public class RegenKeyBinds {
 
 
     public static void handleGeneralInputs(InputUpdateEvent e) {
-        PlayerEntity player = Minecraft.getMinecraft().player;
+        PlayerEntity player = Minecraft.getInstance().player;
 
         if (player == null) return;
 
         //If Lucraft isn't installed, we get our stuff
-        if (Minecraft.getMinecraft().currentScreen == null && !EnumCompatModids.LCCORE.isLoaded()) {
+        if (Minecraft.getInstance().currentScreen == null && !EnumCompatModids.LCCORE.isLoaded()) {
             ClientUtil.keyBind = RegenKeyBinds.getRegenerateNowDisplayName();
         }
 
         //Regenerate if in Grace & Keybind is pressed
-        if (REGEN_NOW.isPressed() && CapabilityRegeneration.getForPlayer(player).getState().isGraceful()) {
+        if (REGEN_NOW.isPressed() && RegenCap.get(player).getState().isGraceful()) {
             NetworkHandler.INSTANCE.sendToServer(new MessageTriggerRegeneration(player));
         }
 
@@ -67,7 +67,7 @@ public class RegenKeyBinds {
         }
 
 
-        IRegeneration cap = CapabilityRegeneration.getForPlayer(Minecraft.getMinecraft().player);
+        IRegeneration cap = RegenCap.get(Minecraft.getInstance().player);
         if (cap.getState() == REGENERATING || cap.isSyncingToJar()) { // locking user
             MovementInput moveType = e.getMovementInput();
             moveType.rightKeyDown = false;

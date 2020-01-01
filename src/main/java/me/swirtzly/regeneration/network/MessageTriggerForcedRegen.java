@@ -2,7 +2,7 @@ package me.swirtzly.regeneration.network;
 
 import io.netty.buffer.ByteBuf;
 import me.swirtzly.regeneration.common.advancements.RegenTriggers;
-import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.item.ItemHand;
 import me.swirtzly.regeneration.common.tiles.TileEntityHandInJar;
@@ -43,7 +43,7 @@ public class MessageTriggerForcedRegen implements IMessage {
 
                 ServerPlayerEntity player = ctx.getServerHandler().player;
 
-                IRegeneration data = CapabilityRegeneration.getForPlayer(ctx.getServerHandler().player);
+                IRegeneration data = RegenCap.get(ctx.getServerHandler().player);
                 if (data.canRegenerate() && data.getState() == PlayerUtil.RegenState.ALIVE) {
                     data.getPlayer().attackEntityFrom(RegenObjects.REGEN_DMG_LINDOS, Integer.MAX_VALUE);
                 }

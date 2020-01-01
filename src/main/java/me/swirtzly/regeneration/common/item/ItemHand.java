@@ -6,9 +6,9 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.UsernameCache;
 
@@ -70,9 +70,9 @@ public class ItemHand extends Item {
         return getStackTag(stack).getUniqueId("owner");
     }
 
-    public static NBTTagCompound getStackTag(ItemStack stack) {
+    public static CompoundNBT getStackTag(ItemStack stack) {
         if (stack.getTagCompound() == null) {
-            stack.setTagCompound(new NBTTagCompound());
+            stack.setTagCompound(new CompoundNBT());
             stack.getTagCompound().setString("textureString", "NONE");
             stack.getTagCompound().setString("skinType", SkinInfo.SkinType.ALEX.name());
             stack.getTagCompound().setUniqueId("owner", UUID.fromString("96511168-1bb3-4ff0-a894-271e42606a39"));
@@ -84,7 +84,7 @@ public class ItemHand extends Item {
 
     @Override
     public String getItemStackDisplayName(ItemStack stack) {
-        return new TextComponentTranslation("item.hand.name", UsernameCache.getLastKnownUsername(getOwner(stack))).getUnformattedComponentText();
+        return new TranslationTextComponent("item.hand.name", UsernameCache.getLastKnownUsername(getOwner(stack))).getUnformattedComponentText();
     }
 
     @Override
@@ -99,7 +99,7 @@ public class ItemHand extends Item {
         DateFormat formatter = new SimpleDateFormat("dd/MM/YYYY @ HH:mm");
         formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
         String dateFormatted = formatter.format(date);
-        tooltip.add(new TextComponentTranslation("nbt.created", dateFormatted).getUnformattedComponentText());
-        tooltip.add("Trait: " + new TextComponentTranslation(DnaHandler.getDnaEntry(new ResourceLocation(getTrait(stack))).getLangKey()).getUnformattedComponentText());
+        tooltip.add(new TranslationTextComponent("nbt.created", dateFormatted).getUnformattedComponentText());
+        tooltip.add("Trait: " + new TranslationTextComponent(DnaHandler.getDnaEntry(new ResourceLocation(getTrait(stack))).getLangKey()).getUnformattedComponentText());
     }
 }

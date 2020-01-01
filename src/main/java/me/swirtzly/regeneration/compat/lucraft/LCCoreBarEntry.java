@@ -7,8 +7,8 @@ import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
 import me.swirtzly.regeneration.network.MessageTriggerRegeneration;
 import me.swirtzly.regeneration.network.NetworkHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
 
@@ -26,7 +26,7 @@ public class LCCoreBarEntry implements IAbilityBarProvider, IAbilityBarEntry {
 
     @Override
     public void onButtonPress() {
-        EntityPlayerSP player = Minecraft.getMinecraft().player;
+        ClientPlayerEntity player = Minecraft.getMinecraft().player;
         if (CapabilityRegeneration.getForPlayer(player).getState().isGraceful()) {
             NetworkHandler.INSTANCE.sendToServer(new MessageTriggerRegeneration(player));
         }
@@ -38,7 +38,7 @@ public class LCCoreBarEntry implements IAbilityBarProvider, IAbilityBarEntry {
     }
 
     @Override
-    public void drawIcon(Minecraft mc, Gui gui, int x, int y) {
+    public void drawIcon(Minecraft mc, AbstractGui gui, int x, int y) {
         mc.renderEngine.bindTexture(ICON_TEX);
         gui.drawTexturedModalRect(x, y, 9 * 16, 16, 16, 16);
     }
@@ -60,7 +60,7 @@ public class LCCoreBarEntry implements IAbilityBarProvider, IAbilityBarEntry {
 
     @Override
     public Vec3d getCooldownColor() {
-        EntityPlayerSP player = Minecraft.getMinecraft().player;
+        ClientPlayerEntity player = Minecraft.getMinecraft().player;
         return CapabilityRegeneration.getForPlayer(player).getPrimaryColor();
     }
 

@@ -2,9 +2,9 @@ package me.swirtzly.regeneration.common;
 
 import me.swirtzly.regeneration.RegenerationMod;
 import me.swirtzly.regeneration.compat.lucraft.PlayerCanRegenEvent;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.server.permission.DefaultPermissionLevel;
 import net.minecraftforge.server.permission.PermissionAPI;
 
@@ -29,7 +29,7 @@ public class RegenPermission {
         return permission;
     }
 
-    public static boolean isAllowedToRegeneration(EntityPlayer player) {
+    public static boolean isAllowedToRegeneration(PlayerEntity player) {
         if (player.world.isRemote) return true;
         return PermissionAPI.hasPermission(player, RegenPermission.CAN_REGENERATE);
     }
@@ -37,7 +37,7 @@ public class RegenPermission {
     //Stop the Player Regeneration if they are not allowed to!
     @SubscribeEvent
     public static void onRegenerate(PlayerCanRegenEvent event) {
-        if (!isAllowedToRegeneration(event.getEntityPlayer())) {
+        if (!isAllowedToRegeneration(event.getPlayer())) {
             event.setCanceled(true);
         }
     }

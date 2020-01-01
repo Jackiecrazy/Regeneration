@@ -2,7 +2,7 @@ package me.swirtzly.regeneration.common.types;
 
 import me.swirtzly.regeneration.client.rendering.types.ATypeRenderer;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.Vec3d;
 
@@ -21,13 +21,13 @@ public interface IRegenType<R extends ATypeRenderer<?>> {
 
     R getRenderer();
 
-    default void onStartRegeneration(EntityPlayer player, IRegeneration capability) {
+    default void onStartRegeneration(PlayerEntity player, IRegeneration capability) {
     }
 
-    default void onUpdateMidRegen(EntityPlayer player, IRegeneration capability) {
+    default void onUpdateMidRegen(PlayerEntity player, IRegeneration capability) {
     }
 
-    default void onFinishRegeneration(EntityPlayer player, IRegeneration capability) {
+    default void onFinishRegeneration(PlayerEntity player, IRegeneration capability) {
     }
 
     double getAnimationProgress(IRegeneration cap);

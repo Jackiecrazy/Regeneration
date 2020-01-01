@@ -18,23 +18,22 @@ import me.swirtzly.regeneration.util.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.PositionedSoundRecord;
-import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelPlayer;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
-import net.minecraft.init.MobEffects;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.util.EnumHandSide;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Items;
+import net.minecraft.potion.Effects;
+import net.minecraft.util.*;
+import net.minecraft.util.HandSide;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ChatType;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.event.HoverEvent;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.client.event.sound.PlaySoundEvent;
@@ -59,11 +58,11 @@ import static me.swirtzly.regeneration.util.PlayerUtil.RegenState.*;
 public class ClientEventHandler {
 
     public static final ResourceLocation[] SHADERS_TEXTURES = new ResourceLocation[]{new ResourceLocation("shaders/post/notch.json"), new ResourceLocation("shaders/post/fxaa.json"), new ResourceLocation("shaders/post/art.json"), new ResourceLocation("shaders/post/bumpy.json"), new ResourceLocation("shaders/post/blobs2.json"), new ResourceLocation("shaders/post/pencil.json"), new ResourceLocation("shaders/post/color_convolve.json"), new ResourceLocation("shaders/post/deconverge.json"), new ResourceLocation("shaders/post/flip.json"), new ResourceLocation("shaders/post/invert.json"), new ResourceLocation("shaders/post/ntsc.json"), new ResourceLocation("shaders/post/outline.json"), new ResourceLocation("shaders/post/phosphor.json"), new ResourceLocation("shaders/post/scan_pincushion.json"), new ResourceLocation("shaders/post/sobel.json"), new ResourceLocation("shaders/post/bits.json"), new ResourceLocation("shaders/post/desaturate.json"), new ResourceLocation("shaders/post/green.json"), new ResourceLocation("shaders/post/blur.json"), new ResourceLocation("shaders/post/wobble.json"), new ResourceLocation("shaders/post/blobs.json"), new ResourceLocation("shaders/post/antialias.json"), new ResourceLocation("shaders/post/creeper.json"), new ResourceLocation("shaders/post/spider.json")};
-    public static EnumHandSide SIDE = null;
+    public static HandSide SIDE = null;
 
     @SubscribeEvent
     public static void onColorFog(EntityViewRenderEvent.RenderFogEvent.FogColors e) {
-        if (Minecraft.getMinecraft().getRenderViewEntity() instanceof EntityPlayer) {
+        if (Minecraft.getMinecraft().getRenderViewEntity() instanceof PlayerEntity) {
             IRegeneration data = CapabilityRegeneration.getForPlayer(Minecraft.getMinecraft().player);
             if (data.getType() == TypeHandler.RegenType.LAY_FADE && data.getState() == REGENERATING) {
                 e.setRed((float) data.getPrimaryColor().x);
@@ -82,10 +81,10 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public static void onClientUpdate(LivingEvent.LivingUpdateEvent e) {
-        if (!(e.getEntity() instanceof EntityPlayer) || Minecraft.getMinecraft().player == null)
+        if (!(e.getEntity() instanceof PlayerEntity) || Minecraft.getMinecraft().player == null)
             return;
 
-        EntityPlayer player = (EntityPlayer) e.getEntity();
+        PlayerEntity player = (PlayerEntity) e.getEntity();
         UUID clientUUID = Minecraft.getMinecraft().player.getUniqueID();
         IRegeneration cap = CapabilityRegeneration.getForPlayer(player);
 
@@ -119,8 +118,8 @@ public class ClientEventHandler {
     @SubscribeEvent(receiveCanceled = true)
     public static void onAnimate(ModelRotationEvent ev) {
         if (EnumCompatModids.LCCORE.isLoaded()) return;
-        if (ev.getEntity() instanceof EntityPlayer) {
-            EntityPlayer player = (EntityPlayer) ev.getEntity();
+        if (ev.getEntity() instanceof PlayerEntity) {
+            PlayerEntity player = (PlayerEntity) ev.getEntity();
             IRegeneration data = CapabilityRegeneration.getForPlayer(player);
             AnimationContext context = new AnimationContext(ev.model, player, ev.limbSwing, ev.limbSwingAmount, ev.ageInTicks, ev.netHeadYaw, ev.headPitch);
             if (data.getState() == REGENERATING) {
@@ -138,19 +137,19 @@ public class ClientEventHandler {
         if (event.getType() != RenderGameOverlayEvent.ElementType.ALL)
             return;
 
-        EntityPlayerSP player = Minecraft.getMinecraft().player;
+        ClientPlayerEntity player = Minecraft.getMinecraft().player;
         IRegeneration cap = CapabilityRegeneration.getForPlayer(player);
 
         String warning = null;
         switch (cap.getState()) {
             case GRACE:
                 RenderUtil.renderVignette(cap.getPrimaryColor(), 0.3F, cap.getState());
-                warning = new TextComponentTranslation("regeneration.messages.warning.grace", ClientUtil.keyBind).getUnformattedText();
+                warning = new TranslationTextComponent("regeneration.messages.warning.grace", ClientUtil.keyBind).getUnformattedText();
                 break;
 
             case GRACE_CRIT:
                 RenderUtil.renderVignette(new Vec3d(1, 0, 0), 0.5F, cap.getState());
-                warning = new TextComponentTranslation("regeneration.messages.warning.grace_critical", ClientUtil.keyBind).getUnformattedText();
+                warning = new TranslationTextComponent("regeneration.messages.warning.grace_critical", ClientUtil.keyBind).getUnformattedText();
                 break;
 
             case REGENERATING:
@@ -161,7 +160,7 @@ public class ClientEventHandler {
                 break;
 
             case POST:
-                if (player.hurtTime > 0 || player.getActivePotionEffect(MobEffects.NAUSEA) != null) {
+                if (player.hurtTime > 0 || player.getActivePotionEffect(Effects.NAUSEA) != null) {
                     RenderUtil.renderVignette(cap.getSecondaryColor(), 0.5F, cap.getState());
                 }
 
@@ -202,8 +201,8 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public static void onSetupFogDensity(EntityViewRenderEvent.RenderFogEvent.FogDensity event) {
-        if (Minecraft.getMinecraft().getRenderViewEntity() instanceof EntityPlayer) {
-            EntityPlayer player = (EntityPlayer) Minecraft.getMinecraft().getRenderViewEntity();
+        if (Minecraft.getMinecraft().getRenderViewEntity() instanceof PlayerEntity) {
+            PlayerEntity player = (PlayerEntity) Minecraft.getMinecraft().getRenderViewEntity();
             IRegeneration data = CapabilityRegeneration.getForPlayer(player);
 
             if (data.getState() == GRACE_CRIT) {
@@ -225,26 +224,26 @@ public class ClientEventHandler {
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public static void onClientChatRecieved(ClientChatReceivedEvent e) {
-        EntityPlayerSP player = Minecraft.getMinecraft().player;
+        ClientPlayerEntity player = Minecraft.getMinecraft().player;
         if (e.getType() != ChatType.CHAT) return;
         if (CapabilityRegeneration.getForPlayer(player).getState() != POST) return;
 
         if (player.world.rand.nextBoolean()) {
             String message = e.getMessage().getUnformattedText();
-            TextComponentString newMessage = new TextComponentString("");
+            StringTextComponent newMessage = new StringTextComponent("");
             String[] words = message.split(" ");
             for (String word : words) {
                 if (word.equals(words[0])) {
-                    TextComponentString name = new TextComponentString(word + " ");
+                    StringTextComponent name = new StringTextComponent(word + " ");
                     newMessage.appendSibling(name);
                     continue;
                 }
                 if (player.world.rand.nextBoolean()) {
-                    TextComponentString txtComp = new TextComponentString(getColoredText("&k" + word + "&r "));
-                    txtComp.getStyle().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(word)));
+                    StringTextComponent txtComp = new StringTextComponent(getColoredText("&k" + word + "&r "));
+                    txtComp.getStyle().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new StringTextComponent(word)));
                     newMessage.appendSibling(txtComp);
                 } else {
-                    TextComponentString txtComp = new TextComponentString(word + " ");
+                    StringTextComponent txtComp = new StringTextComponent(word + " ");
                     newMessage.appendSibling(txtComp);
                 }
             }
@@ -267,8 +266,8 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public static void onDeath(LivingDeathEvent e) {
-        if (e.getEntityLiving() instanceof EntityPlayer) {
-            EntityPlayer player = (EntityPlayer) e.getEntityLiving();
+        if (e.getEntityLiving() instanceof PlayerEntity) {
+            PlayerEntity player = (PlayerEntity) e.getEntityLiving();
             if (player.getUniqueID().equals(Minecraft.getMinecraft().player.getUniqueID())) {
                 ClientUtil.sendSkinResetPacket();
             }
@@ -278,7 +277,7 @@ public class ClientEventHandler {
     @SubscribeEvent
     public static void onRenderHand(RenderHandEvent e) {
         Minecraft mc = Minecraft.getMinecraft();
-        EntityPlayerSP player = Minecraft.getMinecraft().player;
+        ClientPlayerEntity player = Minecraft.getMinecraft().player;
 
         float factor = 0.2F;
         if (player.getHeldItemMainhand().getItem() != Items.AIR || mc.gameSettings.thirdPersonView > 0)
@@ -294,7 +293,7 @@ public class ClientEventHandler {
 
         GlStateManager.pushMatrix();
 
-        float leftHandedFactor = mc.gameSettings.mainHand.equals(EnumHandSide.RIGHT) ? 1 : -1;
+        float leftHandedFactor = mc.gameSettings.mainHand.equals(HandSide.RIGHT) ? 1 : -1;
         GlStateManager.translate(0.33F * leftHandedFactor, -0.23F, -0.5F); // move in place
         GlStateManager.translate(-.8F * player.swingProgress * leftHandedFactor, -.8F * player.swingProgress, -.4F * player.swingProgress); // compensate for 'punching' motion
         GlStateManager.translate(-(player.renderArmYaw - player.prevRenderArmYaw) / 400F, (player.renderArmPitch - player.prevRenderArmPitch) / 500F, 0); // compensate for 'swinging' motion
@@ -316,8 +315,8 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public static void onRenderCallBack(RenderCallbackEvent event) {
-        if (event.getEntityLiving() instanceof EntityPlayer) {
-            EntityPlayer player = (EntityPlayer) event.getEntityLiving();
+        if (event.getEntityLiving() instanceof PlayerEntity) {
+            PlayerEntity player = (PlayerEntity) event.getEntityLiving();
             IRegeneration data = CapabilityRegeneration.getForPlayer(player);
             TypeHandler.RegenType type = data.getType();
             if (data.getState() == REGENERATING) {
@@ -332,12 +331,12 @@ public class ClientEventHandler {
             if (model instanceof ModelPlayer) {
                 ModelPlayer modelPlayer = (ModelPlayer) model;
                 if (data.hasDroppedHand()) {
-                    if (data.getCutoffHand() == EnumHandSide.LEFT) {
+                    if (data.getCutoffHand() == HandSide.LEFT) {
                         modelPlayer.bipedRightArmwear.isHidden = modelPlayer.bipedRightArm.isHidden = true;
                     } else {
                         modelPlayer.bipedRightArmwear.isHidden = modelPlayer.bipedRightArm.isHidden = false;
                     }
-                    if (data.getCutoffHand() == EnumHandSide.RIGHT) {
+                    if (data.getCutoffHand() == HandSide.RIGHT) {
                         modelPlayer.bipedLeftArmwear.isHidden = modelPlayer.bipedLeftArm.isHidden = true;
                     } else {
                         modelPlayer.bipedLeftArmwear.isHidden = modelPlayer.bipedLeftArm.isHidden = false;

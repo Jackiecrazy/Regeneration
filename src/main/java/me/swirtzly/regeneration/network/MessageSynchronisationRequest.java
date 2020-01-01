@@ -2,7 +2,7 @@ package me.swirtzly.regeneration.network;
 
 import io.netty.buffer.ByteBuf;
 import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -13,12 +13,12 @@ import java.util.UUID;
 
 public class MessageSynchronisationRequest implements IMessage {
 
-    private EntityPlayer player;
+    private PlayerEntity player;
 
     public MessageSynchronisationRequest() {
     }
 
-    public MessageSynchronisationRequest(EntityPlayer player) {
+    public MessageSynchronisationRequest(PlayerEntity player) {
         this.player = player;
     }
 

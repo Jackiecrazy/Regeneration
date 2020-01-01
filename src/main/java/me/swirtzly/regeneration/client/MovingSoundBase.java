@@ -2,7 +2,7 @@ package me.swirtzly.regeneration.client;
 
 import me.swirtzly.regeneration.handlers.RegenObjects;
 import me.swirtzly.regeneration.util.RegenUtil;
-import net.minecraft.client.audio.MovingSound;
+import net.minecraft.client.audio.TickableSound;
 import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.SoundCategory;
@@ -15,7 +15,7 @@ import java.util.function.Supplier;
  * Created by Sub
  * on 20/09/2018.
  */
-public class MovingSoundBase extends MovingSound {
+public class MovingSoundBase extends TickableSound {
 
     private final Object entity;
     private final Supplier<Boolean> stopCondition;

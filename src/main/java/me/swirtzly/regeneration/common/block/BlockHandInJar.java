@@ -7,13 +7,14 @@ import me.swirtzly.regeneration.common.entity.EntityLindos;
 import me.swirtzly.regeneration.common.tiles.TileEntityHandInJar;
 import me.swirtzly.regeneration.handlers.RegenObjects;
 import me.swirtzly.regeneration.util.PlayerUtil;
-import net.minecraft.block.BlockDirectional;
+import net.minecraft.block.*;
+import net.minecraft.block.DirectionalBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -23,21 +24,21 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
-public class BlockHandInJar extends BlockDirectional {
+public class BlockHandInJar extends DirectionalBlock {
 
     public BlockHandInJar() {
         super(Material.GOURD);
-        this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.SOUTH));
+        this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, Direction.SOUTH));
         setHardness(5);
     }
 
     @Override
-    public boolean hasTileEntity(IBlockState state) {
+    public boolean hasTileEntity(BlockState state) {
         return true;
     }
 
     @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction facing, float hitX, float hitY, float hitZ) {
         if (worldIn.isRemote) return false;
 
         if (worldIn.getTileEntity(pos) instanceof TileEntityHandInJar) {
@@ -65,7 +66,7 @@ public class BlockHandInJar extends BlockDirectional {
 
     @Nullable
     @Override
-    public TileEntity createTileEntity(World world, IBlockState state) {
+    public TileEntity createTileEntity(World world, BlockState state) {
         return new TileEntityHandInJar();
     }
 
@@ -75,12 +76,12 @@ public class BlockHandInJar extends BlockDirectional {
     }
 
     @Override
-    public EnumBlockRenderType getRenderType(IBlockState state) {
-        return EnumBlockRenderType.MODEL;
+    public BlockRenderType getRenderType(BlockState state) {
+        return BlockRenderType.MODEL;
     }
 
     @Override
-    public boolean isOpaqueCube(IBlockState state) {
+    public boolean isOpaqueCube(BlockState state) {
         return false;
     }
 
@@ -89,7 +90,7 @@ public class BlockHandInJar extends BlockDirectional {
         return new BlockStateContainer(this, FACING);
     }
 
-    public int getMetaFromState(IBlockState state) {
+    public int getMetaFromState(BlockState state) {
         return state.getValue(FACING).getIndex();
     }
 
@@ -97,11 +98,11 @@ public class BlockHandInJar extends BlockDirectional {
      * Returns the blockstate with the given rotation from the passed blockstate. If inapplicable, returns the passed
      * blockstate.
      *
-     * @deprecated call via {@link IBlockState#withRotation(Rotation)} whenever possible. Implementing/overriding is
+     * @deprecated call via {@link BlockState#withRotation(Rotation)} whenever possible. Implementing/overriding is
      * fine.
      */
     @Override
-    public IBlockState withRotation(IBlockState state, Rotation rot) {
+    public BlockState withRotation(BlockState state, Rotation rot) {
         return state.withProperty(FACING, rot.rotate(state.getValue(FACING)));
     }
 
@@ -109,10 +110,10 @@ public class BlockHandInJar extends BlockDirectional {
      * Returns the blockstate with the given mirror of the passed blockstate. If inapplicable, returns the passed
      * blockstate.
      *
-     * @deprecated call via {@link IBlockState#withMirror(Mirror)} whenever possible. Implementing/overriding is fine.
+     * @deprecated call via {@link BlockState#withMirror(Mirror)} whenever possible. Implementing/overriding is fine.
      */
     @Override
-    public IBlockState withMirror(IBlockState state, Mirror mirrorIn) {
+    public BlockState withMirror(BlockState state, Mirror mirrorIn) {
         return state.withRotation(mirrorIn.toRotation(state.getValue(FACING)));
     }
 
@@ -120,18 +121,18 @@ public class BlockHandInJar extends BlockDirectional {
      * Convert the given metadata into a BlockState for this Block
      */
     @Override
-    public IBlockState getStateFromMeta(int meta) {
-        EnumFacing enumfacing = EnumFacing.byIndex(meta);
+    public BlockState getStateFromMeta(int meta) {
+        Direction enumfacing = Direction.byIndex(meta);
 
-        if (enumfacing.getAxis() == EnumFacing.Axis.Y) {
-            enumfacing = EnumFacing.NORTH;
+        if (enumfacing.getAxis() == Direction.Axis.Y) {
+            enumfacing = Direction.NORTH;
         }
 
         return this.getDefaultState().withProperty(FACING, enumfacing);
     }
 
     @Override
-    public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
+    public boolean removedByPlayer(BlockState state, World world, BlockPos pos, PlayerEntity player, boolean willHarvest) {
         if (world.isRemote) return super.removedByPlayer(state, world, pos, player, willHarvest);
         if (world.getTileEntity(pos) instanceof TileEntityHandInJar) {
             TileEntityHandInJar jar = (TileEntityHandInJar) world.getTileEntity(pos);
@@ -147,24 +148,24 @@ public class BlockHandInJar extends BlockDirectional {
     }
 
     @Override
-    public CreativeTabs getCreativeTab() {
-        return CreativeTabs.MISC;
+    public ItemGroup getCreativeTab() {
+        return ItemGroup.MISC;
     }
 
 
     @Override
-    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase entity, ItemStack stack) {
-        EnumFacing entityFacing = entity.getHorizontalFacing();
+    public void onBlockPlacedBy(World world, BlockPos pos, BlockState state, LivingEntity entity, ItemStack stack) {
+        Direction entityFacing = entity.getHorizontalFacing();
 
         if (!world.isRemote) {
-            if (entityFacing == EnumFacing.NORTH) {
-                entityFacing = EnumFacing.SOUTH;
-            } else if (entityFacing == EnumFacing.EAST) {
-                entityFacing = EnumFacing.WEST;
-            } else if (entityFacing == EnumFacing.SOUTH) {
-                entityFacing = EnumFacing.NORTH;
-            } else if (entityFacing == EnumFacing.WEST) {
-                entityFacing = EnumFacing.EAST;
+            if (entityFacing == Direction.NORTH) {
+                entityFacing = Direction.SOUTH;
+            } else if (entityFacing == Direction.EAST) {
+                entityFacing = Direction.WEST;
+            } else if (entityFacing == Direction.SOUTH) {
+                entityFacing = Direction.NORTH;
+            } else if (entityFacing == Direction.WEST) {
+                entityFacing = Direction.EAST;
             }
 
             world.setBlockState(pos, state.withProperty(FACING, entityFacing), 2);

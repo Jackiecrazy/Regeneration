@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.types.TypeHandler;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -36,7 +36,7 @@ public class MessageChangeType implements IMessage {
         @Override
         public IMessage onMessage(MessageChangeType message, MessageContext ctx) {
             ctx.getServerHandler().player.getServerWorld().addScheduledTask(() -> {
-                EntityPlayerMP player = ctx.getServerHandler().player;
+                ServerPlayerEntity player = ctx.getServerHandler().player;
                 IRegeneration data = CapabilityRegeneration.getForPlayer(player);
                 data.setType(TypeHandler.RegenType.valueOf(message.regenType));
                 data.synchronise();

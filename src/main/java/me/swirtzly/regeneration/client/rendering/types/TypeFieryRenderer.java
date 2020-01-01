@@ -9,18 +9,18 @@ import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.types.TypeFiery;
 import me.swirtzly.regeneration.common.types.TypeHandler;
 import me.swirtzly.regeneration.util.RenderUtil;
-import net.minecraft.client.entity.AbstractClientPlayer;
+import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelPlayer;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.RenderLivingBase;
+import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumHandSide;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.HandSide;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.event.RenderPlayerEvent;
@@ -38,7 +38,7 @@ public class TypeFieryRenderer extends ATypeRenderer<TypeFiery> {
     private TypeFieryRenderer() {
     }
 
-    public static void renderCone(EntityPlayer entityPlayer, float scale, float scale2, Vec3d color) {
+    public static void renderCone(PlayerEntity entityPlayer, float scale, float scale2, Vec3d color) {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder vertexBuffer = tessellator.getBuffer();
 
@@ -57,7 +57,7 @@ public class TypeFieryRenderer extends ATypeRenderer<TypeFiery> {
         }
     }
 
-    public static void renderOverlay(EntityPlayer entityPlayer, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale, @Nullable ModelBase base) {
+    public static void renderOverlay(PlayerEntity entityPlayer, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale, @Nullable ModelBase base) {
         GlStateManager.pushMatrix();
         RenderUtil.setLightmapTextureCoords(240, 240);
         GlStateManager.disableLighting();
@@ -69,7 +69,7 @@ public class TypeFieryRenderer extends ATypeRenderer<TypeFiery> {
         GlStateManager.color((float) color.x, (float) color.y, (float) color.z, opacity);
 
         if (base == null) {
-            if (SkinChangingHandler.getSkinType((AbstractClientPlayer) entityPlayer, false) == SkinInfo.SkinType.STEVE) {
+            if (SkinChangingHandler.getSkinType((AbstractClientPlayerEntity) entityPlayer, false) == SkinInfo.SkinType.STEVE) {
                 modelSteve.isChild = false;
                 modelSteve.render(entityPlayer, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
             } else {
@@ -86,7 +86,7 @@ public class TypeFieryRenderer extends ATypeRenderer<TypeFiery> {
         GlStateManager.popMatrix();
     }
 
-    public static void renderConeAtArms(EntityPlayer player) {
+    public static void renderConeAtArms(PlayerEntity player) {
         IRegeneration capability = CapabilityRegeneration.getForPlayer(player);
         double x = TypeHandler.getTypeInstance(capability.getType()).getAnimationProgress(capability);
         double p = 109.89010989010987; // see the wiki for the explanation of these "magic" numbers
@@ -96,7 +96,7 @@ public class TypeFieryRenderer extends ATypeRenderer<TypeFiery> {
         float primaryScale = cf * 4F;
         float secondaryScale = cf * 6.4F;
 
-        NBTTagCompound style = capability.getStyle();
+        CompoundNBT style = capability.getStyle();
         Vec3d primaryColor = new Vec3d(style.getFloat("PrimaryRed"), style.getFloat("PrimaryGreen"), style.getFloat("PrimaryBlue"));
         Vec3d secondaryColor = new Vec3d(style.getFloat("SecondaryRed"), style.getFloat("SecondaryGreen"), style.getFloat("SecondaryBlue"));
 
@@ -139,7 +139,7 @@ public class TypeFieryRenderer extends ATypeRenderer<TypeFiery> {
 
     @Override
     public boolean onAnimateRegen(AnimationContext animationContext) {
-        EntityPlayer player = animationContext.getEntityPlayer();
+        PlayerEntity player = animationContext.getEntityPlayer();
         IRegeneration data = CapabilityRegeneration.getForPlayer(player);
         ModelBiped playerModel = animationContext.getModelBiped();
         double animationProgress = data.getAnimationTicks();
@@ -192,7 +192,7 @@ public class TypeFieryRenderer extends ATypeRenderer<TypeFiery> {
 
     @Deprecated //This duplicated code needs sorted asap
     @Override
-    public void renderHand(EntityPlayer player, EnumHandSide handSide, RenderLivingBase<?> render) {
+    public void renderHand(PlayerEntity player, HandSide handSide, LivingRenderer<?> render) {
         renderConeAtArms(player);
     }
 
@@ -202,7 +202,7 @@ public class TypeFieryRenderer extends ATypeRenderer<TypeFiery> {
     }
 
     @Override
-    public void onRenderLayer(TypeFiery type, RenderLivingBase<?> renderLivingBase, IRegeneration capability, EntityPlayer entityPlayer, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+    public void onRenderLayer(TypeFiery type, LivingRenderer<?> renderLivingBase, IRegeneration capability, PlayerEntity entityPlayer, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
 
         // State manager changes
         GlStateManager.pushAttrib();
@@ -213,7 +213,7 @@ public class TypeFieryRenderer extends ATypeRenderer<TypeFiery> {
         GlStateManager.depthMask(true);
         RenderUtil.setLightmapTextureCoords(65, 65);
 
-        NBTTagCompound style = capability.getStyle();
+        CompoundNBT style = capability.getStyle();
         Vec3d primaryColor = new Vec3d(style.getFloat("PrimaryRed"), style.getFloat("PrimaryGreen"), style.getFloat("PrimaryBlue"));
         Vec3d secondaryColor = new Vec3d(style.getFloat("SecondaryRed"), style.getFloat("SecondaryGreen"), style.getFloat("SecondaryBlue"));
 

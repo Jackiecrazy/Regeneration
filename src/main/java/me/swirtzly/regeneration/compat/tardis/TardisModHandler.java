@@ -6,11 +6,11 @@ import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.types.TypeHandler;
 import me.swirtzly.regeneration.handlers.IActingHandler;
 import me.swirtzly.regeneration.handlers.RegenObjects;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.play.server.SPacketParticles;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.play.server.SSpawnParticlePacket;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
@@ -91,7 +91,7 @@ public class TardisModHandler implements IActingHandler {
         }
     }
 
-    private void damageTardisInRange(EntityPlayer player) {
+    private void damageTardisInRange(PlayerEntity player) {
         if (!RegenConfig.modIntegrations.tardisMod.damageTardis)
             return;
         for (TileEntity te : player.world.loadedTileEntityList) {
@@ -105,7 +105,7 @@ public class TardisModHandler implements IActingHandler {
             // Lets close the door
             ControlDoor controlDoor = tileEntityTardis.getDoor();
             if (controlDoor != null && controlDoor.isOpen()) {
-                controlDoor.processInitialInteract(player, EnumHand.MAIN_HAND);
+                controlDoor.processInitialInteract(player, Hand.MAIN_HAND);
             }
 
             // Lets damage some systems
@@ -113,13 +113,13 @@ public class TardisModHandler implements IActingHandler {
             for (TardisSystems.BaseSystem system : systems) {
                 if (rand.nextInt(5) < 2 && !(system instanceof SystemDimension)) {
                     system.damage();
-                    tileEntityTardis.getWorld().getEntitiesWithinAABB(EntityPlayer.class, player.getEntityBoundingBox().expand(45, 45, 45)).forEach(player1 -> {
-                        if (player1 instanceof EntityPlayerMP) {
-                            EntityPlayerMP entityPlayerMP = (EntityPlayerMP) player1;
+                    tileEntityTardis.getWorld().getEntitiesWithinAABB(PlayerEntity.class, player.getEntityBoundingBox().expand(45, 45, 45)).forEach(player1 -> {
+                        if (player1 instanceof ServerPlayerEntity) {
+                            ServerPlayerEntity entityPlayerMP = (ServerPlayerEntity) player1;
                             BlockPos tilePos = tileEntityTardis.getPos();
                             Vec3d look = new Vec3d(0.1, 0, 0.1);
                             for (int particle = 0; particle < 300; ++particle) {
-                                entityPlayerMP.connection.sendPacket(new SPacketParticles(EnumParticleTypes.EXPLOSION_NORMAL, true, tilePos.getX(), tilePos.getY(), tilePos.getZ(), (float) look.x, (float) look.y, (float) look.z, 2, 25));
+                                entityPlayerMP.connection.sendPacket(new SSpawnParticlePacket(EnumParticleTypes.EXPLOSION_NORMAL, true, tilePos.getX(), tilePos.getY(), tilePos.getZ(), (float) look.x, (float) look.y, (float) look.z, 2, 25));
                                 look = look.rotateYaw(0.003F);
                             }
                         }
@@ -135,8 +135,8 @@ public class TardisModHandler implements IActingHandler {
 
     @SubscribeEvent
     public void onLivingUpdate(LivingEvent.LivingUpdateEvent event) {
-        if (event.getEntityLiving() instanceof EntityPlayer) {
-            EntityPlayer player = (EntityPlayer) event.getEntityLiving();
+        if (event.getEntityLiving() instanceof PlayerEntity) {
+            PlayerEntity player = (PlayerEntity) event.getEntityLiving();
             IRegeneration data = CapabilityRegeneration.getForPlayer(player);
             if (player.dimension == TDimensions.TARDIS_ID) {
                 if (data.getState().isGraceful()) {

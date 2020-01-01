@@ -1,7 +1,7 @@
 package me.swirtzly.regeneration.common.entity;
 
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.ai.EntityAIAttackMelee;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
@@ -11,7 +11,7 @@ import javax.vecmath.Vector3d;
  * Created by Swirtzly
  * on 22/09/2019 @ 21:37
  */
-public class CreepTowardPlayer extends EntityAIAttackMelee {
+public class CreepTowardPlayer extends MeleeAttackGoal {
     private final EntityWatcher eyes;
 
     public CreepTowardPlayer(EntityWatcher creature, double speedIn, boolean useLongMemory) {
@@ -33,7 +33,7 @@ public class CreepTowardPlayer extends EntityAIAttackMelee {
             return true;
 
         Vector3d selfPos = new Vector3d(eyes.posX, eyes.posY, eyes.posZ);
-        EntityLivingBase target = eyes.getAttackTarget();
+        LivingEntity target = eyes.getAttackTarget();
         if (target == null)
             return false;
         Vector3d playerPos = new Vector3d(target.posX, target.posY, target.posZ);

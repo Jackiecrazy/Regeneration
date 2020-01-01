@@ -10,14 +10,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.entity.RenderLivingBase;
+import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.monster.EntityCreeper;
-import net.minecraft.entity.monster.EntityEnderman;
-import net.minecraft.entity.monster.EntitySpider;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.MobEffects;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.monster.CreeperEntity;
+import net.minecraft.entity.monster.EndermanEntity;
+import net.minecraft.entity.monster.SpiderEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -37,7 +37,7 @@ public class RegenClientHooks {
         MinecraftForge.EVENT_BUS.post(rotationEvent);
     }
 
-    public static void preRenderCallBack(RenderLivingBase renderer, EntityLivingBase entity) {
+    public static void preRenderCallBack(LivingRenderer renderer, LivingEntity entity) {
         if (entity == null)
             return;
         RenderCallbackEvent ev = new RenderCallbackEvent(entity, renderer);
@@ -53,8 +53,8 @@ public class RegenClientHooks {
 
         if (OpenGlHelper.shadersSupported) {
             Entity entity = Minecraft.getMinecraft().getRenderViewEntity();
-            if (entity instanceof EntityPlayer) {
-                EntityPlayer player = (EntityPlayer) entity;
+            if (entity instanceof PlayerEntity) {
+                PlayerEntity player = (PlayerEntity) entity;
                 IRegeneration data = CapabilityRegeneration.getForPlayer(player);
                 switch (data.getState()) {
                     case POST:
@@ -83,11 +83,11 @@ public class RegenClientHooks {
         Entity entityIn = Minecraft.getMinecraft().getRenderViewEntity();
         entityRender.stopUseShader();
 
-        if (entityIn instanceof EntityCreeper) {
+        if (entityIn instanceof CreeperEntity) {
             entityRender.loadShader(new ResourceLocation("shaders/post/creeper.json"));
-        } else if (entityIn instanceof EntitySpider) {
+        } else if (entityIn instanceof SpiderEntity) {
             entityRender.loadShader(new ResourceLocation("shaders/post/spider.json"));
-        } else if (entityIn instanceof EntityEnderman) {
+        } else if (entityIn instanceof EndermanEntity) {
             entityRender.loadShader(new ResourceLocation("shaders/post/invert.json"));
         } else net.minecraftforge.client.ForgeHooksClient.loadEntityShader(entityIn, entityRender);
     }
@@ -142,7 +142,7 @@ public class RegenClientHooks {
         }
 
         colorModeCache = 1;
-        if (Minecraft.getMinecraft().player.isPotionActive(MobEffects.NIGHT_VISION) && colorModeCache == 0) {
+        if (Minecraft.getMinecraft().player.isPotionActive(Effects.NIGHT_VISION) && colorModeCache == 0) {
             for (int i = 0; i < original.length; i++) {
                 int height = i / 16;
 
@@ -176,8 +176,8 @@ public class RegenClientHooks {
     }
 
     private static boolean enabled() {
-        if (Minecraft.getMinecraft().player != null && Minecraft.getMinecraft().getRenderViewEntity() instanceof EntityPlayer) {
-            return CapabilityRegeneration.getForPlayer((EntityPlayer) Minecraft.getMinecraft().getRenderViewEntity()).getState() == PlayerUtil.RegenState.GRACE_CRIT;
+        if (Minecraft.getMinecraft().player != null && Minecraft.getMinecraft().getRenderViewEntity() instanceof PlayerEntity) {
+            return CapabilityRegeneration.getForPlayer((PlayerEntity) Minecraft.getMinecraft().getRenderViewEntity()).getState() == PlayerUtil.RegenState.GRACE_CRIT;
         }
         return false;
     }

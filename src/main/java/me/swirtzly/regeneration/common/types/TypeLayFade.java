@@ -4,8 +4,8 @@ import me.swirtzly.regeneration.client.rendering.types.TypeLayFadeRenderer;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.handlers.RegenObjects;
 import me.swirtzly.regeneration.util.PlayerUtil;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.Vec3d;
 
@@ -24,20 +24,20 @@ public class TypeLayFade implements IRegenType<TypeLayFadeRenderer> {
     }
 
     @Override
-    public void onStartRegeneration(EntityPlayer player, IRegeneration capability) {
+    public void onStartRegeneration(PlayerEntity player, IRegeneration capability) {
 
     }
 
     @Override
-    public void onUpdateMidRegen(EntityPlayer player, IRegeneration capability) {
+    public void onUpdateMidRegen(PlayerEntity player, IRegeneration capability) {
         if (!player.world.isRemote) {
-            PlayerUtil.setPerspective((EntityPlayerMP) player, true, false);
+            PlayerUtil.setPerspective((ServerPlayerEntity) player, true, false);
         }
     }
 
     @Override
-    public void onFinishRegeneration(EntityPlayer player, IRegeneration capability) {
-        PlayerUtil.setPerspective((EntityPlayerMP) player, false, true);
+    public void onFinishRegeneration(PlayerEntity player, IRegeneration capability) {
+        PlayerUtil.setPerspective((ServerPlayerEntity) player, false, true);
     }
 
     @Override

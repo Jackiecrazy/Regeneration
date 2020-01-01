@@ -3,24 +3,24 @@ package me.swirtzly.regeneration.common.entity;
 import me.swirtzly.regeneration.common.item.ItemLindos;
 import me.swirtzly.regeneration.handlers.RegenObjects;
 import me.swirtzly.regeneration.util.ClientUtil;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityFlying;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.FlyingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityFlyHelper;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.ai.controller.FlyingMovementController;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.pathfinding.PathNavigate;
-import net.minecraft.pathfinding.PathNavigateFlying;
+import net.minecraft.pathfinding.FlyingPathNavigator;
+import net.minecraft.pathfinding.PathNavigator;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class EntityLindos extends EntityFlying {
+public class EntityLindos extends FlyingEntity {
 
     private static final DataParameter<Integer> AMOUNT = EntityDataManager.createKey(EntityLindos.class, DataSerializers.VARINT);
 
@@ -28,7 +28,7 @@ public class EntityLindos extends EntityFlying {
     public EntityLindos(World worldIn) {
         super(worldIn);
         setSize(0.5F, 0.5F);
-        this.moveHelper = new EntityFlyHelper(this);
+        this.moveHelper = new FlyingMovementController(this);
         noClip = true;
     }
 
@@ -48,8 +48,8 @@ public class EntityLindos extends EntityFlying {
     }
 
     @Override
-    protected PathNavigate createNavigator(World worldIn) {
-        PathNavigateFlying pathnavigateflying = new PathNavigateFlying(this, worldIn);
+    protected PathNavigator createNavigator(World worldIn) {
+        FlyingPathNavigator pathnavigateflying = new FlyingPathNavigator(this, worldIn);
         pathnavigateflying.setCanOpenDoors(false);
         pathnavigateflying.setCanFloat(true);
         pathnavigateflying.setCanEnterDoors(true);
@@ -80,7 +80,7 @@ public class EntityLindos extends EntityFlying {
     }
 
     @Override
-    protected boolean processInteract(EntityPlayer player, EnumHand hand) {
+    protected boolean processInteract(PlayerEntity player, Hand hand) {
 
         if (!world.isRemote) {
             ItemStack stack = player.getHeldItem(hand);
@@ -98,7 +98,7 @@ public class EntityLindos extends EntityFlying {
     }
 
     @Override
-    protected void updateFallState(double y, boolean onGroundIn, IBlockState state, BlockPos pos) {
+    protected void updateFallState(double y, boolean onGroundIn, BlockState state, BlockPos pos) {
     }
 
     @Override

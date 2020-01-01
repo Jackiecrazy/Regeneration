@@ -8,9 +8,9 @@ import me.swirtzly.regeneration.util.ClientUtil;
 import me.swirtzly.regeneration.util.PlayerUtil;
 import me.swirtzly.regeneration.util.RegenUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.EnumHandSide;
+import net.minecraft.util.HandSide;
 import net.minecraft.util.SoundCategory;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 
 class ActingClientHandler implements IActingHandler {
 
@@ -40,10 +40,10 @@ class ActingClientHandler implements IActingHandler {
 
     @Override
     public void onRegenFinish(IRegeneration cap) {
-        ClientUtil.createToast(new TextComponentTranslation("regeneration.toast.regenerated"), new TextComponentTranslation("regeneration.toast.regenerations_left", cap.getRegenerationsLeft()));
+        ClientUtil.createToast(new TranslationTextComponent("regeneration.toast.regenerated"), new TranslationTextComponent("regeneration.toast.regenerations_left", cap.getRegenerationsLeft()));
 
         if (RegenConfig.changeHand && cap.getPlayer().getUniqueID() == Minecraft.getMinecraft().player.getUniqueID()) {
-            Minecraft.getMinecraft().gameSettings.mainHand = RegenUtil.randomEnum(EnumHandSide.class);
+            Minecraft.getMinecraft().gameSettings.mainHand = RegenUtil.randomEnum(HandSide.class);
             Minecraft.getMinecraft().gameSettings.sendSettingsToServer();
         }
         RegenClientHooks.handleShader();
@@ -69,7 +69,7 @@ class ActingClientHandler implements IActingHandler {
 
     @Override
     public void onGoCritical(IRegeneration cap) {
-        ClientUtil.createToast(new TextComponentTranslation("regeneration.toast.enter_critical"), new TextComponentTranslation("regeneration.toast.enter_critical.sub", RegenConfig.grace.criticalPhaseLength / 60));
+        ClientUtil.createToast(new TranslationTextComponent("regeneration.toast.enter_critical"), new TranslationTextComponent("regeneration.toast.enter_critical.sub", RegenConfig.grace.criticalPhaseLength / 60));
         ClientUtil.playSound(cap.getPlayer(), RegenObjects.Sounds.CRITICAL_STAGE.getRegistryName(), SoundCategory.PLAYERS, true, () -> cap.getState() != PlayerUtil.RegenState.GRACE_CRIT, 1.0F);
         RegenClientHooks.handleShader();
     }

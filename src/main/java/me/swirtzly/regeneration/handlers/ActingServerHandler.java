@@ -12,12 +12,12 @@ import me.swirtzly.regeneration.util.PlayerUtil;
 import me.swirtzly.regeneration.util.RegenUtil;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.MobEffects;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.potion.Effects;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.SoundCategory;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 
 import java.util.UUID;
@@ -36,7 +36,7 @@ class ActingServerHandler implements IActingHandler {
 
     @Override
     public void onRegenTick(IRegeneration cap) {
-        EntityPlayer player = cap.getPlayer();
+        PlayerEntity player = cap.getPlayer();
         float stateProgress = (float) cap.getStateManager().getStateProgress();
 
         switch (cap.getState()) {
@@ -55,10 +55,10 @@ class ActingServerHandler implements IActingHandler {
                 float nauseaPercentage = 0.5F;
 
                 if (stateProgress > nauseaPercentage) {
-                    PlayerUtil.applyPotionIfAbsent(player, MobEffects.NAUSEA, (int) (RegenConfig.grace.criticalPhaseLength * 20 * (1 - nauseaPercentage) * 1.5F), 0, false, false);
+                    PlayerUtil.applyPotionIfAbsent(player, Effects.NAUSEA, (int) (RegenConfig.grace.criticalPhaseLength * 20 * (1 - nauseaPercentage) * 1.5F), 0, false, false);
                 }
 
-                PlayerUtil.applyPotionIfAbsent(player, MobEffects.WEAKNESS, (int) (RegenConfig.grace.criticalPhaseLength * 20 * (1 - stateProgress)), 0, false, false);
+                PlayerUtil.applyPotionIfAbsent(player, Effects.WEAKNESS, (int) (RegenConfig.grace.criticalPhaseLength * 20 * (1 - stateProgress)), 0, false, false);
 
                 if (player.world.rand.nextDouble() < (RegenConfig.grace.criticalDamageChance / 100F))
                     player.attackEntityFrom(RegenObjects.REGEN_DMG_CRITICAL, player.world.rand.nextFloat() + .5F);
@@ -69,7 +69,7 @@ class ActingServerHandler implements IActingHandler {
                 float weaknessPercentage = 0.5F;
 
                 if (stateProgress > weaknessPercentage) {
-                    PlayerUtil.applyPotionIfAbsent(player, MobEffects.WEAKNESS, (int) (RegenConfig.grace.gracePhaseLength * 20 * (1 - weaknessPercentage) + RegenConfig.grace.criticalPhaseLength * 20), 0, false, false);
+                    PlayerUtil.applyPotionIfAbsent(player, Effects.WEAKNESS, (int) (RegenConfig.grace.gracePhaseLength * 20 * (1 - weaknessPercentage) + RegenConfig.grace.criticalPhaseLength * 20), 0, false, false);
                 }
 
                 break;
@@ -83,7 +83,7 @@ class ActingServerHandler implements IActingHandler {
 
     @Override
     public void onEnterGrace(IRegeneration cap) {
-        EntityPlayer player = cap.getPlayer();
+        PlayerEntity player = cap.getPlayer();
         // Reduce number of hearts, but compensate with absorption
         player.setAbsorptionAmount(player.getMaxHealth() * (float) HEART_REDUCTION);
 
@@ -99,13 +99,13 @@ class ActingServerHandler implements IActingHandler {
 
     @Override
     public void onHandsStartGlowing(IRegeneration cap) {
-        PlayerUtil.sendMessage(cap.getPlayer(), new TextComponentTranslation("regeneration.messages.regen_warning"), true);
+        PlayerUtil.sendMessage(cap.getPlayer(), new TranslationTextComponent("regeneration.messages.regen_warning"), true);
     }
 
     @Override
     public void onGoCritical(IRegeneration cap) {
 
-        RegenTriggers.CRITICAL.trigger((EntityPlayerMP) cap.getPlayer());
+        RegenTriggers.CRITICAL.trigger((ServerPlayerEntity) cap.getPlayer());
 
         if (!cap.getPlayer().getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).hasModifier(slownessModifier)) {
             cap.getPlayer().getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(slownessModifier);
@@ -114,9 +114,9 @@ class ActingServerHandler implements IActingHandler {
 
     @Override
     public void onRegenFinish(IRegeneration cap) {
-        EntityPlayer player = cap.getPlayer();
-        RegenTriggers.FIRST_REGENERATION.trigger((EntityPlayerMP) cap.getPlayer());
-        player.addPotionEffect(new PotionEffect(MobEffects.REGENERATION, RegenConfig.postRegen.postRegenerationDuration * 2, RegenConfig.postRegen.postRegenerationLevel - 1, false, false));
+        PlayerEntity player = cap.getPlayer();
+        RegenTriggers.FIRST_REGENERATION.trigger((ServerPlayerEntity) cap.getPlayer());
+        player.addPotionEffect(new EffectInstance(Effects.REGENERATION, RegenConfig.postRegen.postRegenerationDuration * 2, RegenConfig.postRegen.postRegenerationLevel - 1, false, false));
         player.setHealth(player.getMaxHealth());
         player.setAbsorptionAmount(RegenConfig.postRegen.absorbtionLevel * 2);
         if (RegenConfig.onRegen.traitsEnabled) {
@@ -124,7 +124,7 @@ class ActingServerHandler implements IActingHandler {
             DnaHandler.IDna newDna = DnaHandler.getDnaEntry(cap.getDnaType());
             newDna.onAdded(cap);
             cap.setDnaActive(true);
-            PlayerUtil.sendMessage(player, new TextComponentTranslation(newDna.getLangKey()), true);
+            PlayerUtil.sendMessage(player, new TranslationTextComponent(newDna.getLangKey()), true);
         }
         RegenUtil.resetNextSkin(player);
     }
@@ -136,7 +136,7 @@ class ActingServerHandler implements IActingHandler {
 
     @Override
     public void onProcessDone(IRegeneration cap) {
-        EntityPlayer player = cap.getPlayer();
+        PlayerEntity player = cap.getPlayer();
         if (player.world.rand.nextBoolean()) {
             EntityLindos lindos = new EntityLindos(player.world);
             lindos.setLocationAndAngles(player.posX, player.posY + player.getEyeHeight(), player.posZ, 0, 0);
@@ -148,7 +148,7 @@ class ActingServerHandler implements IActingHandler {
 
     @Override
     public void onRegenTrigger(IRegeneration cap) {
-        EntityPlayer player = cap.getPlayer();
+        PlayerEntity player = cap.getPlayer();
         NetworkHandler.INSTANCE.sendToAllAround(new MessagePlayRegenerationSound(RegenUtil.getRandomSound(TypeHandler.getTypeInstance(cap.getType()).getRegeneratingSounds(), player.world.rand), player.getUniqueID().toString()), new NetworkRegistry.TargetPoint(player.dimension, player.posX, player.posY, player.posZ, 40));
         player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).removeModifier(MAX_HEALTH_ID);
         player.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).removeModifier(SLOWNESS_ID);

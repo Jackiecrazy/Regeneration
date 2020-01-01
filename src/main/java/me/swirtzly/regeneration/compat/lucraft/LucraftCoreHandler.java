@@ -16,7 +16,7 @@ import me.swirtzly.regeneration.handlers.IActingHandler;
 import me.swirtzly.regeneration.util.ClientUtil;
 import me.swirtzly.regeneration.util.PlayerUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.client.event.InputUpdateEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -95,8 +95,8 @@ public class LucraftCoreHandler implements IActingHandler {
 
     @SubscribeEvent
     public void onHurt(LivingHurtEvent e) {
-        if (e.getEntityLiving() instanceof EntityPlayer) {
-            EntityPlayer player = (EntityPlayer) e.getEntityLiving();
+        if (e.getEntityLiving() instanceof PlayerEntity) {
+            PlayerEntity player = (PlayerEntity) e.getEntityLiving();
             IRegeneration data = CapabilityRegeneration.getForPlayer(player);
             boolean flag = data.canRegenerate() && e.getSource() == PotionRadiation.RADIATION && RegenConfig.modIntegrations.lucraftcore.immuneToRadiation;
             e.setCanceled(flag);
@@ -115,9 +115,9 @@ public class LucraftCoreHandler implements IActingHandler {
     @SubscribeEvent(receiveCanceled = true)
     @SideOnly(Side.CLIENT)
     public void onAnimation(RenderModelEvent.SetRotationAngels ev) {
-        if (ev.getEntity() instanceof EntityPlayer) {
-            AnimationContext context = new AnimationContext(ev.model, (EntityPlayer) ev.getEntity(), ev.limbSwing, ev.limbSwingAmount, ev.ageInTicks, ev.netHeadYaw, ev.headPitch);
-            IRegeneration data = CapabilityRegeneration.getForPlayer((EntityPlayer) ev.getEntity());
+        if (ev.getEntity() instanceof PlayerEntity) {
+            AnimationContext context = new AnimationContext(ev.model, (PlayerEntity) ev.getEntity(), ev.limbSwing, ev.limbSwingAmount, ev.ageInTicks, ev.netHeadYaw, ev.headPitch);
+            IRegeneration data = CapabilityRegeneration.getForPlayer((PlayerEntity) ev.getEntity());
             if (data.getState() == REGENERATING) {
                 IRegenType type = TypeHandler.getTypeInstance(data.getType());
                 ev.setCanceled(type.getRenderer().onAnimateRegen(context));

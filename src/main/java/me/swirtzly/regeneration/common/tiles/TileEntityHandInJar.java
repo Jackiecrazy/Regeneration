@@ -4,21 +4,21 @@ import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.handlers.RegenObjects;
 import me.swirtzly.regeneration.util.PlayerUtil;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
@@ -43,7 +43,7 @@ public class TileEntityHandInJar extends TileEntity implements ITickable, IInven
             world.playSound(null, getPos().getX(), getPos().getY(), getPos().getZ(), RegenObjects.Sounds.JAR_BUBBLES, SoundCategory.PLAYERS, 0.4F, 0.3F);
         }
 
-        EntityPlayer player = world.getClosestPlayer(getPos().getX(), getPos().getY(), getPos().getZ(), 56, false);
+        PlayerEntity player = world.getClosestPlayer(getPos().getX(), getPos().getY(), getPos().getZ(), 56, false);
         if (player != null) {
             IRegeneration data = CapabilityRegeneration.getForPlayer(player);
             if (data.getState() == PlayerUtil.RegenState.REGENERATING) {
@@ -64,7 +64,7 @@ public class TileEntityHandInJar extends TileEntity implements ITickable, IInven
 
 
     @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+    public CompoundNBT writeToNBT(CompoundNBT compound) {
         compound.setFloat("lindos", lindosAmont);
         compound.setBoolean("hasHand", hasHand());
         ItemStackHelper.saveAllItems(compound, this.handInv);
@@ -73,7 +73,7 @@ public class TileEntityHandInJar extends TileEntity implements ITickable, IInven
 
 
     @Override
-    public void readFromNBT(NBTTagCompound compound) {
+    public void readFromNBT(CompoundNBT compound) {
         lindosAmont = compound.getInteger("lindos");
         ItemStackHelper.loadAllItems(compound, this.handInv);
         super.readFromNBT(compound);
@@ -127,17 +127,17 @@ public class TileEntityHandInJar extends TileEntity implements ITickable, IInven
     }
 
     @Override
-    public boolean isUsableByPlayer(EntityPlayer player) {
+    public boolean isUsableByPlayer(PlayerEntity player) {
         return true;
     }
 
     @Override
-    public void openInventory(EntityPlayer player) {
+    public void openInventory(PlayerEntity player) {
         this.world.notifyNeighborsOfStateChange(this.pos, this.getBlockType(), false);
     }
 
     @Override
-    public void closeInventory(EntityPlayer player) {
+    public void closeInventory(PlayerEntity player) {
 
     }
 
@@ -179,21 +179,21 @@ public class TileEntityHandInJar extends TileEntity implements ITickable, IInven
     @Nullable
     @Override
     public ITextComponent getDisplayName() {
-        return new TextComponentTranslation(RegenObjects.Blocks.HAND_JAR.getLocalizedName());
+        return new TranslationTextComponent(RegenObjects.Blocks.HAND_JAR.getLocalizedName());
     }
 
     @Override
-    public SPacketUpdateTileEntity getUpdatePacket() {
-        return new SPacketUpdateTileEntity(pos, 3, getUpdateTag());
+    public SUpdateTileEntityPacket getUpdatePacket() {
+        return new SUpdateTileEntityPacket(pos, 3, getUpdateTag());
     }
 
     @Override
-    public NBTTagCompound getUpdateTag() {
-        return writeToNBT(new NBTTagCompound());
+    public CompoundNBT getUpdateTag() {
+        return writeToNBT(new CompoundNBT());
     }
 
     @Override
-    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+    public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
         super.onDataPacket(net, pkt);
         handleUpdateTag(pkt.getNbtCompound());
     }
@@ -206,7 +206,7 @@ public class TileEntityHandInJar extends TileEntity implements ITickable, IInven
     }
 
     @Override
-    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate) {
+    public boolean shouldRefresh(World world, BlockPos pos, BlockState oldState, BlockState newSate) {
         return false;
     }
 }

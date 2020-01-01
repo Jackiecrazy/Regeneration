@@ -1,6 +1,6 @@
 package me.swirtzly.regeneration.compat.lucraft;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;
 
@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.Cancelable;
 
 @Cancelable
 public class PlayerCanRegenEvent extends PlayerEvent {
-    public PlayerCanRegenEvent(EntityPlayer player) {
+    public PlayerCanRegenEvent(PlayerEntity player) {
         super(player);
     }
 }

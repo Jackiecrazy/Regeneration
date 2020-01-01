@@ -10,7 +10,7 @@ import me.swirtzly.regeneration.util.ClientUtil;
 import me.swirtzly.regeneration.util.EnumCompatModids;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.MovementInput;
 import net.minecraftforge.client.event.InputUpdateEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -47,7 +47,7 @@ public class RegenKeyBinds {
 
 
     public static void handleGeneralInputs(InputUpdateEvent e) {
-        EntityPlayer player = Minecraft.getMinecraft().player;
+        PlayerEntity player = Minecraft.getMinecraft().player;
 
         if (player == null) return;
 

@@ -3,7 +3,7 @@ package me.swirtzly.regeneration.network;
 import io.netty.buffer.ByteBuf;
 import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -15,12 +15,12 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
  */
 public class MessageSaveStyle implements IMessage {
 
-    private NBTTagCompound style;
+    private CompoundNBT style;
 
     public MessageSaveStyle() {
     }
 
-    public MessageSaveStyle(NBTTagCompound nbtTagCompound) {
+    public MessageSaveStyle(CompoundNBT nbtTagCompound) {
         style = nbtTagCompound;
     }
 

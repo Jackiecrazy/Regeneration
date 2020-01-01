@@ -16,20 +16,17 @@ import me.swirtzly.regeneration.network.MessageSynchroniseRegeneration;
 import me.swirtzly.regeneration.network.NetworkHandler;
 import me.swirtzly.regeneration.util.DebuggableScheduledAction;
 import me.swirtzly.regeneration.util.PlayerUtil;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumHandSide;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.*;
+import net.minecraft.util.HandSide;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.event.HoverEvent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -51,7 +48,7 @@ public class CapabilityRegeneration implements IRegeneration {
     public static final Capability<IRegeneration> CAPABILITY = null;
     public static final ResourceLocation CAP_REGEN_ID = new ResourceLocation(RegenerationMod.MODID, "regeneration");
 
-    private final EntityPlayer player;
+    private final PlayerEntity player;
     private final RegenerationStateManager stateManager;
     public int regenerationsLeft, ticksAnimating = 0;
     private boolean didSetup = false, traitActive = true, syncingToJar = false, handDropped = false;
@@ -66,7 +63,7 @@ public class CapabilityRegeneration implements IRegeneration {
     private ResourceLocation traitLocation = new ResourceLocation(RegenerationMod.MODID, "boring");
     private SkinInfo.SkinType nextSkinType = SkinInfo.SkinType.ALEX;
     private SkinInfo.SkinType skinType = SkinInfo.SkinType.ALEX;
-    private EnumHandSide cutOffHand = EnumHandSide.LEFT;
+    private HandSide cutOffHand = HandSide.LEFT;
 
     /**
      * WHY THIS IS A SEPARATE FIELD: the hands are glowing if <code>stateManager.handGlowTimer.getTransition() == Transition.HAND_GLOW_TRIGGER</code>, however the state manager isn't available on the client.
@@ -79,7 +76,7 @@ public class CapabilityRegeneration implements IRegeneration {
         this.stateManager = null;
     }
 
-    public CapabilityRegeneration(EntityPlayer player) {
+    public CapabilityRegeneration(PlayerEntity player) {
         this.player = player;
         if (!player.world.isRemote)
             this.stateManager = new RegenerationStateManager();
@@ -88,7 +85,7 @@ public class CapabilityRegeneration implements IRegeneration {
     }
 
     @Nonnull
-    public static IRegeneration getForPlayer(EntityPlayer player) {
+    public static IRegeneration getForPlayer(PlayerEntity player) {
         if (player.hasCapability(CAPABILITY, null)) {
             return player.getCapability(CAPABILITY, null);
         }
@@ -117,7 +114,7 @@ public class CapabilityRegeneration implements IRegeneration {
                 synchronise();
             } else {
                 if (isSyncingToJar()) {
-                    PlayerUtil.setPerspective((EntityPlayerMP) player, true, false);
+                    PlayerUtil.setPerspective((ServerPlayerEntity) player, true, false);
                 }
             }
         }
@@ -151,15 +148,15 @@ public class CapabilityRegeneration implements IRegeneration {
             throw new IllegalStateException("Don't sync client -> server");
 
         handsAreGlowingClient = state.isGraceful() && stateManager.handGlowTimer.getTransition() == PlayerUtil.RegenState.Transition.HAND_GLOW_TRIGGER;
-        NBTTagCompound nbt = serializeNBT();
+        CompoundNBT nbt = serializeNBT();
         nbt.removeTag("stateManager");
         NetworkHandler.INSTANCE.sendToAll(new MessageSynchroniseRegeneration(player, nbt));
     }
 
 
     @Override
-    public NBTTagCompound serializeNBT() {
-        NBTTagCompound nbt = new NBTTagCompound();
+    public CompoundNBT serializeNBT() {
+        CompoundNBT nbt = new CompoundNBT();
         nbt.setString("state", state.toString());
         nbt.setInteger("regenerationsLeft", regenerationsLeft);
         nbt.setTag("style", getStyle());
@@ -191,7 +188,7 @@ public class CapabilityRegeneration implements IRegeneration {
     }
 
     @Override
-    public void deserializeNBT(NBTTagCompound nbt) {
+    public void deserializeNBT(CompoundNBT nbt) {
         regenerationsLeft = Math.min(RegenConfig.regenCapacity, nbt.getInteger(nbt.hasKey("livesLeft") ? "livesLeft" : "regenerationsLeft"));
 
         //TODO could probably use a utility method that checks is a key exists and returns a default value if it doesn't
@@ -259,7 +256,7 @@ public class CapabilityRegeneration implements IRegeneration {
         }
 
         if (nbt.hasKey("cutOffHand")) {
-            cutOffHand = EnumHandSide.valueOf(nbt.getString("cutOffhand"));
+            cutOffHand = HandSide.valueOf(nbt.getString("cutOffhand"));
         }
     }
 
@@ -277,7 +274,7 @@ public class CapabilityRegeneration implements IRegeneration {
 
 
     @Override
-    public EntityPlayer getPlayer() {
+    public PlayerEntity getPlayer() {
         return player;
     }
 
@@ -304,8 +301,8 @@ public class CapabilityRegeneration implements IRegeneration {
 
 
     @Override
-    public NBTTagCompound getStyle() {
-        NBTTagCompound nbt = new NBTTagCompound();
+    public CompoundNBT getStyle() {
+        CompoundNBT nbt = new CompoundNBT();
         nbt.setFloat("PrimaryRed", primaryRed);
         nbt.setFloat("PrimaryGreen", primaryGreen);
         nbt.setFloat("PrimaryBlue", primaryBlue);
@@ -317,7 +314,7 @@ public class CapabilityRegeneration implements IRegeneration {
     }
 
     @Override
-    public void setStyle(NBTTagCompound nbt) {
+    public void setStyle(CompoundNBT nbt) {
         primaryRed = nbt.getFloat("PrimaryRed");
         primaryGreen = nbt.getFloat("PrimaryGreen");
         primaryBlue = nbt.getFloat("PrimaryBlue");
@@ -468,12 +465,12 @@ public class CapabilityRegeneration implements IRegeneration {
     }
 
     @Override
-    public EnumHandSide getCutoffHand() {
+    public HandSide getCutoffHand() {
         return cutOffHand;
     }
 
     @Override
-    public void setCutOffHand(EnumHandSide side) {
+    public void setCutOffHand(HandSide side) {
         cutOffHand = side;
     }
 
@@ -606,12 +603,12 @@ public class CapabilityRegeneration implements IRegeneration {
 
         @Override
         public void onPunchEntity(LivingHurtEvent event) {
-            EntityLivingBase entity = event.getEntityLiving();
+            LivingEntity entity = event.getEntityLiving();
             // We're healing mobs...
             if (state.isGraceful() && entity.getHealth() < entity.getMaxHealth() && areHandsGlowing() && player.isSneaking()) { // ... check if we're in grace and if the mob needs health
                 float healthNeeded = entity.getMaxHealth() - entity.getHealth();
                 entity.heal(healthNeeded);
-                PlayerUtil.sendMessage(player, new TextComponentTranslation("message.regeneration.healed", entity.getName()), true);
+                PlayerUtil.sendMessage(player, new TranslationTextComponent("message.regeneration.healed", entity.getName()), true);
                 event.setAmount(0.0F);
                 player.attackEntityFrom(RegenObjects.REGEN_DMG_HEALING, healthNeeded);
             }
@@ -621,7 +618,7 @@ public class CapabilityRegeneration implements IRegeneration {
         public void onPunchBlock(PlayerInteractEvent.LeftClickBlock e) {
             if (getState().isGraceful() && areHandsGlowing()) {
 
-                IBlockState block = e.getWorld().getBlockState(e.getPos());
+                BlockState block = e.getWorld().getBlockState(e.getPos());
 
                 if (block.getBlock() == Blocks.SNOW || block.getBlock() == Blocks.SNOW_LAYER) {
                     e.getWorld().playSound(null, e.getPos(), SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 1, 1);
@@ -635,8 +632,8 @@ public class CapabilityRegeneration implements IRegeneration {
                 handGlowTimer.cancel();
                 scheduleNextHandGlow();
                 if (!player.world.isRemote) {
-                    RegenTriggers.CHANGE_REFUSAL.trigger((EntityPlayerMP) player);
-                    PlayerUtil.sendMessage(player, new TextComponentTranslation("regeneration.messages.regen_delayed"), true);
+                    RegenTriggers.CHANGE_REFUSAL.trigger((ServerPlayerEntity) player);
+                    PlayerUtil.sendMessage(player, new TranslationTextComponent("regeneration.messages.regen_delayed"), true);
                 }
                 e.setCanceled(true); //It got annoying in creative to break something
             }
@@ -661,8 +658,8 @@ public class CapabilityRegeneration implements IRegeneration {
             state = PlayerUtil.RegenState.REGENERATING;
 
             if (RegenConfig.sendRegenDeathMessages) {
-                TextComponentTranslation text = new TextComponentTranslation("regeneration.messages.regen_chat_message", player.getName());
-                text.getStyle().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(getDeathSource())));
+                TranslationTextComponent text = new TranslationTextComponent("regeneration.messages.regen_chat_message", player.getName());
+                text.getStyle().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new StringTextComponent(getDeathSource())));
                 PlayerUtil.sendMessageToAll(text);
             }
 
@@ -715,7 +712,7 @@ public class CapabilityRegeneration implements IRegeneration {
             state = PlayerUtil.RegenState.ALIVE;
             synchronise();
             nextTransition = null;
-            PlayerUtil.sendMessage(player, new TextComponentTranslation("regeneration.messages.post_ended"), true);
+            PlayerUtil.sendMessage(player, new TranslationTextComponent("regeneration.messages.post_ended"), true);
             ActingForwarder.onProcessDone(CapabilityRegeneration.this);
         }
 
@@ -747,8 +744,8 @@ public class CapabilityRegeneration implements IRegeneration {
 
         @SuppressWarnings("deprecation")
         @Override
-        public NBTTagCompound serializeNBT() {
-            NBTTagCompound nbt = new NBTTagCompound();
+        public CompoundNBT serializeNBT() {
+            CompoundNBT nbt = new CompoundNBT();
             if (nextTransition != null && nextTransition.getTicksLeft() >= 0) {
                 nbt.setString("transitionId", nextTransition.transition.toString());
                 nbt.setLong("transitionInTicks", nextTransition.getTicksLeft());
@@ -762,7 +759,7 @@ public class CapabilityRegeneration implements IRegeneration {
         }
 
         @Override
-        public void deserializeNBT(NBTTagCompound nbt) {
+        public void deserializeNBT(CompoundNBT nbt) {
             if (nbt.hasKey("transitionId"))
                 scheduleTransitionInTicks(PlayerUtil.RegenState.Transition.valueOf(nbt.getString("transitionId")), nbt.getLong("transitionInTicks"));
 

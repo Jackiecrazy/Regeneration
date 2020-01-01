@@ -1,12 +1,12 @@
 package me.swirtzly.regeneration.client.image;
 
-import net.minecraft.client.renderer.ImageBufferDownload;
+import net.minecraft.client.renderer.DownloadImageBuffer;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 
-public class ImageBufferDownloadAlt extends ImageBufferDownload {
+public class ImageBufferDownloadAlt extends DownloadImageBuffer {
     private int[] imageData;
     private int imageWidth;
     private int imageHeight;

@@ -7,8 +7,8 @@ import me.swirtzly.regeneration.common.traits.negative.DnaHunger;
 import me.swirtzly.regeneration.common.traits.negative.DnaHydrophobic;
 import me.swirtzly.regeneration.common.traits.positive.*;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.projectile.EntityArrow;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.AbstractArrowEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
@@ -85,8 +85,8 @@ public class DnaHandler {
 
     @SubscribeEvent
     public static void onJump(LivingEvent.LivingJumpEvent event) {
-        if (event.getEntityLiving() instanceof EntityPlayer) {
-            EntityPlayer player = (EntityPlayer) event.getEntityLiving();
+        if (event.getEntityLiving() instanceof PlayerEntity) {
+            PlayerEntity player = (PlayerEntity) event.getEntityLiving();
             IRegeneration data = CapabilityRegeneration.getForPlayer(player);
             if (player.world.isRemote) return;
             if (data.isDnaActive() && data.getDnaType().equals(DNA_ATHLETE.getRegistryName())) {
@@ -101,9 +101,9 @@ public class DnaHandler {
         DamageSource source = event.getSource();
         Entity attacked = event.getEntity();
         if (source != null && attacked != null && source.getImmediateSource() != null) {
-            if (attacked instanceof EntityPlayer && source.getImmediateSource() instanceof EntityArrow) {
+            if (attacked instanceof PlayerEntity && source.getImmediateSource() instanceof AbstractArrowEntity) {
                 if (!attacked.world.isRemote) {
-                    EntityPlayer player = (EntityPlayer) attacked;
+                    PlayerEntity player = (PlayerEntity) attacked;
                     boolean flag = CapabilityRegeneration.getForPlayer(player).getDnaType().toString().equals(DNA_REPEL_ARROW.getRegistryName().toString());
                     event.setCanceled(flag);
                 }

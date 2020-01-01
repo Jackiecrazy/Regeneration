@@ -7,20 +7,20 @@ import me.swirtzly.regeneration.common.types.TypeHandler;
 import me.swirtzly.regeneration.util.PlayerUtil;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.RenderLivingBase;
+import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EnumHandSide;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.HandSide;
 
-public class LayerHands implements LayerRenderer<EntityPlayer> {
-    protected final RenderLivingBase<?> livingEntityRenderer;
+public class LayerHands implements LayerRenderer<PlayerEntity> {
+    protected final LivingRenderer<?> livingEntityRenderer;
 
-    public LayerHands(RenderLivingBase<?> livingEntityRendererIn) {
+    public LayerHands(LivingRenderer<?> livingEntityRendererIn) {
         this.livingEntityRenderer = livingEntityRendererIn;
     }
 
 
-    public void doRenderLayer(EntityPlayer entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+    public void doRenderLayer(PlayerEntity entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
         GlStateManager.pushMatrix();
 
         IRegeneration data = CapabilityRegeneration.getForPlayer(entitylivingbaseIn);
@@ -30,24 +30,24 @@ public class LayerHands implements LayerRenderer<EntityPlayer> {
             GlStateManager.scale(0.5F, 0.5F, 0.5F);
         }
         if (data.areHandsGlowing()) {
-            renderHand(entitylivingbaseIn, EnumHandSide.LEFT, EnumHandRenderType.GRACE);
-            renderHand(entitylivingbaseIn, EnumHandSide.RIGHT, EnumHandRenderType.GRACE);
+            renderHand(entitylivingbaseIn, HandSide.LEFT, EnumHandRenderType.GRACE);
+            renderHand(entitylivingbaseIn, HandSide.RIGHT, EnumHandRenderType.GRACE);
         }
 
         if (data.getState() == PlayerUtil.RegenState.REGENERATING) {
-            renderHand(entitylivingbaseIn, EnumHandSide.LEFT, EnumHandRenderType.REGEN);
-            renderHand(entitylivingbaseIn, EnumHandSide.RIGHT, EnumHandRenderType.REGEN);
+            renderHand(entitylivingbaseIn, HandSide.LEFT, EnumHandRenderType.REGEN);
+            renderHand(entitylivingbaseIn, HandSide.RIGHT, EnumHandRenderType.REGEN);
         }
 
         if (data.isSyncingToJar()) {
-            renderHand(entitylivingbaseIn, EnumHandSide.LEFT, EnumHandRenderType.JAR);
-            renderHand(entitylivingbaseIn, EnumHandSide.RIGHT, EnumHandRenderType.JAR);
+            renderHand(entitylivingbaseIn, HandSide.LEFT, EnumHandRenderType.JAR);
+            renderHand(entitylivingbaseIn, HandSide.RIGHT, EnumHandRenderType.JAR);
         }
 
         GlStateManager.popMatrix();
     }
 
-    public void renderHand(EntityPlayer player, EnumHandSide handSide, EnumHandRenderType type) {
+    public void renderHand(PlayerEntity player, HandSide handSide, EnumHandRenderType type) {
         GlStateManager.pushMatrix();
 
         IRegeneration data = CapabilityRegeneration.getForPlayer(player);
@@ -57,7 +57,7 @@ public class LayerHands implements LayerRenderer<EntityPlayer> {
         }
 
         this.translateToHand(handSide);
-        boolean flag = handSide == EnumHandSide.LEFT;
+        boolean flag = handSide == HandSide.LEFT;
         GlStateManager.translate((float) (flag ? -1 : 1) / 25.0F, 0.125F, -0.625F);
         GlStateManager.translate(0, -0.050, 0.6);
 
@@ -76,7 +76,7 @@ public class LayerHands implements LayerRenderer<EntityPlayer> {
         GlStateManager.popMatrix();
     }
 
-    protected void translateToHand(EnumHandSide handSide) {
+    protected void translateToHand(HandSide handSide) {
         ((ModelBiped) this.livingEntityRenderer.getMainModel()).postRenderArm(0.0625F, handSide);
     }
 

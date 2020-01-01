@@ -19,7 +19,7 @@ import me.swirtzly.regeneration.util.FileUtil;
 import micdoodle8.mods.galacticraft.api.client.tabs.InventoryTabVanilla;
 import micdoodle8.mods.galacticraft.api.client.tabs.TabRegistry;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.RenderPlayer;
+import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
@@ -53,8 +53,8 @@ public class ClientProxy extends CommonProxy {
         RegenKeyBinds.init();
 
         // Render layers ===========================================
-        Map<String, RenderPlayer> skinMap = Minecraft.getMinecraft().getRenderManager().getSkinMap();
-        for (RenderPlayer renderPlayer : skinMap.values()) {
+        Map<String, PlayerRenderer> skinMap = Minecraft.getMinecraft().getRenderManager().getSkinMap();
+        for (PlayerRenderer renderPlayer : skinMap.values()) {
             renderPlayer.addLayer(new LayerRegeneration(renderPlayer)); // Add Regeneration Layer
             renderPlayer.addLayer(new LayerHands(renderPlayer));
         }

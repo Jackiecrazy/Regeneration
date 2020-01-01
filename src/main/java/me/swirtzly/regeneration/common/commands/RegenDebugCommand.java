@@ -8,11 +8,11 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -26,7 +26,7 @@ public class RegenDebugCommand extends CommandBase {
         if (args.length == 0 || args.length > 2)
             throw new WrongUsageException("regeneration.commands.debug.usage");
 
-        EntityPlayer player = getCommandSenderAsPlayer(sender);
+        PlayerEntity player = getCommandSenderAsPlayer(sender);
         IRegeneration cap = CapabilityRegeneration.getForPlayer(player);
 
         switch (args[0]) {
@@ -55,7 +55,7 @@ public class RegenDebugCommand extends CommandBase {
                     DnaHandler.DNA_ENTRIES.get(cap.getDnaType()).onRemoved(cap);
                     trait.onAdded(cap);
                     cap.setDnaType(new ResourceLocation(args[1]));
-                    PlayerUtil.sendMessage(player, new TextComponentTranslation(trait.getLangKey()), true);
+                    PlayerUtil.sendMessage(player, new TranslationTextComponent(trait.getLangKey()), true);
                 } else {
                     throw new CommandException(args[1] + " is not a valid Trait!");
                 }

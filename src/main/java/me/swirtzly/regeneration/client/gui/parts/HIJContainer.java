@@ -1,16 +1,16 @@
 package me.swirtzly.regeneration.client.gui.parts;
 
 import me.swirtzly.regeneration.handlers.RegenObjects;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.Container;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 
 public class HIJContainer extends Container {
     private final IInventory hijInv;
 
-    public HIJContainer(IInventory playerInventory, IInventory hijInvIn, EntityPlayer player) {
+    public HIJContainer(IInventory playerInventory, IInventory hijInvIn, PlayerEntity player) {
         this.hijInv = hijInvIn;
         hijInvIn.openInventory(player);
         Slot s = new HandSlot(hijInvIn, 3, 44 + 2 * 18, 20) {
@@ -32,15 +32,15 @@ public class HIJContainer extends Container {
         }
     }
 
-    public boolean canInteractWith(EntityPlayer playerIn) {
+    public boolean canInteractWith(PlayerEntity playerIn) {
         return true;
     }
 
-    public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
+    public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
         return ItemStack.EMPTY;
     }
 
-    public void onContainerClosed(EntityPlayer playerIn) {
+    public void onContainerClosed(PlayerEntity playerIn) {
         super.onContainerClosed(playerIn);
         this.hijInv.closeInventory(playerIn);
     }

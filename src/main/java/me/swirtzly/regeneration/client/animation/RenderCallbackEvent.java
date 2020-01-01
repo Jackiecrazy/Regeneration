@@ -1,19 +1,19 @@
 package me.swirtzly.regeneration.client.animation;
 
-import net.minecraft.client.renderer.entity.RenderLivingBase;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.client.renderer.entity.LivingRenderer;
+import net.minecraft.entity.LivingEntity;
 import net.minecraftforge.event.entity.living.LivingEvent;
 
 public class RenderCallbackEvent extends LivingEvent {
 
-    protected RenderLivingBase<EntityLivingBase> renderer;
+    protected LivingRenderer<LivingEntity> renderer;
 
-    public RenderCallbackEvent(EntityLivingBase entity, RenderLivingBase<EntityLivingBase> renderer) {
+    public RenderCallbackEvent(LivingEntity entity, LivingRenderer<LivingEntity> renderer) {
         super(entity);
         this.renderer = renderer;
     }
 
-    public RenderLivingBase<EntityLivingBase> getRenderer() {
+    public LivingRenderer<LivingEntity> getRenderer() {
         return renderer;
     }
 

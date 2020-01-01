@@ -8,23 +8,23 @@ import me.swirtzly.regeneration.common.entity.EntityItemOverride;
 import me.swirtzly.regeneration.common.tiles.TileEntityHandInJar;
 import me.swirtzly.regeneration.handlers.RegenObjects;
 import me.swirtzly.regeneration.util.PlayerUtil;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.SoundEvents;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.block.Blocks;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -39,7 +39,7 @@ public class ItemLindos extends ItemOverrideBase {
         addPropertyOverride(new ResourceLocation("amount"), new IItemPropertyGetter() {
             @Override
             @SideOnly(Side.CLIENT)
-            public float apply(ItemStack stack, @Nullable World worldIn, @Nullable EntityLivingBase entityIn) {
+            public float apply(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
 
                 if (stack.getTagCompound() != null) {
                     int amount = getAmount(stack);
@@ -74,9 +74,9 @@ public class ItemLindos extends ItemOverrideBase {
         });
     }
 
-    public static NBTTagCompound getStackTag(ItemStack stack) {
+    public static CompoundNBT getStackTag(ItemStack stack) {
         if (stack.getTagCompound() == null) {
-            stack.setTagCompound(new NBTTagCompound());
+            stack.setTagCompound(new CompoundNBT());
             stack.getTagCompound().setInteger("amount", 0);
         }
         return stack.getTagCompound();
@@ -99,10 +99,10 @@ public class ItemLindos extends ItemOverrideBase {
     }
 
     @Override
-    public void onCreated(ItemStack stack, World worldIn, EntityPlayer playerIn) {
+    public void onCreated(ItemStack stack, World worldIn, PlayerEntity playerIn) {
         super.onCreated(stack, worldIn, playerIn);
         if (!playerIn.world.isRemote) {
-            RegenTriggers.LINDOS_VIAL.trigger((EntityPlayerMP) playerIn);
+            RegenTriggers.LINDOS_VIAL.trigger((ServerPlayerEntity) playerIn);
         }
     }
 
@@ -110,7 +110,7 @@ public class ItemLindos extends ItemOverrideBase {
     public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
 
         if (stack.getTagCompound() == null) {
-            stack.setTagCompound(new NBTTagCompound());
+            stack.setTagCompound(new CompoundNBT());
             stack.getTagCompound().setBoolean("live", true);
         } else {
             stack.getTagCompound().setBoolean("live", true);
@@ -118,8 +118,8 @@ public class ItemLindos extends ItemOverrideBase {
 
         if (!worldIn.isRemote) {
             //Entiies around
-            worldIn.getEntitiesWithinAABB(EntityPlayer.class, entityIn.getEntityBoundingBox().expand(10, 10, 10)).forEach(player -> {
-                IRegeneration data = CapabilityRegeneration.getForPlayer((EntityPlayer) entityIn);
+            worldIn.getEntitiesWithinAABB(PlayerEntity.class, entityIn.getEntityBoundingBox().expand(10, 10, 10)).forEach(player -> {
+                IRegeneration data = CapabilityRegeneration.getForPlayer((PlayerEntity) entityIn);
                 if (data.getState() == PlayerUtil.RegenState.REGENERATING) {
                     if (worldIn.rand.nextInt(100) > 50 && isSelected) {
                         setAmount(stack, getAmount(stack) + 1);
@@ -128,8 +128,8 @@ public class ItemLindos extends ItemOverrideBase {
             });
 
             //Player glowing
-            if (entityIn instanceof EntityPlayer) {
-                EntityPlayer player = (EntityPlayer) entityIn;
+            if (entityIn instanceof PlayerEntity) {
+                PlayerEntity player = (PlayerEntity) entityIn;
                 if (isSelected) {
                     if (CapabilityRegeneration.getForPlayer(player).areHandsGlowing() && player.ticksExisted % 40 == 0) {
                         setAmount(stack, getAmount(stack) + 2);
@@ -141,17 +141,17 @@ public class ItemLindos extends ItemOverrideBase {
     }
 
     @Override
-    public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public ActionResultType onItemUse(PlayerEntity player, World worldIn, BlockPos pos, Hand hand, Direction facing, float hitX, float hitY, float hitZ) {
         if (!worldIn.isRemote) {
             ItemStack itemStack = player.getHeldItem(hand);
             RayTraceResult raytraceresult = this.rayTrace(worldIn, player, true);
 
             if (raytraceresult == null || raytraceresult.getBlockPos() == null) {
-                return EnumActionResult.FAIL;
+                return ActionResultType.FAIL;
             }
 
             BlockPos blockPos = raytraceresult.getBlockPos();
-            IBlockState iblockstate = worldIn.getBlockState(blockPos);
+            BlockState iblockstate = worldIn.getBlockState(blockPos);
             Material material = iblockstate.getMaterial();
 
             if (iblockstate.getBlock() instanceof BlockHandInJar && player.isSneaking()) {
@@ -160,7 +160,7 @@ public class ItemLindos extends ItemOverrideBase {
                     setAmount(itemStack, getAmount(itemStack) + jar.getLindosAmont());
                     jar.setLindosAmont(0);
                 }
-                return EnumActionResult.SUCCESS;
+                return ActionResultType.SUCCESS;
             }
 
             if (material == Material.WATER) {
@@ -170,18 +170,18 @@ public class ItemLindos extends ItemOverrideBase {
                 if (!hasWater(itemStack)) {
                     setWater(itemStack, true);
                     player.playSound(SoundEvents.ITEM_BUCKET_FILL, 1.0F, 1.0F);
-                    PlayerUtil.sendMessage(player, new TextComponentTranslation("nbt.item.water_filled"), true);
+                    PlayerUtil.sendMessage(player, new TranslationTextComponent("nbt.item.water_filled"), true);
                 } else {
-                    PlayerUtil.sendMessage(player, new TextComponentTranslation("nbt.item.water_already_filled"), true);
+                    PlayerUtil.sendMessage(player, new TranslationTextComponent("nbt.item.water_already_filled"), true);
                 }
-                return EnumActionResult.SUCCESS;
+                return ActionResultType.SUCCESS;
             }
         }
         return super.onItemUse(player, worldIn, pos, hand, facing, hitX, hitY, hitZ);
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer player, EnumHand handIn) {
+    public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity player, Hand handIn) {
         ItemStack stack = player.getHeldItem(handIn);
         IRegeneration cap = CapabilityRegeneration.getForPlayer(player);
         if (!worldIn.isRemote) {
@@ -189,8 +189,8 @@ public class ItemLindos extends ItemOverrideBase {
             //If the player is in POST or Regenerating, stop them from drinking it
             if (getAmount(stack) > 100) {
                 if (cap.getState() == PlayerUtil.RegenState.POST || cap.getState() == PlayerUtil.RegenState.REGENERATING || player.isCreative()) {
-                    PlayerUtil.sendMessage(player, new TextComponentTranslation("regeneration.messages.cannot_use"), true);
-                    return ActionResult.newResult(EnumActionResult.FAIL, player.getHeldItem(handIn));
+                    PlayerUtil.sendMessage(player, new TranslationTextComponent("regeneration.messages.cannot_use"), true);
+                    return ActionResult.newResult(ActionResultType.FAIL, player.getHeldItem(handIn));
                 }
             }
 
@@ -203,24 +203,24 @@ public class ItemLindos extends ItemOverrideBase {
                     player.attackEntityFrom(RegenObjects.REGEN_DMG_LINDOS, Integer.MAX_VALUE);
                     setAmount(stack, 0);
                     setWater(stack, false);
-                    return ActionResult.newResult(EnumActionResult.PASS, player.getHeldItem(handIn));
+                    return ActionResult.newResult(ActionResultType.PASS, player.getHeldItem(handIn));
                 } else {
-                    PlayerUtil.sendMessage(player, new TextComponentTranslation("regeneration.messages.empty_vial"), true);
-                    return ActionResult.newResult(EnumActionResult.FAIL, player.getHeldItem(handIn));
+                    PlayerUtil.sendMessage(player, new TranslationTextComponent("regeneration.messages.empty_vial"), true);
+                    return ActionResult.newResult(ActionResultType.FAIL, player.getHeldItem(handIn));
                 }
             } else {
-                PlayerUtil.sendMessage(player, new TextComponentTranslation("regeneration.messages.no_water"), true);
-                return ActionResult.newResult(EnumActionResult.FAIL, player.getHeldItem(handIn));
+                PlayerUtil.sendMessage(player, new TranslationTextComponent("regeneration.messages.no_water"), true);
+                return ActionResult.newResult(ActionResultType.FAIL, player.getHeldItem(handIn));
             }
         }
-        return ActionResult.newResult(EnumActionResult.FAIL, player.getHeldItem(handIn));
+        return ActionResult.newResult(ActionResultType.FAIL, player.getHeldItem(handIn));
     }
 
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
-        tooltip.add(new TextComponentTranslation("nbt.item.lindos", getAmount(stack)).getUnformattedText());
-        tooltip.add(new TextComponentTranslation("nbt.item.water", hasWater(stack)).getUnformattedText());
+        tooltip.add(new TranslationTextComponent("nbt.item.lindos", getAmount(stack)).getUnformattedText());
+        tooltip.add(new TranslationTextComponent("nbt.item.water", hasWater(stack)).getUnformattedText());
     }
 
     @Override

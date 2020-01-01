@@ -1,24 +1,24 @@
 package me.swirtzly.regeneration.common.entity;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MoverType;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.*;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 
 public class EntityItemOverride extends Entity {
@@ -48,9 +48,9 @@ public class EntityItemOverride extends Entity {
         this.isImmuneToFire = true;
     }
 
-    public static void givePlayerItemStack(EntityPlayer player, ItemStack stack) {
+    public static void givePlayerItemStack(PlayerEntity player, ItemStack stack) {
         if (player.getHeldItemMainhand().isEmpty())
-            player.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, stack);
+            player.setItemStackToSlot(EquipmentSlotType.MAINHAND, stack);
         else if (!player.inventory.addItemStackToInventory(stack)) {
             player.dropItem(stack, true);
         }
@@ -73,8 +73,8 @@ public class EntityItemOverride extends Entity {
      * (abstract) Protected helper method to read subclass entity data from NBT.
      */
     @Override
-    protected void readEntityFromNBT(NBTTagCompound compound) {
-        NBTTagCompound nbttagcompound = compound.getCompoundTag("Item");
+    protected void readEntityFromNBT(CompoundNBT compound) {
+        CompoundNBT nbttagcompound = compound.getCompoundTag("Item");
         this.setItem(new ItemStack(nbttagcompound));
 
         if (this.getItem().isEmpty())
@@ -88,9 +88,9 @@ public class EntityItemOverride extends Entity {
      * (abstract) Protected helper method to write subclass entity data to NBT.
      */
     @Override
-    protected void writeEntityToNBT(NBTTagCompound compound) {
+    protected void writeEntityToNBT(CompoundNBT compound) {
         if (!this.getItem().isEmpty())
-            compound.setTag("Item", this.getItem().writeToNBT(new NBTTagCompound()));
+            compound.setTag("Item", this.getItem().writeToNBT(new CompoundNBT()));
 
         compound.setFloat("Height", getHeight());
         compound.setFloat("Width", getWidth());
@@ -170,10 +170,10 @@ public class EntityItemOverride extends Entity {
      * Applies the given player interaction to this Entity.
      */
     @Override
-    public EnumActionResult applyPlayerInteraction(EntityPlayer player, Vec3d vec, EnumHand hand) {
+    public ActionResultType applyPlayerInteraction(PlayerEntity player, Vec3d vec, Hand hand) {
         givePlayerItemStack(player, this.getItem());
         this.setDead();
-        return EnumActionResult.SUCCESS;
+        return ActionResultType.SUCCESS;
     }
 
     /**
@@ -227,7 +227,7 @@ public class EntityItemOverride extends Entity {
 
         if (this.onGround) {
             BlockPos underPos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getEntityBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
-            net.minecraft.block.state.IBlockState underState = this.world.getBlockState(underPos);
+            BlockState underState = this.world.getBlockState(underPos);
             f = underState.getBlock().getSlipperiness(underState, this.world, underPos, this) * 0.98F;
         }
 
@@ -255,6 +255,6 @@ public class EntityItemOverride extends Entity {
 
     @Override
     public ITextComponent getDisplayName() {
-        return new TextComponentString(getItem().getDisplayName());
+        return new StringTextComponent(getItem().getDisplayName());
     }
 }

@@ -6,9 +6,9 @@ import me.swirtzly.regeneration.client.skinhandling.SkinInfo;
 import me.swirtzly.regeneration.common.types.TypeHandler;
 import me.swirtzly.regeneration.compat.lucraft.PlayerCanRegenEvent;
 import me.swirtzly.regeneration.util.PlayerUtil;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumHandSide;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.HandSide;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.MinecraftForge;
@@ -18,9 +18,9 @@ import net.minecraftforge.common.util.INBTSerializable;
  * Created by Sub
  * on 16/09/2018.
  */
-public interface IRegeneration extends INBTSerializable<NBTTagCompound> {
+public interface IRegeneration extends INBTSerializable<CompoundNBT> {
 
-    EntityPlayer getPlayer();
+    PlayerEntity getPlayer();
 
     int getRegenerationsLeft();
 
@@ -36,9 +36,9 @@ public interface IRegeneration extends INBTSerializable<NBTTagCompound> {
 
     void synchronise();
 
-    NBTTagCompound getStyle();
+    CompoundNBT getStyle();
 
-    void setStyle(NBTTagCompound nbt);
+    void setStyle(CompoundNBT nbt);
 
     Vec3d getPrimaryColor();
 
@@ -109,7 +109,7 @@ public interface IRegeneration extends INBTSerializable<NBTTagCompound> {
 
     void setDroppedHand(boolean droppedHand);
 
-    EnumHandSide getCutoffHand();
+    HandSide getCutoffHand();
 
-    void setCutOffHand(EnumHandSide side);
+    void setCutOffHand(HandSide side);
 }

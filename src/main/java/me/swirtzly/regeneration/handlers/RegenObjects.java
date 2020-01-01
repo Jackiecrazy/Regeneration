@@ -10,8 +10,8 @@ import me.swirtzly.regeneration.common.item.ItemHand;
 import me.swirtzly.regeneration.common.item.ItemLindos;
 import me.swirtzly.regeneration.util.RegenDamageSource;
 import net.minecraft.block.Block;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
@@ -68,7 +68,7 @@ public class RegenObjects {
     private static void registerBlocks(IForgeRegistry<Block> reg, Block... blocks) {
         reg.registerAll(blocks);
         for (Block block : blocks) {
-            ITEM_BLOCKS.add(new ItemBlock(block).setRegistryName(block.getRegistryName()).setTranslationKey(block.getTranslationKey()));
+            ITEM_BLOCKS.add(new BlockItem(block).setRegistryName(block.getRegistryName()).setTranslationKey(block.getTranslationKey()));
         }
     }
 

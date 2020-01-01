@@ -4,17 +4,17 @@ import me.swirtzly.regeneration.RegenConfig;
 import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.handlers.RegenObjects;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.block.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemSword;
-import net.minecraft.item.ItemTool;
+import net.minecraft.item.SwordItem;
+import net.minecraft.item.ToolItem;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -48,7 +48,7 @@ public class RegenUtil {
                 for (int z = pos.getZ() - radius; z < pos.getZ() + radius; ++z) {
                     double squareDistance = Math.pow(x - pos.getX(), 2) + Math.pow(y - pos.getY(), 2) + Math.pow(z - pos.getZ(), 2);
                     if (squareDistance <= Math.pow(radius, 2)) {
-                        IBlockState block = world.getBlockState(new BlockPos(x, y, z));
+                        BlockState block = world.getBlockState(new BlockPos(x, y, z));
 
                         if (block.getBlock() != Blocks.BEDROCK && block.getBlockHardness(world, new BlockPos(x, y, z)) < 3.0F) {
 
@@ -72,17 +72,17 @@ public class RegenUtil {
         }
     }
 
-    public static void regenerationExplosion(EntityPlayer player) {
+    public static void regenerationExplosion(PlayerEntity player) {
         explodeKnockback(player, player.world, player.getPosition(), RegenConfig.onRegen.regenerativeKnockback, RegenConfig.onRegen.regenerativeKnockbackRange);
         explodeKill(player, player.world, player.getPosition(), RegenConfig.onRegen.regenerativeKillRange);
     }
 
     public static void explodeKnockback(Entity exploder, World world, BlockPos pos, float knockback, int range) {
         world.getEntitiesWithinAABBExcludingEntity(exploder, getReach(pos, range)).forEach(entity -> {
-            if (entity instanceof EntityLivingBase && !exploder.isDead) {
-                EntityLivingBase victim = (EntityLivingBase) entity;
+            if (entity instanceof LivingEntity && !exploder.isDead) {
+                LivingEntity victim = (LivingEntity) entity;
 
-                if (entity instanceof EntityPlayer && !RegenConfig.onRegen.regenerationKnocksbackPlayers || !victim.isNonBoss())
+                if (entity instanceof PlayerEntity && !RegenConfig.onRegen.regenerationKnocksbackPlayers || !victim.isNonBoss())
                     return;
 
                 float densMod = world.getBlockDensity(new Vec3d(pos), entity.getEntityBoundingBox());
@@ -98,7 +98,7 @@ public class RegenUtil {
 
     public static void explodeKill(Entity exploder, World world, BlockPos pos, int range) {
         world.getEntitiesWithinAABBExcludingEntity(exploder, getReach(pos, range)).forEach(entity -> {
-            if ((entity instanceof EntityCreature && entity.isNonBoss()) || (entity instanceof EntityPlayer && RegenConfig.onRegen.regenerationKillsPlayers))
+            if ((entity instanceof CreatureEntity && entity.isNonBoss()) || (entity instanceof PlayerEntity && RegenConfig.onRegen.regenerationKillsPlayers))
                 entity.attackEntityFrom(RegenObjects.REGEN_DMG_ENERGY_EXPLOSION, 4);
         });
     }
@@ -107,7 +107,7 @@ public class RegenUtil {
         return new AxisAlignedBB(pos.up(range).north(range).west(range), pos.down(range).south(range).east(range));
     }
 
-    public static void resetNextSkin(EntityPlayer player) {
+    public static void resetNextSkin(PlayerEntity player) {
         IRegeneration data = CapabilityRegeneration.getForPlayer(player);
         data.setNextSkin("NONE");
         data.synchronise();
@@ -118,6 +118,6 @@ public class RegenUtil {
     }
 
     public static boolean isSharp(ItemStack stack) {
-        return stack.getItem() instanceof ItemTool || stack.getItem() instanceof ItemSword;
+        return stack.getItem() instanceof ToolItem || stack.getItem() instanceof SwordItem;
     }
 }

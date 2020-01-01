@@ -4,7 +4,7 @@ import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.traits.DnaHandler;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 
 import java.util.UUID;
 
@@ -23,7 +23,7 @@ public class DnaLucky extends DnaHandler.IDna {
 
     @Override
     public void onUpdate(IRegeneration cap) {
-        EntityPlayer player = cap.getPlayer();
+        PlayerEntity player = cap.getPlayer();
         if (!player.getEntityAttribute(SharedMonsterAttributes.LUCK).hasModifier(LUCKY_MODIFIER)) {
             player.getEntityAttribute(SharedMonsterAttributes.LUCK).applyModifier(LUCKY_MODIFIER);
         }
@@ -31,7 +31,7 @@ public class DnaLucky extends DnaHandler.IDna {
 
     @Override
     public void onAdded(IRegeneration cap) {
-        EntityPlayer player = cap.getPlayer();
+        PlayerEntity player = cap.getPlayer();
         if (!player.getEntityAttribute(SharedMonsterAttributes.LUCK).hasModifier(LUCKY_MODIFIER)) {
             player.getEntityAttribute(SharedMonsterAttributes.LUCK).applyModifier(LUCKY_MODIFIER);
         }
@@ -39,7 +39,7 @@ public class DnaLucky extends DnaHandler.IDna {
 
     @Override
     public void onRemoved(IRegeneration cap) {
-        EntityPlayer player = cap.getPlayer();
+        PlayerEntity player = cap.getPlayer();
         if (player.getEntityAttribute(SharedMonsterAttributes.LUCK).hasModifier(LUCKY_MODIFIER)) {
             player.getEntityAttribute(SharedMonsterAttributes.LUCK).removeModifier(LUCKY_MODIFIER);
         }

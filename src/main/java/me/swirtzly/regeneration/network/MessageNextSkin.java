@@ -5,8 +5,8 @@ import me.swirtzly.regeneration.client.skinhandling.SkinInfo;
 import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.util.PlayerUtil;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -41,12 +41,12 @@ public class MessageNextSkin implements IMessage {
         @Override
         public IMessage onMessage(MessageNextSkin message, MessageContext ctx) {
             ctx.getServerHandler().player.getServerWorld().addScheduledTask(() -> {
-                EntityPlayerMP player = ctx.getServerHandler().player;
+                ServerPlayerEntity player = ctx.getServerHandler().player;
                 IRegeneration data = CapabilityRegeneration.getForPlayer(player);
                 data.setNextSkin(message.encodedSkin);
                 data.setNextSkinType(message.isAlex ? SkinInfo.SkinType.ALEX : SkinInfo.SkinType.STEVE);
                 data.synchronise();
-                PlayerUtil.sendMessage(player, new TextComponentTranslation("regeneration.messages.new_skin"), true);
+                PlayerUtil.sendMessage(player, new TranslationTextComponent("regeneration.messages.new_skin"), true);
             });
             return null;
         }

@@ -6,9 +6,9 @@ import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.handlers.RegenObjects;
 import me.swirtzly.regeneration.util.PlayerUtil;
 import me.swirtzly.regeneration.util.RegenUtil;
-import net.minecraft.block.BlockFire;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.block.FireBlock;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -29,18 +29,18 @@ public class TypeFiery implements IRegenType<TypeFieryRenderer> {
     };
 
     @Override
-    public void onUpdateMidRegen(EntityPlayer player, IRegeneration capability) {
+    public void onUpdateMidRegen(PlayerEntity player, IRegeneration capability) {
 
         player.extinguish();
 
         if (!player.world.isRemote) {
-            PlayerUtil.setPerspective((EntityPlayerMP) player, true, false);
+            PlayerUtil.setPerspective((ServerPlayerEntity) player, true, false);
         }
 
         if (player.world.isRemote)
             return;
 
-        if (player.world.getBlockState(player.getPosition()).getBlock() instanceof BlockFire)
+        if (player.world.getBlockState(player.getPosition()).getBlock() instanceof FireBlock)
             player.world.setBlockToAir(player.getPosition());
 
         double x = player.posX + player.getRNG().nextGaussian() * 2;
@@ -51,15 +51,15 @@ public class TypeFiery implements IRegenType<TypeFieryRenderer> {
         RegenUtil.regenerationExplosion(player);
 
         for (BlockPos bs : BlockPos.getAllInBox(player.getPosition().north().west(), player.getPosition().south().east())) {
-            if (player.world.getBlockState(bs).getBlock() instanceof BlockFire) {
+            if (player.world.getBlockState(bs).getBlock() instanceof FireBlock) {
                 player.world.setBlockToAir(bs);
             }
         }
     }
 
     @Override
-    public void onFinishRegeneration(EntityPlayer player, IRegeneration capability) {
-        PlayerUtil.setPerspective((EntityPlayerMP) player, false, true);
+    public void onFinishRegeneration(PlayerEntity player, IRegeneration capability) {
+        PlayerUtil.setPerspective((ServerPlayerEntity) player, false, true);
         capability.setAnimationTicks(0);
     }
 

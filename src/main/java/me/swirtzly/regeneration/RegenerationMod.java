@@ -21,7 +21,7 @@ import me.swirtzly.regeneration.util.EnumCompatModids;
 import me.swirtzly.regeneration.util.PlayerUtil;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.storage.loot.LootTableList;
+import net.minecraft.world.storage.loot.LootTables;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -89,7 +89,7 @@ public class RegenerationMod {
     public void init(FMLInitializationEvent event) {
         proxy.init();
         NetworkHandler.init();
-        LootTableList.register(LOOT_FILE);
+        LootTables.register(LOOT_FILE);
         DnaHandler.init();
         NetworkRegistry.INSTANCE.registerGuiHandler(INSTANCE, new GuiHandler());
         TypeHandler.init();

@@ -12,11 +12,11 @@ import me.swirtzly.regeneration.util.ClientUtil;
 import me.swirtzly.regeneration.util.FileUtil;
 import micdoodle8.mods.galacticraft.api.client.tabs.TabRegistry;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.client.config.GuiButtonExt;
 
 import javax.imageio.ImageIO;
@@ -29,7 +29,7 @@ import static me.swirtzly.regeneration.util.ClientUtil.playerModelAlex;
 import static me.swirtzly.regeneration.util.ClientUtil.playerModelSteve;
 import static me.swirtzly.regeneration.util.RenderUtil.drawModelToGui;
 
-public class GuiSkinChange extends GuiContainer {
+public class GuiSkinChange extends ContainerScreen {
 
     public static final int ID = 3;
     private static final ResourceLocation background = new ResourceLocation(RegenerationMod.MODID, "textures/gui/customizer_background_small.png");
@@ -76,12 +76,12 @@ public class GuiSkinChange extends GuiContainer {
         final int btnW = 68, btnH = 17;
         position = 0;
 
-        GuiButtonExt btnNext = new GuiButtonExt(44, cx + 20, cy + 80, 20, 20, new TextComponentTranslation("regeneration.gui.previous").getFormattedText());
-        GuiButtonExt btnPrevious = new GuiButtonExt(55, cx + 130, cy + 80, 20, 20, new TextComponentTranslation("regeneration.gui.next").getFormattedText());
-        GuiButtonExt btnBack = new GuiButtonExt(66, cx + 20, cy + 145, btnW, btnH, new TextComponentTranslation("regeneration.gui.back").getFormattedText());
-        GuiButtonExt btnOpenFolder = new GuiButtonExt(77, cx + 90, cy + 145, btnW, btnH, new TextComponentTranslation("regeneration.gui.open_folder").getFormattedText());
-        GuiButtonExt btnSave = new GuiButtonExt(88, cx + 90, cy + 127, btnW, btnH, new TextComponentTranslation("regeneration.gui.save").getFormattedText());
-        GuiButtonExt btnResetSkin = new GuiButtonExt(100, cx + 20, cy + 127, btnW, btnH, new TextComponentTranslation("regeneration.gui.reset_skin").getFormattedText());
+        GuiButtonExt btnNext = new GuiButtonExt(44, cx + 20, cy + 80, 20, 20, new TranslationTextComponent("regeneration.gui.previous").getFormattedText());
+        GuiButtonExt btnPrevious = new GuiButtonExt(55, cx + 130, cy + 80, 20, 20, new TranslationTextComponent("regeneration.gui.next").getFormattedText());
+        GuiButtonExt btnBack = new GuiButtonExt(66, cx + 20, cy + 145, btnW, btnH, new TranslationTextComponent("regeneration.gui.back").getFormattedText());
+        GuiButtonExt btnOpenFolder = new GuiButtonExt(77, cx + 90, cy + 145, btnW, btnH, new TranslationTextComponent("regeneration.gui.open_folder").getFormattedText());
+        GuiButtonExt btnSave = new GuiButtonExt(88, cx + 90, cy + 127, btnW, btnH, new TranslationTextComponent("regeneration.gui.save").getFormattedText());
+        GuiButtonExt btnResetSkin = new GuiButtonExt(100, cx + 20, cy + 127, btnW, btnH, new TranslationTextComponent("regeneration.gui.reset_skin").getFormattedText());
 
         addButton(btnNext);
         addButton(btnPrevious);
@@ -116,7 +116,7 @@ public class GuiSkinChange extends GuiContainer {
         }
         GlStateManager.popMatrix();
 
-        drawCenteredString(Minecraft.getMinecraft().fontRenderer, new TextComponentTranslation("regeneration.gui.next_incarnation").getUnformattedText(), width / 2, height / 2 - 80, Color.WHITE.getRGB());
+        drawCenteredString(Minecraft.getMinecraft().fontRenderer, new TranslationTextComponent("regeneration.gui.next_incarnation").getUnformattedText(), width / 2, height / 2 - 80, Color.WHITE.getRGB());
 
         String skinName = skins.get(position).getName();
         skinName = skinName.substring(0, 1).toUpperCase() + skinName.substring(1);
@@ -132,7 +132,7 @@ public class GuiSkinChange extends GuiContainer {
     }
 
     @Override
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(Button button) throws IOException {
         super.actionPerformed(button);
         skins = FileUtil.listAllSkins(choices);
         updateModels();

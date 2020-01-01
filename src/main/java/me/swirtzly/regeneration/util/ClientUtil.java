@@ -15,7 +15,7 @@ import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -31,7 +31,7 @@ public class ClientUtil {
 
     public static String keyBind = "???"; //WAFFLE there was a weird thing with this somewhere that I still need to fix
 
-    public static void createToast(TextComponentTranslation title, TextComponentTranslation subtitle) {
+    public static void createToast(TranslationTextComponent title, TranslationTextComponent subtitle) {
         Minecraft.getMinecraft().getToastGui().add(new SystemToast(SystemToast.Type.TUTORIAL_HINT, title, subtitle));
     }
 

@@ -9,10 +9,10 @@ import me.swirtzly.regeneration.util.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelPlayer;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.RenderPlayer;
+import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EnumHandSide;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.HandSide;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.Random;
@@ -24,17 +24,17 @@ import static me.swirtzly.regeneration.util.RenderUtil.drawGlowingLine;
  * Created by Sub
  * on 16/09/2018.
  */
-public class LayerRegeneration implements LayerRenderer<EntityPlayer> {
+public class LayerRegeneration implements LayerRenderer<PlayerEntity> {
 
     public static final ModelPlayer modelSteve = new ModelPlayer(0.1F, false);
     public static final ModelPlayer modelAlex = new ModelPlayer(0.1F, true);
-    private static RenderPlayer playerRenderer;
+    private static PlayerRenderer playerRenderer;
 
-    public LayerRegeneration(RenderPlayer playerRenderer) {
+    public LayerRegeneration(PlayerRenderer playerRenderer) {
         LayerRegeneration.playerRenderer = playerRenderer;
     }
 
-    public static void renderGlowingHands(EntityPlayer player, IRegeneration handler, float scale, EnumHandSide side) {
+    public static void renderGlowingHands(PlayerEntity player, IRegeneration handler, float scale, HandSide side) {
         Vec3d primaryColor = handler.getPrimaryColor();
         Vec3d secondaryColor = handler.getSecondaryColor();
 
@@ -55,7 +55,7 @@ public class LayerRegeneration implements LayerRenderer<EntityPlayer> {
     }
 
     @Override
-    public void doRenderLayer(EntityPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+    public void doRenderLayer(PlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
         IRegeneration cap = CapabilityRegeneration.getForPlayer(player);
         IRegenType type = TypeHandler.getTypeInstance(cap.getType());
         if (cap.getState() == PlayerUtil.RegenState.REGENERATING) {

@@ -5,7 +5,7 @@ import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.item.ItemFobWatch;
 import me.swirtzly.regeneration.util.ClientUtil;
 import me.swirtzly.regeneration.util.PlayerUtil;
-import net.minecraft.client.entity.AbstractClientPlayer;
+import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelPlayer;
 import net.minecraft.item.ItemStack;
@@ -13,7 +13,7 @@ import net.minecraft.item.ItemStack;
 public class AnimationHandler {
 
     public static boolean animate(AnimationContext animationContext) {
-        AbstractClientPlayer player = (AbstractClientPlayer) animationContext.getEntityPlayer();
+        AbstractClientPlayerEntity player = (AbstractClientPlayerEntity) animationContext.getEntityPlayer();
         ItemStack stack = player.getHeldItemMainhand();
         ItemStack offStack = player.getHeldItemOffhand();
         ModelBiped modelBiped = animationContext.getModelBiped();

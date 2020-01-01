@@ -8,14 +8,14 @@ import me.swirtzly.regeneration.common.entity.EntityItemOverride;
 import me.swirtzly.regeneration.handlers.RegenObjects;
 import me.swirtzly.regeneration.util.ClientUtil;
 import me.swirtzly.regeneration.util.PlayerUtil;
-import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.SoundEvents;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.*;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 /**
@@ -26,7 +26,7 @@ public class ItemFobWatch extends ItemOverrideBase {
 
     public ItemFobWatch() {
         setMaxDamage(RegenConfig.regenCapacity);
-        setCreativeTab(CreativeTabs.MISC);
+        setCreativeTab(ItemGroup.MISC);
         setMaxStackSize(1);
 
         addPropertyOverride(new ResourceLocation("open"), (stack, worldIn, entityIn) -> {
@@ -53,9 +53,9 @@ public class ItemFobWatch extends ItemOverrideBase {
         getStackTag(stack).setInteger("engrave", engrave);
     }
 
-    public static NBTTagCompound getStackTag(ItemStack stack) {
+    public static CompoundNBT getStackTag(ItemStack stack) {
         if (stack.getTagCompound() == null) {
-            stack.setTagCompound(new NBTTagCompound());
+            stack.setTagCompound(new CompoundNBT());
             stack.getTagCompound().setInteger("open", 0);
             stack.getTagCompound().setInteger("engrave", itemRand.nextInt(2));
         }
@@ -71,7 +71,7 @@ public class ItemFobWatch extends ItemOverrideBase {
     }
 
     @Override
-    public void onCreated(ItemStack stack, World worldIn, EntityPlayer playerIn) {
+    public void onCreated(ItemStack stack, World worldIn, PlayerEntity playerIn) {
         super.onCreated(stack, worldIn, playerIn);
         if (RegenConfig.craftWithRegens) {
             stack.setItemDamage(0);
@@ -83,7 +83,7 @@ public class ItemFobWatch extends ItemOverrideBase {
     @Override
     public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
         if (stack.getTagCompound() == null) {
-            stack.setTagCompound(new NBTTagCompound());
+            stack.setTagCompound(new CompoundNBT());
             stack.getTagCompound().setBoolean("live", false);
         } else {
             stack.getTagCompound().setBoolean("live", false);
@@ -99,7 +99,7 @@ public class ItemFobWatch extends ItemOverrideBase {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
         IRegeneration cap = CapabilityRegeneration.getForPlayer(player);
         ItemStack stack = player.getHeldItem(hand);
 
@@ -113,12 +113,12 @@ public class ItemFobWatch extends ItemOverrideBase {
 
             if (cap.canRegenerate()) {
                 setOpen(stack, 1);
-                PlayerUtil.sendMessage(player, new TextComponentTranslation("regeneration.messages.gained_regens", used), true);
+                PlayerUtil.sendMessage(player, new TranslationTextComponent("regeneration.messages.gained_regens", used), true);
             } else {
                 if (!world.isRemote) {
                     setOpen(stack, 1);
                 } else {
-                    ClientUtil.createToast(new TextComponentTranslation("regeneration.toast.timelord"), new TextComponentTranslation("regeneration.toast.to_use", RegenConfig.regenCapacity));
+                    ClientUtil.createToast(new TranslationTextComponent("regeneration.toast.timelord"), new TranslationTextComponent("regeneration.toast.to_use", RegenConfig.regenCapacity));
                 }
             }
 
@@ -137,7 +137,7 @@ public class ItemFobWatch extends ItemOverrideBase {
                 cap.receiveRegenerations(used);
             }
 
-            return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+            return new ActionResult<>(ActionResultType.SUCCESS, stack);
         } else { // transferring player->watch
             if (!cap.canRegenerate())
                 return msgUsageFailed(player, "regeneration.messages.transfer.no_regens", stack);
@@ -159,13 +159,13 @@ public class ItemFobWatch extends ItemOverrideBase {
                 cap.extractRegeneration(1);
             }
 
-            return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+            return new ActionResult<>(ActionResultType.SUCCESS, stack);
         }
     }
 
-    private ActionResult<ItemStack> msgUsageFailed(EntityPlayer player, String message, ItemStack stack) {
+    private ActionResult<ItemStack> msgUsageFailed(PlayerEntity player, String message, ItemStack stack) {
         PlayerUtil.sendMessage(player, message, true);
-        return ActionResult.newResult(EnumActionResult.FAIL, stack);
+        return ActionResult.newResult(ActionResultType.FAIL, stack);
     }
 
     @Override

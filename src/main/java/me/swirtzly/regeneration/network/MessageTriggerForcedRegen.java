@@ -8,8 +8,8 @@ import me.swirtzly.regeneration.common.item.ItemHand;
 import me.swirtzly.regeneration.common.tiles.TileEntityHandInJar;
 import me.swirtzly.regeneration.handlers.RegenObjects;
 import me.swirtzly.regeneration.util.PlayerUtil;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
@@ -41,7 +41,7 @@ public class MessageTriggerForcedRegen implements IMessage {
 
             ctx.getServerHandler().player.getServerWorld().addScheduledTask(() -> {
 
-                EntityPlayerMP player = ctx.getServerHandler().player;
+                ServerPlayerEntity player = ctx.getServerHandler().player;
 
                 IRegeneration data = CapabilityRegeneration.getForPlayer(ctx.getServerHandler().player);
                 if (data.canRegenerate() && data.getState() == PlayerUtil.RegenState.ALIVE) {
@@ -50,7 +50,7 @@ public class MessageTriggerForcedRegen implements IMessage {
 
                 if (data.getState() == REGENERATING) {
                     for (BlockPos pos : BlockPos.getAllInBox(player.getPosition().add(15, 15, 15), player.getPosition().subtract(new Vec3i(15, 15, 15)))) {
-                        IBlockState blockState = player.world.getBlockState(pos);
+                        BlockState blockState = player.world.getBlockState(pos);
                         if (blockState.getBlock().getRegistryName() == RegenObjects.Blocks.HAND_JAR.getRegistryName()) {
                             TileEntityHandInJar handInJar = (TileEntityHandInJar) player.world.getTileEntity(pos);
                             if (handInJar.hasHand()) {

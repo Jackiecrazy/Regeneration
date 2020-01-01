@@ -4,8 +4,8 @@ import me.swirtzly.regeneration.RegenerationMod;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.traits.DnaHandler;
 import me.swirtzly.regeneration.util.PlayerUtil;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.MobEffects;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
 
 /**
@@ -23,9 +23,9 @@ public class DnaSwimmer extends DnaHandler.IDna {
 
     @Override
     public void onUpdate(IRegeneration cap) {
-        EntityPlayer player = cap.getPlayer();
+        PlayerEntity player = cap.getPlayer();
         if (player.isInWater()) {
-            PlayerUtil.applyPotionIfAbsent(player, MobEffects.WATER_BREATHING, 100, 1, true, false);
+            PlayerUtil.applyPotionIfAbsent(player, Effects.WATER_BREATHING, 100, 1, true, false);
         }
     }
 
@@ -36,7 +36,7 @@ public class DnaSwimmer extends DnaHandler.IDna {
 
     @Override
     public void onRemoved(IRegeneration cap) {
-        EntityPlayer player = cap.getPlayer();
-        player.removeActivePotionEffect(MobEffects.WATER_BREATHING);
+        PlayerEntity player = cap.getPlayer();
+        player.removeActivePotionEffect(Effects.WATER_BREATHING);
     }
 }

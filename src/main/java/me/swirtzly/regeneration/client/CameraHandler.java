@@ -3,9 +3,9 @@ package me.swirtzly.regeneration.client;
 import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.util.PlayerUtil;
+import net.minecraft.client.GameSettings;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.settings.GameSettings;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -32,7 +32,7 @@ public class CameraHandler {
     public static void onView(EntityViewRenderEvent.CameraSetup event) {
 
         Minecraft mc = Minecraft.getMinecraft();
-        EntityPlayerSP player = mc.player;
+        ClientPlayerEntity player = mc.player;
         GameSettings gameSettings = mc.gameSettings;
 
         IRegeneration data = CapabilityRegeneration.getForPlayer(player);

@@ -5,14 +5,14 @@ import me.swirtzly.regeneration.network.MessageSetPerspective;
 import me.swirtzly.regeneration.network.MessageUpdateModel;
 import me.swirtzly.regeneration.network.NetworkHandler;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.ai.*;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.MobEffects;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.ai.goal.*;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.potion.Effects;
+import net.minecraft.potion.Effect;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import java.awt.*;
@@ -25,45 +25,45 @@ import java.util.List;
  */
 public class PlayerUtil {
 
-    public static ArrayList<Potion> POTIONS = new ArrayList<>();
+    public static ArrayList<Effect> POTIONS = new ArrayList<>();
 
     public static void createPostList() {
-        POTIONS.add(MobEffects.WEAKNESS);
-        POTIONS.add(MobEffects.MINING_FATIGUE);
-        POTIONS.add(MobEffects.RESISTANCE);
-        POTIONS.add(MobEffects.HEALTH_BOOST);
-        POTIONS.add(MobEffects.HUNGER);
-        POTIONS.add(MobEffects.WATER_BREATHING);
-        POTIONS.add(MobEffects.HASTE);
+        POTIONS.add(Effects.WEAKNESS);
+        POTIONS.add(Effects.MINING_FATIGUE);
+        POTIONS.add(Effects.RESISTANCE);
+        POTIONS.add(Effects.HEALTH_BOOST);
+        POTIONS.add(Effects.HUNGER);
+        POTIONS.add(Effects.WATER_BREATHING);
+        POTIONS.add(Effects.HASTE);
     }
 
-    public static void sendMessage(EntityPlayer player, String message, boolean hotBar) {
+    public static void sendMessage(PlayerEntity player, String message, boolean hotBar) {
         if (!player.world.isRemote) {
-            player.sendStatusMessage(new TextComponentTranslation(message), hotBar);
+            player.sendStatusMessage(new TranslationTextComponent(message), hotBar);
         }
     }
 
-    public static void sendMessage(EntityPlayer player, TextComponentTranslation translation, boolean hotBar) {
+    public static void sendMessage(PlayerEntity player, TranslationTextComponent translation, boolean hotBar) {
         if (!player.world.isRemote) {
             player.sendStatusMessage(translation, hotBar);
         }
     }
 
-    public static void sendMessageToAll(TextComponentTranslation translation) {
-        List<EntityPlayerMP> players = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers();
+    public static void sendMessageToAll(TranslationTextComponent translation) {
+        List<ServerPlayerEntity> players = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers();
         players.forEach(playerMP -> sendMessage(playerMP, translation, false));
     }
 
-    public static void setPerspective(EntityPlayerMP player, boolean thirdperson, boolean resetPitch) {
+    public static void setPerspective(ServerPlayerEntity player, boolean thirdperson, boolean resetPitch) {
         NetworkHandler.INSTANCE.sendTo(new MessageSetPerspective(thirdperson, resetPitch), player);
     }
 
     public static boolean canEntityAttack(Entity entity) { // NOTE unused
-        if (entity instanceof EntityLiving) {
-            EntityLiving ent = (EntityLiving) entity;
-            for (EntityAITasks.EntityAITaskEntry task : ent.tasks.taskEntries) {
-                if (task.action instanceof EntityAIAttackMelee || task.action instanceof EntityAIAttackRanged || task.action instanceof EntityAIAttackRangedBow
-                        || task.action instanceof EntityAINearestAttackableTarget || task.action instanceof EntityAIZombieAttack || task.action instanceof EntityAIOwnerHurtByTarget)
+        if (entity instanceof MobEntity) {
+            MobEntity ent = (MobEntity) entity;
+            for (GoalSelector.EntityAITaskEntry task : ent.tasks.taskEntries) {
+                if (task.action instanceof MeleeAttackGoal || task.action instanceof RangedAttackGoal || task.action instanceof RangedBowAttackGoal
+                        || task.action instanceof NearestAttackableTargetGoal || task.action instanceof ZombieAttackGoal || task.action instanceof OwnerHurtByTargetGoal)
                     return true;
             }
         }
@@ -74,16 +74,16 @@ public class PlayerUtil {
         NetworkHandler.INSTANCE.sendToServer(new MessageUpdateModel(choice.name()));
     }
 
-    public static boolean applyPotionIfAbsent(EntityPlayer player, Potion potion, int length, int amplifier, boolean ambient, boolean showParticles) {
+    public static boolean applyPotionIfAbsent(PlayerEntity player, Effect potion, int length, int amplifier, boolean ambient, boolean showParticles) {
         if (potion == null) return false;
         if (player.getActivePotionEffect(potion) == null) {
-            player.addPotionEffect(new PotionEffect(potion, length, amplifier, ambient, showParticles));
+            player.addPotionEffect(new EffectInstance(potion, length, amplifier, ambient, showParticles));
             return true;
         }
         return false;
     }
 
-    public static void lookAt(double px, double py, double pz, EntityPlayer me) {
+    public static void lookAt(double px, double py, double pz, PlayerEntity me) {
         double dirx = me.getPosition().getX() - px;
         double diry = me.getPosition().getY() - py;
         double dirz = me.getPosition().getZ() - pz;

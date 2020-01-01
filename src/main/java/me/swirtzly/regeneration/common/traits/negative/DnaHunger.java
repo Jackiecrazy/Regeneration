@@ -3,8 +3,8 @@ package me.swirtzly.regeneration.common.traits.negative;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.traits.DnaHandler;
 import me.swirtzly.regeneration.util.PlayerUtil;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.MobEffects;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.potion.Effects;
 
 public class DnaHunger extends DnaHandler.IDna {
 
@@ -14,21 +14,21 @@ public class DnaHunger extends DnaHandler.IDna {
 
     @Override
     public void onUpdate(IRegeneration cap) {
-        EntityPlayer player = cap.getPlayer();
+        PlayerEntity player = cap.getPlayer();
         if (player.ticksExisted % 2400 == 0 && player.world.rand.nextBoolean()) {
-            PlayerUtil.applyPotionIfAbsent(player, MobEffects.HUNGER, 200, 1, true, false);
+            PlayerUtil.applyPotionIfAbsent(player, Effects.HUNGER, 200, 1, true, false);
         }
     }
 
     @Override
     public void onAdded(IRegeneration cap) {
-        EntityPlayer player = cap.getPlayer();
-        PlayerUtil.applyPotionIfAbsent(player, MobEffects.HUNGER, 200, 1, true, false);
+        PlayerEntity player = cap.getPlayer();
+        PlayerUtil.applyPotionIfAbsent(player, Effects.HUNGER, 200, 1, true, false);
     }
 
     @Override
     public void onRemoved(IRegeneration cap) {
-        EntityPlayer player = cap.getPlayer();
-        player.removePotionEffect(MobEffects.HUNGER);
+        PlayerEntity player = cap.getPlayer();
+        player.removePotionEffect(Effects.HUNGER);
     }
 }

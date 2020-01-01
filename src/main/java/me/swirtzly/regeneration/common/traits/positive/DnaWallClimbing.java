@@ -2,7 +2,7 @@ package me.swirtzly.regeneration.common.traits.positive;
 
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.traits.DnaHandler;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 
 public class DnaWallClimbing extends DnaHandler.IDna {
 
@@ -12,7 +12,7 @@ public class DnaWallClimbing extends DnaHandler.IDna {
 
     @Override
     public void onUpdate(IRegeneration cap) {
-        EntityPlayer player = cap.getPlayer();
+        PlayerEntity player = cap.getPlayer();
         if (player.collidedHorizontally && player.moveForward > 0) {
             player.motionY = 0.2D;
         }

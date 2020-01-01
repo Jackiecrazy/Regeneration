@@ -14,18 +14,18 @@ import me.swirtzly.regeneration.network.NetworkHandler;
 import me.swirtzly.regeneration.util.ClientUtil;
 import micdoodle8.mods.galacticraft.api.client.tabs.TabRegistry;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
+import net.minecraft.client.gui.screen.inventory.InventoryScreen;
+import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.client.config.GuiButtonExt;
 
 import java.awt.*;
 import java.io.IOException;
 
-public class GuiPreferences extends GuiContainer {
+public class GuiPreferences extends ContainerScreen {
 
     public static final int ID = 1;
     private static final ResourceLocation BACKGROUND = new ResourceLocation(RegenerationMod.MODID, "textures/gui/pref_back.png");
@@ -48,16 +48,16 @@ public class GuiPreferences extends GuiContainer {
         int cy = (height - ySize) / 2;
         final int btnW = 68, btnH = 17;
 
-        GuiButtonExt btnClose = new GuiButtonExt(98, width / 2 - 109, cy + 145, 71, btnH, new TextComponentTranslation("regeneration.gui.close").getFormattedText());
-        GuiButtonExt btnRegenType = new GuiButtonExt(44, width / 2 + 50 - 66, cy + 125, btnW * 2, btnH, new TextComponentTranslation("regentype." + SELECTED_TYPE.name().toLowerCase()).getUnformattedComponentText());
-        GuiButtonExt btnSkinType = new GuiButtonExt(22, width / 2 + 50 - 66, cy + 85, btnW * 2, btnH, new TextComponentTranslation("regeneration.gui.skintype", new TextComponentTranslation("skintype." + CHOICES.name().toLowerCase())).getUnformattedComponentText());
-        btnRegenType.displayString = new TextComponentTranslation("regeneration.gui.type", new TextComponentTranslation("regentype." + SELECTED_TYPE.name().toLowerCase()).getUnformattedComponentText()).getUnformattedComponentText();
+        GuiButtonExt btnClose = new GuiButtonExt(98, width / 2 - 109, cy + 145, 71, btnH, new TranslationTextComponent("regeneration.gui.close").getFormattedText());
+        GuiButtonExt btnRegenType = new GuiButtonExt(44, width / 2 + 50 - 66, cy + 125, btnW * 2, btnH, new TranslationTextComponent("regentype." + SELECTED_TYPE.name().toLowerCase()).getUnformattedComponentText());
+        GuiButtonExt btnSkinType = new GuiButtonExt(22, width / 2 + 50 - 66, cy + 85, btnW * 2, btnH, new TranslationTextComponent("regeneration.gui.skintype", new TranslationTextComponent("skintype." + CHOICES.name().toLowerCase())).getUnformattedComponentText());
+        btnRegenType.displayString = new TranslationTextComponent("regeneration.gui.type", new TranslationTextComponent("regentype." + SELECTED_TYPE.name().toLowerCase()).getUnformattedComponentText()).getUnformattedComponentText();
 
-        GuiButtonExt btnColor = new GuiButtonExt(99, width / 2 + 50 - 66, cy + 105, btnW * 2, btnH, new TextComponentTranslation("regeneration.gui.color_gui").getUnformattedComponentText());
-        GuiButtonExt btnOpenFolder = new GuiButtonExt(100, width / 2 + 50 - 66, cy + 145, btnW * 2, btnH, new TextComponentTranslation("regeneration.gui.skin_choice").getFormattedText());
+        GuiButtonExt btnColor = new GuiButtonExt(99, width / 2 + 50 - 66, cy + 105, btnW * 2, btnH, new TranslationTextComponent("regeneration.gui.color_gui").getUnformattedComponentText());
+        GuiButtonExt btnOpenFolder = new GuiButtonExt(100, width / 2 + 50 - 66, cy + 145, btnW * 2, btnH, new TranslationTextComponent("regeneration.gui.skin_choice").getFormattedText());
 
-        GuiButtonExt forceAlex = new GuiButtonExt(34, cx + 135, cy + 175, btnW + 50, btnH, new TextComponentTranslation("regeneration.gui.force_alex").getFormattedText());
-        GuiButtonExt forceSteve = new GuiButtonExt(35, cx + 15, cy + 175, btnW + 50, btnH, new TextComponentTranslation("regeneration.gui.force_steve").getFormattedText());
+        GuiButtonExt forceAlex = new GuiButtonExt(34, cx + 135, cy + 175, btnW + 50, btnH, new TranslationTextComponent("regeneration.gui.force_alex").getFormattedText());
+        GuiButtonExt forceSteve = new GuiButtonExt(35, cx + 15, cy + 175, btnW + 50, btnH, new TranslationTextComponent("regeneration.gui.force_steve").getFormattedText());
 
         addButton(forceAlex);
         addButton(forceSteve);
@@ -80,32 +80,32 @@ public class GuiPreferences extends GuiContainer {
 
         GlStateManager.pushMatrix();
         //RenderUtil.drawRect(width / 2, height / 2 - 50, width / 2 - 80, height / 2 + 35, 0.0F, 0.0F, 0.0F, 1);
-        GuiInventory.drawEntityOnScreen(width / 2 - 75, height / 2 + 45, 55, (float) (guiLeft + 51) - mouseX, (float) (guiTop + 75 - 50) - mouseY, Minecraft.getMinecraft().player);
+        InventoryScreen.drawEntityOnScreen(width / 2 - 75, height / 2 + 45, 55, (float) (guiLeft + 51) - mouseX, (float) (guiTop + 75 - 50) - mouseY, Minecraft.getMinecraft().player);
         GlStateManager.popMatrix();
 
-        drawCenteredString(Minecraft.getMinecraft().fontRenderer, new TextComponentTranslation("regeneration.gui.preferences").getUnformattedComponentText(), width / 2, height / 2 - 80, Color.WHITE.getRGB());
+        drawCenteredString(Minecraft.getMinecraft().fontRenderer, new TranslationTextComponent("regeneration.gui.preferences").getUnformattedComponentText(), width / 2, height / 2 - 80, Color.WHITE.getRGB());
 
         String str = "Banana Phone";
         int length = mc.fontRenderer.getStringWidth(str);
 
         if (RegenConfig.infiniteRegeneration)
-            str = new TextComponentTranslation("regeneration.gui.infinite_regenerations").getFormattedText(); // TODO this should be optimized
+            str = new TranslationTextComponent("regeneration.gui.infinite_regenerations").getFormattedText(); // TODO this should be optimized
         else
-            str = new TextComponentTranslation("regeneration.gui.remaining_regens.status").getFormattedText() + " " + CapabilityRegeneration.getForPlayer(Minecraft.getMinecraft().player).getRegenerationsLeft();
+            str = new TranslationTextComponent("regeneration.gui.remaining_regens.status").getFormattedText() + " " + CapabilityRegeneration.getForPlayer(Minecraft.getMinecraft().player).getRegenerationsLeft();
 
         length = mc.fontRenderer.getStringWidth(str);
         fontRenderer.drawStringWithShadow(str, cx + 170 - length / 2, cy + 21, Color.WHITE.getRGB());
 
-        TextComponentTranslation traitLang = new TextComponentTranslation(DnaHandler.getDnaEntry(CapabilityRegeneration.getForPlayer(mc.player).getDnaType()).getLangKey());
+        TranslationTextComponent traitLang = new TranslationTextComponent(DnaHandler.getDnaEntry(CapabilityRegeneration.getForPlayer(mc.player).getDnaType()).getLangKey());
         fontRenderer.drawStringWithShadow(traitLang.getUnformattedText(), cx + 170 - length / 2, cy + 40, Color.WHITE.getRGB());
 
-        TextComponentTranslation traitLangDesc = new TextComponentTranslation(DnaHandler.getDnaEntry(CapabilityRegeneration.getForPlayer(mc.player).getDnaType()).getLocalDesc());
+        TranslationTextComponent traitLangDesc = new TranslationTextComponent(DnaHandler.getDnaEntry(CapabilityRegeneration.getForPlayer(mc.player).getDnaType()).getLocalDesc());
         fontRenderer.drawStringWithShadow(traitLangDesc.getUnformattedText(), cx + 170 - length / 2, cy + 50, Color.WHITE.getRGB());
 
     }
 
     @Override
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(Button button) throws IOException {
         super.actionPerformed(button);
         switch (button.id) {
             case 98:
@@ -118,7 +118,7 @@ public class GuiPreferences extends GuiContainer {
                 } else {
                     SELECTED_TYPE = TypeHandler.RegenType.FIERY;
                 }
-                button.displayString = new TextComponentTranslation("regeneration.gui.type", new TextComponentTranslation("regentype." + SELECTED_TYPE.name().toLowerCase()).getUnformattedComponentText()).getUnformattedComponentText();
+                button.displayString = new TranslationTextComponent("regeneration.gui.type", new TranslationTextComponent("regentype." + SELECTED_TYPE.name().toLowerCase()).getUnformattedComponentText()).getUnformattedComponentText();
                 NetworkHandler.INSTANCE.sendToServer(new MessageChangeType(SELECTED_TYPE));
                 break;
             case 99:
@@ -135,7 +135,7 @@ public class GuiPreferences extends GuiContainer {
                 } else {
                     CHOICES = SkinChangingHandler.EnumChoices.ALEX;
                 }
-                button.displayString = new TextComponentTranslation("regeneration.gui.skintype", new TextComponentTranslation("skintype." + CHOICES.name().toLowerCase())).getUnformattedComponentText();
+                button.displayString = new TranslationTextComponent("regeneration.gui.skintype", new TranslationTextComponent("skintype." + CHOICES.name().toLowerCase())).getUnformattedComponentText();
                 NetworkHandler.INSTANCE.sendToServer(new MessageUpdateModel(CHOICES.name()));
                 break;
             case 34:

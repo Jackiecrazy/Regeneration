@@ -8,7 +8,7 @@ import com.google.gson.JsonObject;
 import net.minecraft.advancements.ICriterionTrigger;
 import net.minecraft.advancements.PlayerAdvancements;
 import net.minecraft.advancements.critereon.AbstractCriterionInstance;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.ArrayList;
@@ -103,7 +103,7 @@ public class CustomTrigger implements ICriterionTrigger<CustomTrigger.Instance> 
      *
      * @param parPlayer the player
      */
-    public void trigger(EntityPlayerMP parPlayer) {
+    public void trigger(ServerPlayerEntity parPlayer) {
         CustomTrigger.Listeners tameanimaltrigger$listeners = listeners.get(parPlayer.getAdvancements());
 
         if (tameanimaltrigger$listeners != null) {
@@ -177,7 +177,7 @@ public class CustomTrigger implements ICriterionTrigger<CustomTrigger.Instance> 
          *
          * @param player the player
          */
-        public void trigger(EntityPlayerMP player) {
+        public void trigger(ServerPlayerEntity player) {
             ArrayList<ICriterionTrigger.Listener<CustomTrigger.Instance>> list = null;
 
             for (ICriterionTrigger.Listener<CustomTrigger.Instance> listener : listeners) {

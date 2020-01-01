@@ -6,9 +6,9 @@ import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.types.TypeLayFade;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.RenderLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EnumHandSide;
+import net.minecraft.client.renderer.entity.LivingRenderer;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.HandSide;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 
 import static me.swirtzly.regeneration.client.animation.AnimationHandler.copyAndReturn;
@@ -32,7 +32,7 @@ public class TypeLayFadeRenderer extends ATypeRenderer<TypeLayFade> {
     }
 
     @Override
-    protected void onRenderLayer(TypeLayFade type, RenderLivingBase<?> renderLivingBase, IRegeneration capability, EntityPlayer entityPlayer, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+    protected void onRenderLayer(TypeLayFade type, LivingRenderer<?> renderLivingBase, IRegeneration capability, PlayerEntity entityPlayer, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
         renderOverlay(entityPlayer, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale, null);
     }
 
@@ -53,7 +53,7 @@ public class TypeLayFadeRenderer extends ATypeRenderer<TypeLayFade> {
     }
 
     @Override
-    public void renderHand(EntityPlayer player, EnumHandSide handSide, RenderLivingBase<?> render) {
+    public void renderHand(PlayerEntity player, HandSide handSide, LivingRenderer<?> render) {
 
     }
 

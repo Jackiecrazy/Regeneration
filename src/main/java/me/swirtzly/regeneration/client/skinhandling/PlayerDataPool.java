@@ -1,8 +1,8 @@
 package me.swirtzly.regeneration.client.skinhandling;
 
 import me.swirtzly.regeneration.RegenerationMod;
-import net.minecraft.client.entity.AbstractClientPlayer;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.relauncher.Side;
 
@@ -18,7 +18,7 @@ public class PlayerDataPool {
 
     private static HashMap<UUID, SkinInfo> PLAYER_POOL = new HashMap<>();
 
-    public static void addPlayer(EntityPlayer player, SkinInfo info) {
+    public static void addPlayer(PlayerEntity player, SkinInfo info) {
         info.setUpdateRequired(true);
         PLAYER_POOL.put(player.getUniqueID(), info);
     }
@@ -28,13 +28,13 @@ public class PlayerDataPool {
         PLAYER_POOL.put(player, info);
     }
 
-    public static void removePlayer(EntityPlayer player) {
+    public static void removePlayer(PlayerEntity player) {
         if (PLAYER_POOL.containsKey(player.getUniqueID())) {
             PLAYER_POOL.remove(player.getUniqueID()).setUpdateRequired(true);
         }
     }
 
-    public static void updatePlayer(EntityPlayer player, SkinInfo info) {
+    public static void updatePlayer(PlayerEntity player, SkinInfo info) {
         if (PLAYER_POOL.containsKey(player.getUniqueID())) {
             PLAYER_POOL.replace(player.getUniqueID(), info);
         } else {
@@ -48,7 +48,7 @@ public class PlayerDataPool {
         }
     }
 
-    public static SkinInfo get(AbstractClientPlayer player) {
+    public static SkinInfo get(AbstractClientPlayerEntity player) {
         if (PLAYER_POOL.containsKey(player.getUniqueID())) {
             return PLAYER_POOL.get(player.getUniqueID());
         }

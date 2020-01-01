@@ -4,8 +4,8 @@ import me.swirtzly.regeneration.RegenerationMod;
 import me.swirtzly.regeneration.common.entity.EntityWatcher;
 import net.minecraft.client.model.ModelPlayer;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.RenderLiving;
-import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nullable;
@@ -14,11 +14,11 @@ import javax.annotation.Nullable;
  * Created by Swirtzly
  * on 22/09/2019 @ 20:59
  */
-public class RenderWatcher extends RenderLiving<EntityWatcher> {
+public class RenderWatcher extends MobRenderer<EntityWatcher> {
 
     private ResourceLocation texture = new ResourceLocation(RegenerationMod.MODID, "textures/entity/the_watcher.png");
 
-    public RenderWatcher(RenderManager rendermanagerIn) {
+    public RenderWatcher(EntityRendererManager rendermanagerIn) {
         super(rendermanagerIn, new ModelPlayer(0.1F, false), 0);
     }
 

@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
 import me.swirtzly.regeneration.handlers.ActingForwarder;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -14,13 +14,13 @@ import java.util.UUID;
 
 public class MessageRegenStateEvent implements IMessage {
 
-    private EntityPlayer player;
+    private PlayerEntity player;
     private String event;
 
     public MessageRegenStateEvent() {
     }
 
-    public MessageRegenStateEvent(EntityPlayer player, String event) {
+    public MessageRegenStateEvent(PlayerEntity player, String event) {
         this.player = player;
         this.event = event;
     }

@@ -3,7 +3,7 @@ package me.swirtzly.regeneration.network;
 import io.netty.buffer.ByteBuf;
 import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -14,12 +14,12 @@ import java.util.UUID;
 
 public class MessageTriggerRegeneration implements IMessage {
 
-    private EntityPlayer player;
+    private PlayerEntity player;
 
     public MessageTriggerRegeneration() {
     }
 
-    public MessageTriggerRegeneration(EntityPlayer player) {
+    public MessageTriggerRegeneration(PlayerEntity player) {
         this.player = player;
     }
 

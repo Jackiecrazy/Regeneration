@@ -7,23 +7,23 @@ import me.swirtzly.regeneration.util.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 
 import javax.annotation.Nullable;
 import java.util.Random;
 
-public class RenderItemOverride extends Render<EntityItemOverride> {
+public class RenderItemOverride extends EntityRenderer<EntityItemOverride> {
 
     private Vec3d primaryColor = new Vec3d(0.93F, 0.61F, 0.0F);
     private Vec3d secondaryColor = new Vec3d(1F, 0.5F, 0.18F);
 
-    public RenderItemOverride(RenderManager rm) {
+    public RenderItemOverride(EntityRendererManager rm) {
         super(rm);
     }
 
@@ -73,7 +73,7 @@ public class RenderItemOverride extends Render<EntityItemOverride> {
                 GlStateManager.pushMatrix();
                 GlStateManager.translate(0, 0.4F, 0);
                 GlStateManager.scale(0.60F, 0.60F, 0.60F);
-                this.renderLivingLabel(entity, new TextComponentTranslation("right.click", Minecraft.getMinecraft().gameSettings.keyBindUseItem.getDisplayName()).getUnformattedComponentText(), x, y + 0.4 + offset, z, 46);
+                this.renderLivingLabel(entity, new TranslationTextComponent("right.click", Minecraft.getMinecraft().gameSettings.keyBindUseItem.getDisplayName()).getUnformattedComponentText(), x, y + 0.4 + offset, z, 46);
                 GlStateManager.popMatrix();
             }
         }

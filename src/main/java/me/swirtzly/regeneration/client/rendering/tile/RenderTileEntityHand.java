@@ -9,7 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.util.ResourceLocation;
 
 import java.awt.image.BufferedImage;
@@ -18,7 +18,7 @@ import java.util.HashMap;
 
 import static me.swirtzly.regeneration.client.rendering.types.TypeFieryRenderer.renderOverlay;
 
-public class RenderTileEntityHand extends TileEntitySpecialRenderer<TileEntityHandInJar> {
+public class RenderTileEntityHand extends TileEntityRenderer<TileEntityHandInJar> {
 
     /**
      * The default skin for the Steve model.

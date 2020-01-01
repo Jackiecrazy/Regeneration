@@ -10,30 +10,30 @@ import me.swirtzly.regeneration.common.capability.RegenerationProvider;
 import me.swirtzly.regeneration.common.item.ItemHand;
 import me.swirtzly.regeneration.util.PlayerUtil;
 import me.swirtzly.regeneration.util.RegenUtil;
+import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.ai.EntityAIAvoidEntity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Items;
-import net.minecraft.init.MobEffects;
-import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.ai.goal.AvoidEntityGoal;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.item.Items;
+import net.minecraft.potion.Effects;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumHandSide;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.HandSide;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
-import net.minecraft.world.storage.loot.LootEntry;
-import net.minecraft.world.storage.loot.LootEntryTable;
+import net.minecraft.world.storage.loot.ILootGenerator;
+import net.minecraft.world.storage.loot.TableLootEntry;
 import net.minecraft.world.storage.loot.LootPool;
 import net.minecraft.world.storage.loot.RandomValueRange;
-import net.minecraft.world.storage.loot.conditions.LootCondition;
+import net.minecraft.world.storage.loot.conditions.ILootCondition;
 import net.minecraftforge.common.ForgeVersion;
 import net.minecraftforge.common.capabilities.Capability.IStorage;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -66,22 +66,22 @@ public class RegenEventHandler {
 
     @SubscribeEvent
     public static void onPlayerUpdate(LivingEvent.LivingUpdateEvent event) {
-        if (event.getEntityLiving() instanceof EntityPlayer) {
-            EntityPlayer player = (EntityPlayer) event.getEntityLiving();
+        if (event.getEntityLiving() instanceof PlayerEntity) {
+            PlayerEntity player = (PlayerEntity) event.getEntityLiving();
             IRegeneration data = CapabilityRegeneration.getForPlayer(player);
             data.tick();
 
             if (data.hasDroppedHand() && !player.getHeldItemOffhand().isEmpty()) {
                 player.dropItem(player.getHeldItemOffhand(), false);
-                player.setItemStackToSlot(EntityEquipmentSlot.OFFHAND, new ItemStack(Items.AIR));
+                player.setItemStackToSlot(EquipmentSlotType.OFFHAND, new ItemStack(Items.AIR));
             }
         }
     }
 
     @SubscribeEvent
     public static void onAttachCapabilities(AttachCapabilitiesEvent<Entity> event) {
-        if (event.getObject() instanceof EntityPlayer) {
-            event.addCapability(CapabilityRegeneration.CAP_REGEN_ID, new RegenerationProvider(new CapabilityRegeneration((EntityPlayer) event.getObject())));
+        if (event.getObject() instanceof PlayerEntity) {
+            event.addCapability(CapabilityRegeneration.CAP_REGEN_ID, new RegenerationProvider(new CapabilityRegeneration((PlayerEntity) event.getObject())));
         }
     }
 
@@ -92,7 +92,7 @@ public class RegenEventHandler {
         IRegeneration oldCap = CapabilityRegeneration.getForPlayer(event.getOriginal());
         IRegeneration newCap = CapabilityRegeneration.getForPlayer(event.getEntityPlayer());
 
-        NBTTagCompound nbt = (NBTTagCompound) storage.writeNBT(CapabilityRegeneration.CAPABILITY, oldCap, null);
+        CompoundNBT nbt = (CompoundNBT) storage.writeNBT(CapabilityRegeneration.CAPABILITY, oldCap, null);
         storage.readNBT(CapabilityRegeneration.CAPABILITY, newCap, null, nbt);
         CapabilityRegeneration.getForPlayer(event.getEntityPlayer()).synchronise();
     }
@@ -117,8 +117,8 @@ public class RegenEventHandler {
 
     @SubscribeEvent
     public static void onDeathEvent(LivingDeathEvent e) {
-        if (e.getEntityLiving() instanceof EntityPlayer) {
-            CapabilityRegeneration.getForPlayer((EntityPlayer) e.getEntityLiving()).synchronise();
+        if (e.getEntityLiving() instanceof PlayerEntity) {
+            CapabilityRegeneration.getForPlayer((PlayerEntity) e.getEntityLiving()).synchronise();
         }
     }
 
@@ -136,35 +136,35 @@ public class RegenEventHandler {
     public static void onHurt(LivingHurtEvent event) {
         Entity trueSource = event.getSource().getTrueSource();
 
-        if (trueSource instanceof EntityPlayer && event.getEntityLiving() instanceof EntityLiving) {
-            EntityPlayer player = (EntityPlayer) trueSource;
+        if (trueSource instanceof PlayerEntity && event.getEntityLiving() instanceof MobEntity) {
+            PlayerEntity player = (PlayerEntity) trueSource;
             CapabilityRegeneration.getForPlayer(player).getStateManager().onPunchEntity(event);
             return;
         }
 
-        if (!(event.getEntity() instanceof EntityPlayer) || event.getSource() == RegenObjects.REGEN_DMG_CRITICAL || event.getSource() == RegenObjects.REGEN_DMG_KILLED)
+        if (!(event.getEntity() instanceof PlayerEntity) || event.getSource() == RegenObjects.REGEN_DMG_CRITICAL || event.getSource() == RegenObjects.REGEN_DMG_KILLED)
             return;
 
-        EntityPlayer player = (EntityPlayer) event.getEntity();
+        PlayerEntity player = (PlayerEntity) event.getEntity();
         IRegeneration cap = CapabilityRegeneration.getForPlayer(player);
 
         cap.setDeathSource(event.getSource().getDeathMessage(player).getUnformattedText());
 
         if (cap.getState() == POST && player.posY > 0) {
             if (event.getSource() == DamageSource.FALL) {
-                PlayerUtil.applyPotionIfAbsent(player, MobEffects.NAUSEA, 200, 4, false, false);
+                PlayerUtil.applyPotionIfAbsent(player, Effects.NAUSEA, 200, 4, false, false);
                 if (event.getAmount() > 8.0F) {
                     if (player.world.getGameRules().getBoolean("mobGriefing") && RegenConfig.postRegen.genGreator) {
                         RegenUtil.genCrater(player.world, player.getPosition(), 3);
                     }
                     event.setAmount(0.5F);
-                    PlayerUtil.sendMessage(player, new TextComponentTranslation("regeneration.messages.fall_dmg"), true);
+                    PlayerUtil.sendMessage(player, new TranslationTextComponent("regeneration.messages.fall_dmg"), true);
                     return;
                 }
             } else {
                 if (!player.world.isRemote) {
-                    if (trueSource instanceof EntityLiving) {
-                        EntityLiving living = (EntityLiving) trueSource;
+                    if (trueSource instanceof MobEntity) {
+                        MobEntity living = (MobEntity) trueSource;
                         if (RegenUtil.isSharp(living.getHeldItemMainhand()) & player.world.rand.nextBoolean() && !cap.hasDroppedHand()) {
                             ItemStack hand = new ItemStack(RegenObjects.Items.HAND);
                             ItemHand.setTextureString(hand, cap.getEncodedSkin());
@@ -173,18 +173,18 @@ public class RegenEventHandler {
                             ItemHand.setTimeCreated(hand, System.currentTimeMillis());
                             ItemHand.setTrait(hand, cap.getDnaType().toString());
                             cap.setDroppedHand(true);
-                            RegenTriggers.HAND.trigger((EntityPlayerMP) player);
-                            if (player.getPrimaryHand() == EnumHandSide.LEFT) {
-                                cap.setCutOffHand(EnumHandSide.RIGHT);
+                            RegenTriggers.HAND.trigger((ServerPlayerEntity) player);
+                            if (player.getPrimaryHand() == HandSide.LEFT) {
+                                cap.setCutOffHand(HandSide.RIGHT);
                             } else {
-                                cap.setCutOffHand(EnumHandSide.LEFT);
+                                cap.setCutOffHand(HandSide.LEFT);
                             }
                             InventoryHelper.spawnItemStack(player.world, player.posX, player.posY, player.posZ, hand);
                         }
                     }
                 }
                 event.setAmount(0.5F);
-                PlayerUtil.sendMessage(player, new TextComponentTranslation("regeneration.messages.reduced_dmg"), true);
+                PlayerUtil.sendMessage(player, new TranslationTextComponent("regeneration.messages.reduced_dmg"), true);
             }
             return;
         }
@@ -200,8 +200,8 @@ public class RegenEventHandler {
 
     @SubscribeEvent
     public static void onKnockback(LivingKnockBackEvent event) {
-        if (event.getEntityLiving() instanceof EntityPlayer) {
-            if (CapabilityRegeneration.getForPlayer((EntityPlayer) event.getEntityLiving()).getState() == PlayerUtil.RegenState.REGENERATING) {
+        if (event.getEntityLiving() instanceof PlayerEntity) {
+            if (CapabilityRegeneration.getForPlayer((PlayerEntity) event.getEntityLiving()).getState() == PlayerUtil.RegenState.REGENERATING) {
                 event.setCanceled(true);
             }
         }
@@ -213,12 +213,12 @@ public class RegenEventHandler {
         if (event.player.world.isRemote)
             return;
 
-        NBTTagCompound nbt = event.player.getEntityData(),
-                persist = nbt.getCompoundTag(EntityPlayer.PERSISTED_NBT_TAG);
+        CompoundNBT nbt = event.player.getEntityData(),
+                persist = nbt.getCompoundTag(PlayerEntity.PERSISTED_NBT_TAG);
         if (!persist.getBoolean("loggedInBefore"))
             CapabilityRegeneration.getForPlayer(event.player).receiveRegenerations(RegenConfig.freeRegenerations);
         persist.setBoolean("loggedInBefore", true);
-        nbt.setTag(EntityPlayer.PERSISTED_NBT_TAG, persist);
+        nbt.setTag(PlayerEntity.PERSISTED_NBT_TAG, persist);
     }
 
     @SubscribeEvent
@@ -227,8 +227,8 @@ public class RegenEventHandler {
             return;
 
         // TODO configurable chances? Maybe by doing a simple loot table tutorial?
-        LootEntryTable entry = new LootEntryTable(RegenerationMod.LOOT_FILE, 1, 0, new LootCondition[0], "regeneration_inject_entry");
-        LootPool pool = new LootPool(new LootEntry[]{entry}, new LootCondition[0], new RandomValueRange(1), new RandomValueRange(1), "regeneration_inject_pool");
+        TableLootEntry entry = new TableLootEntry(RegenerationMod.LOOT_FILE, 1, 0, new ILootCondition[0], "regeneration_inject_entry");
+        LootPool pool = new LootPool(new ILootGenerator[]{entry}, new ILootCondition[0], new RandomValueRange(1), new RandomValueRange(1), "regeneration_inject_pool");
         event.getTable().addPool(pool);
     }
 
@@ -237,43 +237,43 @@ public class RegenEventHandler {
      */
     @SubscribeEvent
     public static void onPlayerLogin(PlayerLoggedInEvent e) {
-        EntityPlayer player = e.player;
+        PlayerEntity player = e.player;
         if (!player.world.isRemote && RegenConfig.enableUpdateChecker) {
             ForgeVersion.CheckResult version = ForgeVersion.getResult(Loader.instance().activeModContainer());
             if (version.status.equals(ForgeVersion.Status.OUTDATED)) {
-                TextComponentString url = new TextComponentString(TextFormatting.AQUA + TextFormatting.BOLD.toString() + "UPDATE");
+                StringTextComponent url = new StringTextComponent(TextFormatting.AQUA + TextFormatting.BOLD.toString() + "UPDATE");
                 url.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://minecraft.curseforge.com/projects/regeneration"));
-                url.getStyle().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString("Open URL")));
+                url.getStyle().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new StringTextComponent("Open URL")));
 
-                player.sendMessage(new TextComponentString(TextFormatting.GOLD + "[Regeneration] : ").appendSibling(url));
+                player.sendMessage(new StringTextComponent(TextFormatting.GOLD + "[Regeneration] : ").appendSibling(url));
                 String changes = version.changes.get(version.target);
-                player.sendMessage(new TextComponentString(TextFormatting.GOLD + "Changes: " + TextFormatting.BLUE + changes));
+                player.sendMessage(new StringTextComponent(TextFormatting.GOLD + "Changes: " + TextFormatting.BLUE + changes));
             }
         }
     }
 
     @SubscribeEvent
     public static void addRunAwayTask(EntityJoinWorldEvent e) {
-        if (e.getEntity() instanceof EntityCreature) {
-            EntityCreature living = (EntityCreature) e.getEntity();
+        if (e.getEntity() instanceof CreatureEntity) {
+            CreatureEntity living = (CreatureEntity) e.getEntity();
             Predicate<Entity> pred = entity -> {
 
-                if (entity instanceof EntityPlayer) {
-                    EntityPlayer player = (EntityPlayer) entity;
+                if (entity instanceof PlayerEntity) {
+                    PlayerEntity player = (PlayerEntity) entity;
                     IRegeneration data = CapabilityRegeneration.getForPlayer(player);
                     return data.getState() == PlayerUtil.RegenState.REGENERATING || data.areHandsGlowing();
                 }
                 return false;
             };
 
-            living.tasks.addTask(0, new EntityAIAvoidEntity(living, EntityPlayer.class, pred, 6.0F, 1.0D, 1.2D));
+            living.tasks.addTask(0, new AvoidEntityGoal(living, PlayerEntity.class, pred, 6.0F, 1.0D, 1.2D));
         }
     }
 
     @SubscribeEvent
     public static void onCut(PlayerInteractEvent.RightClickItem event) {
         if (RegenUtil.isSharp(event.getItemStack())) {
-            EntityPlayer player = event.getEntityPlayer();
+            PlayerEntity player = event.getEntityPlayer();
             IRegeneration cap = CapabilityRegeneration.getForPlayer(player);
             if (!player.world.isRemote && cap.getState() == POST && player.isSneaking() && !cap.hasDroppedHand()) {
                 ItemStack hand = new ItemStack(RegenObjects.Items.HAND);
@@ -283,11 +283,11 @@ public class RegenEventHandler {
                 ItemHand.setTimeCreated(hand, System.currentTimeMillis());
                 ItemHand.setTrait(hand, cap.getDnaType().toString());
                 cap.setDroppedHand(true);
-                RegenTriggers.HAND.trigger((EntityPlayerMP) player);
-                if (player.getPrimaryHand() == EnumHandSide.LEFT) {
-                    cap.setCutOffHand(EnumHandSide.RIGHT);
+                RegenTriggers.HAND.trigger((ServerPlayerEntity) player);
+                if (player.getPrimaryHand() == HandSide.LEFT) {
+                    cap.setCutOffHand(HandSide.RIGHT);
                 } else {
-                    cap.setCutOffHand(EnumHandSide.LEFT);
+                    cap.setCutOffHand(HandSide.LEFT);
                 }
                 InventoryHelper.spawnItemStack(player.world, player.posX, player.posY, player.posZ, hand);
             }

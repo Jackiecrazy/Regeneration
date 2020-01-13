@@ -31,7 +31,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.OnlyIn;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-@SideOnly(Dist.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class SkinChangingHandler {
 
     public static final File SKIN_DIRECTORY = new File(RegenConfig.skins.skinDir + "/Regeneration/skins/");

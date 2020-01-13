@@ -1,8 +1,10 @@
 package me.swirtzly.regeneration.common.entity;
 
+import me.swirtzly.regeneration.handlers.RegenObjects;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
@@ -13,21 +15,20 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.ActionResultType;
-import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.network.NetworkHooks;
 
 public class EntityItemOverride extends Entity {
 
-    private static final DataParameter<ItemStack> ITEM = EntityDataManager.createKey(EntityItemOverride.class, DataSerializers.ITEM_STACK);
+    private static final DataParameter<ItemStack> ITEM = EntityDataManager.createKey(EntityItemOverride.class, DataSerializers.ITEMSTACK);
     private static final DataParameter<Float> HEIGHT = EntityDataManager.createKey(EntityItemOverride.class, DataSerializers.FLOAT);
     private static final DataParameter<Float> WIDTH = EntityDataManager.createKey(EntityItemOverride.class, DataSerializers.FLOAT);
+    private double motionX, motionY, motionZ;
 
     public EntityItemOverride(World worldIn, double x, double y, double z, ItemStack stack) {
         this(worldIn);
@@ -44,11 +45,15 @@ public class EntityItemOverride extends Entity {
         this.rotationYaw = (float) (Math.random() * 360.0D);
     }
 
-    public EntityItemOverride(World worldIn) {
-        super(worldIn);
-        this.setSize(getWidth(), getHeight());
-        this.isImmuneToFire = true;
+    public EntityItemOverride(EntityType type, World world){
+        this(world);
     }
+
+    public EntityItemOverride(World worldIn) {
+        super(RegenObjects.EntityEntries.ITEM_OVERRIDE_ENTITY_TYPE, worldIn);
+        this.setEntitySize(getWidth(), getHeight());
+    }
+
 
     public static void givePlayerItemStack(PlayerEntity player, ItemStack stack) {
         if (player.getHeldItemMainhand().isEmpty())
@@ -61,11 +66,10 @@ public class EntityItemOverride extends Entity {
     public void setEntitySize(float height, float width) {
         this.setHeight(height);
         this.setWidth(width);
-        this.setSize(width, height);
     }
 
     @Override
-    protected void entityInit() {
+    protected void registerData() {
         this.getDataManager().register(ITEM, ItemStack.EMPTY);
         this.getDataManager().register(HEIGHT, 0.25F);
         this.getDataManager().register(WIDTH, 0.25F);
@@ -75,13 +79,12 @@ public class EntityItemOverride extends Entity {
      * (abstract) Protected helper method to read subclass entity data from NBT.
      */
     @Override
-    protected void readEntityFromNBT(CompoundNBT compound) {
-        CompoundNBT nbttagcompound = (CompoundNBT) compound.get("Item");
-        this.setItem(new ItemStack(nbttagcompound));
+    public void readAdditional(CompoundNBT compound) {
+        CompoundNBT itemCompound = (CompoundNBT) compound.get("Item");
+        this.setItem(ItemStack.read(itemCompound));
 
         if (this.getItem().isEmpty())
-            this.remove();
-
+            this.onKillCommand();
         this.setHeight(compound.getFloat("Height"));
         this.setWidth(compound.getFloat("Width"));
     }
@@ -90,7 +93,7 @@ public class EntityItemOverride extends Entity {
      * (abstract) Protected helper method to write subclass entity data to NBT.
      */
     @Override
-    protected void writeEntityToNBT(CompoundNBT compound) {
+    public void writeAdditional(CompoundNBT compound) {
         if (!this.getItem().isEmpty())
             compound.put("Item", this.getItem().write(new CompoundNBT()));
 
@@ -104,23 +107,22 @@ public class EntityItemOverride extends Entity {
 
     public void setItem(ItemStack stack) {
         this.getDataManager().set(ITEM, stack);
-        this.getDataManager().setDirty(ITEM);
     }
 
-    public float getHeight() {
+    public float getCHeight() {
         return this.getDataManager().get(HEIGHT);
     }
 
     @Override
     public IPacket<?> createSpawnPacket() {
-        return null;
+        return NetworkHooks.getEntitySpawningPacket(this);
     }
 
     public void setHeight(float height) {
         this.getDataManager().set(HEIGHT, height);
     }
 
-    public float getWidth() {
+    public float getCWidth() {
         return this.getDataManager().get(WIDTH);
     }
 
@@ -128,17 +130,9 @@ public class EntityItemOverride extends Entity {
         this.getDataManager().set(WIDTH, width);
     }
 
-    /**
-     * Returns whether this Entity is invulnerable to the given DamageSource.
-     */
     @Override
-    public boolean isEntityInvulnerable(DamageSource source) {
+    public boolean isInvulnerable() {
         return true;
-    }
-
-    @Override
-    protected void registerData() {
-
     }
 
     /**
@@ -149,6 +143,15 @@ public class EntityItemOverride extends Entity {
     }
 
     /**
+     * returns if this entity triggers Block.onEntityWalking on the blocks they walk on. used for spiders and wolves to
+     * prevent them from trampling crops
+     */
+    @Override
+    protected boolean canTriggerWalking() {
+        return false;
+    }
+
+    /**
      * Returns true if this entity should push and be pushed by other entities when colliding.
      */
     @Override
@@ -156,22 +159,12 @@ public class EntityItemOverride extends Entity {
         return false;
     }
 
-    @Override
-    protected void readAdditional(CompoundNBT p_70037_1_) {
-
-    }
-
-    @Override
-    protected void writeAdditional(CompoundNBT p_213281_1_) {
-
-    }
-
     /**
      * Returns true if other Entities should be prevented from moving through this Entity.
      */
     @Override
     public boolean canBeCollidedWith() {
-        return isAlive();
+        return this.isAlive();
     }
 
     /**
@@ -188,8 +181,8 @@ public class EntityItemOverride extends Entity {
      * Gets called every tick from main Entity class
      */
     @Override
-    public void updateTick() {
-        super.onEntityUpdate();
+    public void tick() {
+        super.tick();
         this.prevPosX = this.posX;
         this.prevPosY = this.posY;
         this.prevPosZ = this.posZ;
@@ -207,26 +200,24 @@ public class EntityItemOverride extends Entity {
             iEntityOverride.update(this);
         }
 
-        this.setSize(getWidth(), getHeight());
+        this.setEntitySize(getWidth(), getHeight());
 
         if (!this.hasNoGravity()) {
-            this.motionY -= 0.03999999910593033D;
+            this.getMotion().add(0, getMotion().getY() - 0.03999999910593033D, 0);
         }
 
         if (this.world.isRemote) {
             this.noClip = false;
         } else {
-            this.noClip = this.pushOutOfBlocks(this.posX, (this.getBoundingBox().minY + this.getBoundingBox().maxY) / 2.0D, this.posZ);
+            this.pushOutOfBlocks(this.posX, (this.getBoundingBox().minY + this.getBoundingBox().maxY) / 2.0D, this.posZ);
         }
 
-        this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
+        this.move(MoverType.SELF, new Vec3d(this.motionX, this.motionY, this.motionZ));
         boolean flag = (int) this.prevPosX != (int) this.posX || (int) this.prevPosY != (int) this.posY || (int) this.prevPosZ != (int) this.posZ;
 
         if (flag || this.ticksExisted % 25 == 0) {
             if (this.world.getBlockState(new BlockPos(this)).getMaterial() == Material.LAVA) {
-                this.motionY = 0.20000000298023224D;
-                this.motionX = (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F;
-                this.motionZ = (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F;
+                this.getMotion().add(0.20000000298023224D, (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F, (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F);
                 this.playSound(SoundEvents.ENTITY_GENERIC_BURN, 0.4F, 2.0F + this.rand.nextFloat() * 0.4F);
             }
         }
@@ -239,13 +230,16 @@ public class EntityItemOverride extends Entity {
             f = underState.getBlock().getSlipperiness(underState, this.world, underPos, this) * 0.98F;
         }
 
-        this.motionX *= f;
-        this.motionY *= 0.9800000190734863D;
-        this.motionZ *= f;
+        motionX *= f;
+        motionY *= 0.9800000190734863D;
+        motionZ *= f;
+        getMotion().add(new Vec3d(motionX, motionY, motionZ));
 
         if (this.onGround) {
             this.motionY *= -0.5D;
         }
+
+        getMotion().add(new Vec3d(motionX, motionY, motionZ));
 
         this.handleWaterMovement();
 
@@ -253,6 +247,7 @@ public class EntityItemOverride extends Entity {
             double d3 = this.motionX - d0;
             double d4 = this.motionY - d1;
             double d5 = this.motionZ - d2;
+            getMotion().add(new Vec3d(motionX, motionY, motionZ));
             double d6 = d3 * d3 + d4 * d4 + d5 * d5;
 
             if (d6 > 0.01D) {
@@ -261,8 +256,10 @@ public class EntityItemOverride extends Entity {
         }
     }
 
-    @Override
-    public ITextComponent getDisplayName() {
-        return new StringTextComponent(getItem().getDisplayName());
+    public interface IEntityOverride {
+
+        void update(OverrideEntity itemOverride);
+
+        boolean shouldDie(ItemStack stack);
     }
 }

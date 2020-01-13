@@ -44,7 +44,7 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.OnlyIn;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -223,7 +223,7 @@ public class ClientEventHandler {
         }
     }
 
-    @SideOnly(Dist.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
     public static void onClientChatRecieved(ClientChatReceivedEvent e) {
         ClientPlayerEntity player = Minecraft.getInstance().player;

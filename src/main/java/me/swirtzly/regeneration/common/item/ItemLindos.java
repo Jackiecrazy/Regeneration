@@ -1,82 +1,69 @@
 package me.swirtzly.regeneration.common.item;
 
-import me.swirtzly.regeneration.common.advancements.RegenTriggers;
-import me.swirtzly.regeneration.common.block.BlockHandInJar;
 import me.swirtzly.regeneration.common.capability.RegenCap;
-import me.swirtzly.regeneration.common.capability.IRegeneration;
-import me.swirtzly.regeneration.common.entity.EntityItemOverride;
-import me.swirtzly.regeneration.common.tiles.TileEntityHandInJar;
+import me.swirtzly.regeneration.common.entity.OverrideEntity;
 import me.swirtzly.regeneration.handlers.RegenObjects;
 import me.swirtzly.regeneration.util.PlayerUtil;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.block.Blocks;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.item.IItemPropertyGetter;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.*;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.*;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class ItemLindos extends ItemOverrideBase {
+public class ItemLindos extends OverrideItem {
 
     public ItemLindos() {
-        setMaxStackSize(1);
-        addPropertyOverride(new ResourceLocation("amount"), new IItemPropertyGetter() {
-            @Override
-            @SideOnly(Dist.CLIENT)
-            public float apply(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
+        super(new Item.Properties().group(ItemGroup.MISC).maxStackSize(1));
+        addPropertyOverride(new ResourceLocation("amount"), (stack, world, entityLivingBase) -> {
+            if (stack.getTag() != null) {
+                int amount = getAmount(stack);
 
-                if (stack.getTag() != null) {
-                    int amount = getAmount(stack);
-
-                    if (!hasWater(stack)) {
-                        return 0.0F;
-                    }
-
-                    if (hasWater(stack) && getAmount(stack) <= 0) {
-                        return 2F;
-                    }
-
-                    if (amount == 100) {
-                        return 1.0F;
-                    }
-
-                    if (amount >= 90) {
-                        return 0.2F;
-                    }
-
-                    if (amount >= 50) {
-                        return 0.5F;
-                    }
-
-                    if (amount >= 10) {
-                        return 0.1F;
-                    }
+                if (!hasWater(stack)) {
+                    return 0.0F;
                 }
 
-                return 2F;
+                if (hasWater(stack) && getAmount(stack) <= 0) {
+                    return 2F;
+                }
+
+                if (amount == 100) {
+                    return 1.0F;
+                }
+
+                if (amount >= 90) {
+                    return 0.2F;
+                }
+
+                if (amount >= 50) {
+                    return 0.5F;
+                }
+
+                if (amount >= 10) {
+                    return 0.1F;
+                }
             }
+
+            return 2F;
         });
     }
 
     public static CompoundNBT getStackTag(ItemStack stack) {
         if (stack.getTag() == null) {
-            stack.putCompound(new CompoundNBT());
+            stack.setTag(new CompoundNBT());
             stack.getTag().putInt("amount", 0);
         }
         return stack.getTag();
@@ -101,16 +88,13 @@ public class ItemLindos extends ItemOverrideBase {
     @Override
     public void onCreated(ItemStack stack, World worldIn, PlayerEntity playerIn) {
         super.onCreated(stack, worldIn, playerIn);
-        if (!playerIn.world.isRemote) {
-            RegenTriggers.LINDOS_VIAL.trigger((ServerPlayerEntity) playerIn);
-        }
     }
 
     @Override
-    public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
+    public void inventoryTick(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
 
         if (stack.getTag() == null) {
-            stack.putCompound(new CompoundNBT());
+            stack.setTag(new CompoundNBT());
             stack.getTag().putBoolean("live", true);
         } else {
             stack.getTag().putBoolean("live", true);
@@ -119,79 +103,80 @@ public class ItemLindos extends ItemOverrideBase {
         if (!worldIn.isRemote) {
             //Entiies around
             worldIn.getEntitiesWithinAABB(PlayerEntity.class, entityIn.getBoundingBox().expand(10, 10, 10)).forEach(player -> {
-                IRegeneration data = RegenCap.get((PlayerEntity) entityIn);
-                if (data.getState() == PlayerUtil.RegenState.REGENERATING) {
-                    if (worldIn.rand.nextInt(100) > 50 && isSelected) {
-                        setAmount(stack, getAmount(stack) + 1);
+                RegenCap.get((PlayerEntity) entityIn).ifPresent((data) -> {
+                    if (data.getState() == PlayerUtil.RegenState.REGENERATING) {
+                        if (worldIn.rand.nextInt(100) > 50 && isSelected) {
+                            setAmount(stack, getAmount(stack) + 1);
+                        }
                     }
-                }
+                });
             });
 
             //Player glowing
             if (entityIn instanceof PlayerEntity) {
                 PlayerEntity player = (PlayerEntity) entityIn;
-                if (isSelected) {
-                    if (RegenCap.get(player).areHandsGlowing() && player.ticksExisted % 40 == 0) {
-                        setAmount(stack, getAmount(stack) + 2);
+                RegenCap.get(player).ifPresent((data) -> {
+                    if (isSelected) {
+                        if (data.areHandsGlowing() && player.ticksExisted % 40 == 0) {
+                            setAmount(stack, getAmount(stack) + 2);
+                        }
                     }
-                }
+                });
             }
         }
-        super.onUpdate(stack, worldIn, entityIn, itemSlot, isSelected);
+        super.inventoryTick(stack, worldIn, entityIn, itemSlot, isSelected);
     }
 
+
     @Override
-    public ActionResultType onItemUse(PlayerEntity player, World worldIn, BlockPos pos, Hand hand, Direction facing, float hitX, float hitY, float hitZ) {
-        if (!worldIn.isRemote) {
-            ItemStack itemStack = player.getHeldItem(hand);
-            RayTraceResult raytraceresult = this.rayTrace(worldIn, player, true);
+    public ActionResultType onItemUse(ItemUseContext useContext) {
+        PlayerEntity player = useContext.getPlayer();
 
-            if (raytraceresult == null || raytraceresult.getBlockPos() == null) {
-                return ActionResultType.FAIL;
-            }
+        if (!player.world.isRemote) {
+            ItemStack itemStack = useContext.getItem();
+            RayTraceResult raytraceresult = rayTrace(player.world, player, RayTraceContext.FluidMode.ANY);
 
-            BlockPos blockPos = raytraceresult.getBlockPos();
-            BlockState iblockstate = worldIn.getBlockState(blockPos);
-            Material material = iblockstate.getMaterial();
 
-            if (iblockstate.getBlock() instanceof BlockHandInJar && player.isCrouching()) {
-                if (worldIn.getTileEntity(blockPos) instanceof TileEntityHandInJar) {
-                    TileEntityHandInJar jar = (TileEntityHandInJar) worldIn.getTileEntity(blockPos);
-                    setAmount(itemStack, getAmount(itemStack) + jar.getLindosAmont());
-                    jar.setLindosAmont(0);
+            if (raytraceresult.getType() == RayTraceResult.Type.BLOCK) {
+                BlockRayTraceResult blockResult = (BlockRayTraceResult) raytraceresult;
+                if (raytraceresult == null || blockResult.getPos() == null) {
+                    return ActionResultType.FAIL;
                 }
-                return ActionResultType.SUCCESS;
-            }
 
-            if (material == Material.WATER) {
-                worldIn.setBlockState(blockPos, Blocks.AIR.getDefaultState(), 11);
-                player.playSound(SoundEvents.ITEM_BUCKET_FILL, 1.0F, 1.0F);
+                BlockPos blockPos = blockResult.getPos();
+                BlockState iblockstate = player.world.getBlockState(blockPos);
+                Material material = iblockstate.getMaterial();
 
-                if (!hasWater(itemStack)) {
-                    setWater(itemStack, true);
+                if (material == Material.WATER) {
+                    player.world.setBlockState(blockPos, Blocks.AIR.getDefaultState(), 11);
                     player.playSound(SoundEvents.ITEM_BUCKET_FILL, 1.0F, 1.0F);
-                    PlayerUtil.sendMessage(player, new TranslationTextComponent("nbt.item.water_filled"), true);
-                } else {
-                    PlayerUtil.sendMessage(player, new TranslationTextComponent("nbt.item.water_already_filled"), true);
+
+                    if (!hasWater(itemStack)) {
+                        setWater(itemStack, true);
+                        player.playSound(SoundEvents.ITEM_BUCKET_FILL, 1.0F, 1.0F);
+                        PlayerUtil.sendMessage(player, new TranslationTextComponent("nbt.item.water_filled"), true);
+                    } else {
+                        PlayerUtil.sendMessage(player, new TranslationTextComponent("nbt.item.water_already_filled"), true);
+                    }
+                    return ActionResultType.SUCCESS;
                 }
-                return ActionResultType.SUCCESS;
+
             }
         }
-        return super.onItemUse(player, worldIn, pos, hand, facing, hitX, hitY, hitZ);
+
+        return super.onItemUse(useContext);
     }
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity player, Hand handIn) {
         ItemStack stack = player.getHeldItem(handIn);
-        IRegeneration cap = RegenCap.get(player);
+        IRegen cap = RegenCap.get(player).orElse(null);
         if (!worldIn.isRemote) {
 
             //If the player is in POST or Regenerating, stop them from drinking it
-            if (getAmount(stack) > 100) {
-                if (cap.getState() == PlayerUtil.RegenState.POST || cap.getState() == PlayerUtil.RegenState.REGENERATING || player.isCreative()) {
-                    PlayerUtil.sendMessage(player, new TranslationTextComponent("regeneration.messages.cannot_use"), true);
-                    return ActionResult.newResult(ActionResultType.FAIL, player.getHeldItem(handIn));
-                }
+            if (cap.getState() == PlayerUtil.RegenState.POST || cap.getState() == PlayerUtil.RegenState.REGENERATING || player.isCreative()) {
+                PlayerUtil.sendMessage(player, new TranslationTextComponent("regeneration.messages.cannot_use"), true);
+                return ActionResult.newResult(ActionResultType.FAIL, player.getHeldItem(handIn));
             }
 
             if (hasWater(stack)) {
@@ -217,17 +202,18 @@ public class ItemLindos extends ItemOverrideBase {
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
-        tooltip.add(new TranslationTextComponent("nbt.item.lindos", getAmount(stack)).getUnformattedText());
-        tooltip.add(new TranslationTextComponent("nbt.item.water", hasWater(stack)).getUnformattedText());
+    public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag idk) {
+        super.addInformation(stack, world, tooltip, idk);
+        tooltip.add(new TranslationTextComponent("nbt.item.lindos", getAmount(stack)));
+        tooltip.add(new TranslationTextComponent("nbt.item.water", hasWater(stack)));
     }
 
+
     @Override
-    public void update(EntityItemOverride itemOverride) {
+    public void update(OverrideEntity itemOverride) {
         if (itemOverride.world.isRemote) return;
         ItemStack itemStack = itemOverride.getItem();
-        if (itemStack.getItem() == this) {
+        if (itemStack.getItem().getItem() == this) {
             if (itemOverride.isInWater()) {
                 if (itemStack.getTag() != null) {
                     setWater(itemStack, true);

@@ -12,6 +12,7 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.Explosion;
 
 /**
  * Created by Sub
@@ -46,7 +47,7 @@ public class TypeFiery implements IRegenType<TypeFieryRenderer> {
         double x = player.getPosition().getX() + player.getRNG().nextGaussian() * 2;
         double y = player.getPosition().getY() + 0.5 + player.getRNG().nextGaussian() * 2;
         double z = player.getPosition().getZ() + player.getRNG().nextGaussian() * 2;
-        player.world.createExplosion(player, x, y, z, 0.1F, RegenConfig.fieryRegen, false);
+        player.world.createExplosion(player, x, y, z, 0.1F, RegenConfig.COMMON.fieryRegen.get(), Explosion.Mode.NONE);
 
         RegenUtil.regenerationExplosion(player);
 

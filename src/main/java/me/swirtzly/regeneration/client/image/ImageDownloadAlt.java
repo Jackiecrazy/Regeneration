@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.OnlyIn;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,7 +21,7 @@ import java.net.URL;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
-@SideOnly(Dist.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class ImageDownloadAlt extends SimpleTexture {
     private static final Logger logger = LogManager.getLogger();
     private static final AtomicInteger threadDownloadCounter = new AtomicInteger(0);

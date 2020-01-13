@@ -42,14 +42,14 @@ public class GuiCustomizer extends ContainerScreen {
     }
 
     @Override
-    public void initGui() {
-        super.initGui();
+    public void init() {
+        super.init();
         TabRegistry.updateTabValues(guiLeft, guiTop, InventoryTabRegeneration.class);
         TabRegistry.addTabsToList(this.buttonList);
         int cx = (width - xSize) / 2;
         int cy = (height - ySize) / 2;
 
-        IRegeneration cap = RegenCap.get(mc.player);
+        IRegeneration cap = RegenCap.get(minecraft.player);
         initialPrimary = cap.getPrimaryColor();
         initialSecondary = cap.getSecondaryColor();
 

@@ -3,17 +3,16 @@ package me.swirtzly.regeneration.common.item;
 import me.swirtzly.regeneration.RegenConfig;
 import me.swirtzly.regeneration.RegenerationMod;
 import me.swirtzly.regeneration.common.capability.RegenCap;
-import me.swirtzly.regeneration.common.capability.IRegeneration;
-import me.swirtzly.regeneration.common.entity.EntityItemOverride;
+import me.swirtzly.regeneration.common.entity.OverrideEntity;
 import me.swirtzly.regeneration.handlers.RegenObjects;
 import me.swirtzly.regeneration.util.ClientUtil;
 import me.swirtzly.regeneration.util.PlayerUtil;
-import net.minecraft.item.ItemGroup;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.SoundEvents;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.*;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -22,27 +21,33 @@ import net.minecraft.world.World;
  * Created by Sub
  * on 16/09/2018.
  */
-public class ItemFobWatch extends ItemOverrideBase {
+public class ItemFobWatch extends OverrideItem {
 
     public ItemFobWatch() {
-        setMaxDamage(RegenConfig.regenCapacity);
-        setCreativeTab(ItemGroup.MISC);
-        setMaxStackSize(1);
-
+        super(new Item.Properties().setNoRepair().maxStackSize(1).group(ItemGroup.MISC));
         addPropertyOverride(new ResourceLocation("open"), (stack, worldIn, entityIn) -> {
-            if (getStackTag(stack) == null || !getStackTag(stack).hasKey("open")) {
+            if (getStackTag(stack) == null || !getStackTag(stack).contains("open")) {
                 return 0F; //Closed
             }
             return getOpen(stack);
         });
 
         addPropertyOverride(new ResourceLocation("engrave"), (stack, worldIn, entityIn) -> {
-            if (getStackTag(stack) == null || !getStackTag(stack).hasKey("engrave")) {
+            if (getStackTag(stack) == null || !getStackTag(stack).contains("engrave")) {
                 return 0F; //Default
             }
             return getEngrave(stack);
         });
 
+    }
+
+    public static CompoundNBT getStackTag(ItemStack stack) {
+        if (stack.getTag() == null) {
+            stack.setTag(new CompoundNBT());
+            stack.getTag().putInt("open", 0);
+            stack.getTag().putInt("engrave", random.nextInt(2));
+        }
+        return stack.getTag();
     }
 
     public static int getEngrave(ItemStack stack) {
@@ -51,15 +56,6 @@ public class ItemFobWatch extends ItemOverrideBase {
 
     public static void setEngrave(ItemStack stack, int engrave) {
         getStackTag(stack).putInt("engrave", engrave);
-    }
-
-    public static CompoundNBT getStackTag(ItemStack stack) {
-        if (stack.getTag() == null) {
-            stack.putCompound(new CompoundNBT());
-            stack.getTag().putInt("open", 0);
-            stack.getTag().putInt("engrave", itemRand.nextInt(2));
-        }
-        return stack.getTag();
     }
 
     public static int getOpen(ItemStack stack) {
@@ -73,17 +69,13 @@ public class ItemFobWatch extends ItemOverrideBase {
     @Override
     public void onCreated(ItemStack stack, World worldIn, PlayerEntity playerIn) {
         super.onCreated(stack, worldIn, playerIn);
-        if (RegenConfig.craftWithRegens) {
-            stack.setItemDamage(0);
-            setEngrave(stack, worldIn.rand.nextInt(3));
-            setOpen(stack, 0);
-        }
+        stack.setDamage(0);
     }
 
     @Override
-    public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
+    public void inventoryTick(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
         if (stack.getTag() == null) {
-            stack.putCompound(new CompoundNBT());
+            stack.setTag(new CompoundNBT());
             stack.getTag().putBoolean("live", false);
         } else {
             stack.getTag().putBoolean("live", false);
@@ -95,72 +87,74 @@ public class ItemFobWatch extends ItemOverrideBase {
             }
         }
 
-        super.onUpdate(stack, worldIn, entityIn, itemSlot, isSelected);
+        super.inventoryTick(stack, worldIn, entityIn, itemSlot, isSelected);
     }
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
-        IRegeneration cap = RegenCap.get(player);
+
         ItemStack stack = player.getHeldItem(hand);
 
-        if (!player.isCrouching()) { // transferring watch->player
-            if (stack.getItemDamage() == RegenConfig.regenCapacity)
-                return msgUsageFailed(player, "regeneration.messages.transfer.empty_watch", stack);
-            else if (cap.getRegenerationsLeft() == RegenConfig.regenCapacity)
-                return msgUsageFailed(player, "regeneration.messages.transfer.max_regens", stack);
+        RegenCap.get(player).map((cap) -> {
 
-            int supply = RegenConfig.regenCapacity - stack.getItemDamage(), needed = RegenConfig.regenCapacity - cap.getRegenerationsLeft(), used = Math.min(supply, needed);
+            if (!player.isSneaking()) { // transferring watch->player
+                if (stack.getDamage() == RegenConfig.COMMON.regenCapacity.get())
+                    return msgUsageFailed(player, "regeneration.messages.transfer.empty_watch", stack);
+                else if (cap.getRegenerationsLeft() == RegenConfig.COMMON.regenCapacity.get())
+                    return msgUsageFailed(player, "regeneration.messages.transfer.max_regens", stack);
 
-            if (cap.canRegenerate()) {
-                setOpen(stack, 1);
-                PlayerUtil.sendMessage(player, new TranslationTextComponent("regeneration.messages.gained_regens", used), true);
-            } else {
-                if (!world.isRemote) {
+                int supply = RegenConfig.COMMON.regenCapacity.get() - stack.getDamage(), needed = RegenConfig.COMMON.regenCapacity.get() - cap.getRegenerationsLeft(), used = Math.min(supply, needed);
+
+                if (cap.canRegenerate()) {
                     setOpen(stack, 1);
-                } else {
-                    ClientUtil.createToast(new TranslationTextComponent("regeneration.toast.timelord"), new TranslationTextComponent("regeneration.toast.to_use", RegenConfig.regenCapacity));
+                    PlayerUtil.sendMessage(player, new TranslationTextComponent("regeneration.messages.gained_regens", used), true);
+                } else if (!world.isRemote) {
+                    setOpen(stack, 1);
+                    PlayerUtil.sendMessage(player, new TranslationTextComponent("regeneration.messages.now_timelord"), true);
                 }
+
+                if (used < 0)
+                    RegenerationMod.LOG.warn(player.getName().getUnformattedComponentText() + " Fob watch used <0 regens (supply: " + supply + ", needed:" + needed + ", used:" + used + ", capacity:" + RegenConfig.COMMON.regenCapacity.get() + ", damage:" + stack.getDamage() + ", regens:" + cap.getRegenerationsLeft());
+
+
+                if (!cap.getPlayer().isCreative()) {
+                    stack.setDamage(stack.getDamage() + used);
+                }
+
+                if (world.isRemote) {
+                    setOpen(stack, 1);
+                    ClientUtil.playPositionedSoundRecord(RegenObjects.Sounds.FOB_WATCH, 1.0F, 2.0F);
+                } else {
+                    cap.receiveRegenerations(used);
+                }
+
+                return new ActionResult<>(ActionResultType.SUCCESS, stack);
+            } else { // transferring player->watch
+                if (!cap.canRegenerate())
+                    return msgUsageFailed(player, "regeneration.messages.transfer.no_regens", stack);
+
+                if (cap.getState() != PlayerUtil.RegenState.ALIVE) {
+                    return msgUsageFailed(player, "regeneration.messages.transfer.not_alive", stack);
+                }
+
+                if (stack.getDamage() == 0)
+                    return msgUsageFailed(player, "regeneration.messages.transfer.full_watch", stack);
+
+                stack.setDamage(stack.getDamage() - 1);
+                PlayerUtil.sendMessage(player, "regeneration.messages.transfer.success", true);
+
+                if (world.isRemote) {
+                    ClientUtil.playPositionedSoundRecord(SoundEvents.BLOCK_FIRE_EXTINGUISH, 5.0F, 2.0F);
+                } else {
+                    setOpen(stack, 1);
+                    cap.extractRegeneration(1);
+                }
+
+                return new ActionResult<>(ActionResultType.SUCCESS, stack);
             }
+        });
+        return new ActionResult<>(ActionResultType.SUCCESS, stack);
 
-            if (used < 0)
-                RegenerationMod.LOG.warn(player.getName() + ": Fob watch used <0 regens (supply: " + supply + ", needed:" + needed + ", used:" + used + ", capacity:" + RegenConfig.regenCapacity + ", damage:" + stack.getItemDamage() + ", regens:" + cap.getRegenerationsLeft());
-
-
-            if (!cap.getPlayer().isCreative()) {
-                stack.setItemDamage(stack.getItemDamage() + used);
-            }
-
-            if (world.isRemote) {
-                setOpen(stack, 1);
-                ClientUtil.playPositionedSoundRecord(RegenObjects.Sounds.FOB_WATCH, 1.0F, 2.0F);
-            } else {
-                cap.receiveRegenerations(used);
-            }
-
-            return new ActionResult<>(ActionResultType.SUCCESS, stack);
-        } else { // transferring player->watch
-            if (!cap.canRegenerate())
-                return msgUsageFailed(player, "regeneration.messages.transfer.no_regens", stack);
-
-            if (cap.getState() != PlayerUtil.RegenState.ALIVE) {
-                return msgUsageFailed(player, "regeneration.messages.not_alive", stack);
-            }
-
-            if (stack.getItemDamage() == 0)
-                return msgUsageFailed(player, "regeneration.messages.transfer.full_watch", stack);
-
-            stack.setItemDamage(stack.getItemDamage() - 1);
-            PlayerUtil.sendMessage(player, "regeneration.messages.transfer.success", true);
-
-            if (world.isRemote) {
-                ClientUtil.playPositionedSoundRecord(SoundEvents.BLOCK_FIRE_EXTINGUISH, 5.0F, 2.0F);
-            } else {
-                setOpen(stack, 1);
-                cap.extractRegeneration(1);
-            }
-
-            return new ActionResult<>(ActionResultType.SUCCESS, stack);
-        }
     }
 
     private ActionResult<ItemStack> msgUsageFailed(PlayerEntity player, String message, ItemStack stack) {
@@ -169,18 +163,18 @@ public class ItemFobWatch extends ItemOverrideBase {
     }
 
     @Override
-    public void update(EntityItemOverride itemOverride) {
+    public void update(OverrideEntity itemOverride) {
         if (!itemOverride.world.isRemote) return;
         ItemStack itemStack = itemOverride.getItem();
-        if (itemStack.getItem() == this && itemStack.getItemDamage() != RegenConfig.regenCapacity) {
+        if (itemStack.getItem() == this && itemStack.getDamage() != RegenConfig.COMMON.regenCapacity.get()) {
             if (itemOverride.ticksExisted % 5000 == 0 || itemOverride.ticksExisted == 2) {
-                ClientUtil.playSound(itemOverride, RegenObjects.Sounds.FOB_WATCH_DIALOGUE.getRegistryName(), SoundCategory.AMBIENT, false, () -> itemOverride.isDead, 1.5F);
+                ClientUtil.playSound(itemOverride, RegenObjects.Sounds.FOB_WATCH_DIALOGUE.getRegistryName(), SoundCategory.AMBIENT, false, () -> !itemOverride.isAlive(), 1.5F);
             }
         }
     }
 
     @Override
-    public boolean isRepairable() {
-        return false;
+    public int getMaxDamage(ItemStack stack) {
+        return RegenConfig.COMMON.regenCapacity.get();
     }
 }

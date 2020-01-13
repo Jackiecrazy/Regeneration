@@ -1,7 +1,6 @@
 package me.swirtzly.regeneration.common.item;
 
-import me.swirtzly.regeneration.common.entity.EntityItemOverride;
-import me.swirtzly.regeneration.common.entity.IEntityOverride;
+import me.swirtzly.regeneration.common.entity.OverrideEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -9,14 +8,14 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
-public class ItemOverrideBase extends Item implements IEntityOverride {
+public class OverrideItem extends Item implements OverrideEntity.IEntityOverride {
 
-    public ItemOverrideBase(Properties p_i48487_1_) {
+    public OverrideItem(Properties p_i48487_1_) {
         super(p_i48487_1_);
     }
 
     @Override
-    public void update(EntityItemOverride itemOverride) {
+    public void update(OverrideEntity itemOverride) {
 
     }
 
@@ -28,18 +27,16 @@ public class ItemOverrideBase extends Item implements IEntityOverride {
     @Nullable
     @Override
     public Entity createEntity(World world, Entity location, ItemStack itemstack) {
-        EntityItemOverride item = new EntityItemOverride(world, location.posX, location.posY, location.posZ, itemstack);
+        OverrideEntity item = new OverrideEntity(world, location.posX, location.posY, location.posZ, itemstack);
         item.setEntitySize(item.getHeight(), item.getWidth());
-        item.motionX = location.motionX;
-        item.motionY = location.motionY;
-        item.motionZ = location.motionZ;
+        item.setMotion(location.getMotion());
         return item;
     }
 
     @Override
     public boolean shouldDie(ItemStack stack) {
         if (stack.getTag() != null) {
-            return !stack.getTag().hasKey("live");
+            return !stack.getTag().contains("live");
         }
         return true;
     }

@@ -66,7 +66,7 @@ public class RegenObjects {
     private static void registerBlocks(IForgeRegistry<Block> reg, Block... blocks) {
         reg.registerAll(blocks);
         for (Block block : blocks) {
-            ITEM_BLOCKS.add(new BlockItem(block).setRegistryName(block.getRegistryName()).setTranslationKey(block.getTranslationKey()));
+            ITEM_BLOCKS.add(new BlockItem(block,new Item.Properties()).setRegistryName(block.getRegistryName()));
         }
     }
 

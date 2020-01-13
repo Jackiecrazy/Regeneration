@@ -11,7 +11,7 @@ import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.OnlyIn;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -160,7 +160,7 @@ public class TabRegistry {
         return gui.func_194310_f().updateScreenPosition(widthTooNarrow, gui.width, gui.getXSize()) - (gui.width - 176) / 2;
     }
 
-    @SideOnly(Dist.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
     public void guiPostInit(GuiScreenEvent.InitGuiEvent.Post event) {
         if (event.getGui() instanceof InventoryScreen) {

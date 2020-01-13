@@ -18,6 +18,7 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.entity.model.BipedModel;
+import net.minecraft.client.renderer.entity.model.PlayerModel;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -48,11 +49,11 @@ public class TypeFieryRenderer extends ATypeRenderer<TypeFiery> {
             RenderSystem.rotatef(entityPlayer.ticksExisted * 4 + i * 45, 0.0F, 1.0F, 0.0F);
             RenderSystem.scaled(1.0f, 1.0f, 0.65f);
             vertexBuffer.begin(6, DefaultVertexFormats.POSITION_COLOR);
-            vertexBuffer.pos(0.0D, 0.0D, 0.0D).color((float) color.x, (float) color.y, (float) color.z, 55).endVertex();
-            vertexBuffer.pos(-0.266D * scale, scale, -0.5F * scale).color((float) color.x, (float) color.y, (float) color.z, 55).endVertex();
-            vertexBuffer.pos(0.266D * scale, scale, -0.5F * scale).color((float) color.x, (float) color.y, (float) color.z, 55).endVertex();
-            vertexBuffer.pos(0.0D, scale2, 1.0F * scale).color((float) color.x, (float) color.y, (float) color.z, 55).endVertex();
-            vertexBuffer.pos(-0.266D * scale, scale, -0.5F * scale).color((float) color.x, (float) color.y, (float) color.z, 55).endVertex();
+            vertexBuffer.vertex(0.0D, 0.0D, 0.0D).color((float) color.x, (float) color.y, (float) color.z, 55).endVertex();
+            vertexBuffer.vertex(-0.266D * scale, scale, -0.5F * scale).color((float) color.x, (float) color.y, (float) color.z, 55).endVertex();
+            vertexBuffer.vertex(0.266D * scale, scale, -0.5F * scale).color((float) color.x, (float) color.y, (float) color.z, 55).endVertex();
+            vertexBuffer.vertex(0.0D, scale2, 1.0F * scale).color((float) color.x, (float) color.y, (float) color.z, 55).endVertex();
+            vertexBuffer.vertex(-0.266D * scale, scale, -0.5F * scale).color((float) color.x, (float) color.y, (float) color.z, 55).endVertex();
             tessellator.draw();
             GlStateManager.popMatrix();
         }
@@ -230,8 +231,8 @@ public class TypeFieryRenderer extends ATypeRenderer<TypeFiery> {
         // Render head cone
         GlStateManager.pushMatrix();
 
-        if (renderLivingBase.getMainModel() instanceof ModelPlayer) {
-            ModelPlayer player = (ModelPlayer) renderLivingBase.getMainModel();
+        if (renderLivingBase.getEntityModel() instanceof PlayerModel) {
+            PlayerModel player = (PlayerModel) renderLivingBase.getEntityModel();
             player.bipedHead.postRender(0.0625F);
         }
 

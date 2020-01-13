@@ -9,11 +9,11 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.OnlyIn;
 
 import java.awt.*;
 
-@SideOnly(Dist.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class GuiHij extends ContainerScreen {
     public static final int ID = 77;
     private static final ResourceLocation TEXTURE = new ResourceLocation(RegenerationMod.MODID, "textures/gui/hij.png");

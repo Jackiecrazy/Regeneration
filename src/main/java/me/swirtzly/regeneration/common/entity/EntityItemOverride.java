@@ -6,14 +6,16 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.*;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.ActionResultType;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -74,11 +76,11 @@ public class EntityItemOverride extends Entity {
      */
     @Override
     protected void readEntityFromNBT(CompoundNBT compound) {
-        CompoundNBT nbttagcompound = compound.getTagTag("Item");
+        CompoundNBT nbttagcompound = (CompoundNBT) compound.get("Item");
         this.setItem(new ItemStack(nbttagcompound));
 
         if (this.getItem().isEmpty())
-            this.setDead();
+            this.remove();
 
         this.setHeight(compound.getFloat("Height"));
         this.setWidth(compound.getFloat("Width"));
@@ -90,7 +92,7 @@ public class EntityItemOverride extends Entity {
     @Override
     protected void writeEntityToNBT(CompoundNBT compound) {
         if (!this.getItem().isEmpty())
-            compound.put("Item", this.getItem().writeToNBT(new CompoundNBT()));
+            compound.put("Item", this.getItem().write(new CompoundNBT()));
 
         compound.putFloat("Height", getHeight());
         compound.putFloat("Width", getWidth());
@@ -105,13 +107,13 @@ public class EntityItemOverride extends Entity {
         this.getDataManager().setDirty(ITEM);
     }
 
-    @Override
-    public void setDead() {
-        super.setDead();
-    }
-
     public float getHeight() {
         return this.getDataManager().get(HEIGHT);
+    }
+
+    @Override
+    public IPacket<?> createSpawnPacket() {
+        return null;
     }
 
     public void setHeight(float height) {
@@ -134,20 +136,16 @@ public class EntityItemOverride extends Entity {
         return true;
     }
 
+    @Override
+    protected void registerData() {
+
+    }
+
     /**
      * Will deal the specified amount of fire damage to the entity if the entity isn't immune to fire damage.
      */
     @Override
     protected void dealFireDamage(int amount) {
-    }
-
-    /**
-     * returns if this entity triggers Block.onEntityWalking on the blocks they walk on. used for spiders and wolves to
-     * prevent them from trampling crops
-     */
-    @Override
-    protected boolean canTriggerWalking() {
-        return false;
     }
 
     /**
@@ -158,12 +156,22 @@ public class EntityItemOverride extends Entity {
         return false;
     }
 
+    @Override
+    protected void readAdditional(CompoundNBT p_70037_1_) {
+
+    }
+
+    @Override
+    protected void writeAdditional(CompoundNBT p_213281_1_) {
+
+    }
+
     /**
      * Returns true if other Entities should be prevented from moving through this Entity.
      */
     @Override
     public boolean canBeCollidedWith() {
-        return !this.isDead;
+        return isAlive();
     }
 
     /**
@@ -172,7 +180,7 @@ public class EntityItemOverride extends Entity {
     @Override
     public ActionResultType applyPlayerInteraction(PlayerEntity player, Vec3d vec, Hand hand) {
         givePlayerItemStack(player, this.getItem());
-        this.setDead();
+        this.remove();
         return ActionResultType.SUCCESS;
     }
 
@@ -180,7 +188,7 @@ public class EntityItemOverride extends Entity {
      * Gets called every tick from main Entity class
      */
     @Override
-    public void onEntityUpdate() {
+    public void updateTick() {
         super.onEntityUpdate();
         this.prevPosX = this.posX;
         this.prevPosY = this.posY;
@@ -194,7 +202,7 @@ public class EntityItemOverride extends Entity {
         if (itemStack.getItem() instanceof IEntityOverride) {
             IEntityOverride iEntityOverride = (IEntityOverride) itemStack.getItem();
             if (iEntityOverride.shouldDie(itemStack)) {
-                setDead();
+                remove();
             }
             iEntityOverride.update(this);
         }
@@ -208,7 +216,7 @@ public class EntityItemOverride extends Entity {
         if (this.world.isRemote) {
             this.noClip = false;
         } else {
-            this.noClip = this.pushOutOfBlocks(this.posX, (this.getEntityBoundingBox().minY + this.getEntityBoundingBox().maxY) / 2.0D, this.posZ);
+            this.noClip = this.pushOutOfBlocks(this.posX, (this.getBoundingBox().minY + this.getBoundingBox().maxY) / 2.0D, this.posZ);
         }
 
         this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
@@ -226,7 +234,7 @@ public class EntityItemOverride extends Entity {
         float f = 0.98F;
 
         if (this.onGround) {
-            BlockPos underPos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getEntityBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
+            BlockPos underPos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
             BlockState underState = this.world.getBlockState(underPos);
             f = underState.getBlock().getSlipperiness(underState, this.world, underPos, this) * 0.98F;
         }

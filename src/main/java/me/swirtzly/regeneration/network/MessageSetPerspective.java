@@ -37,7 +37,7 @@ public class MessageSetPerspective implements IMessage {
     public static class Handler implements IMessageHandler<MessageSetPerspective, IMessage> {
         @Override
         public IMessage onMessage(MessageSetPerspective message, MessageContext ctx) {
-            Minecraft.getInstance().addScheduledTask(() -> {
+            Minecraft.getInstance().enqueue(() -> {
                 if (Minecraft.getInstance().getRenderViewEntity().getUniqueID() == Minecraft.getInstance().player.getUniqueID()) {
                     if (RegenConfig.changePerspective) {
                         if (message.resetPitch)

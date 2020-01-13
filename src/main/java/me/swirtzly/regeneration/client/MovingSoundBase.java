@@ -30,11 +30,11 @@ public class MovingSoundBase extends TickableSound {
     }
 
     @Override
-    public void update() {
+    public void tick() {
 
         if (entity instanceof Entity) {
             Entity entityObject = (Entity) entity;
-            if (stopCondition.get() || entityObject.isDead) {
+            if (stopCondition.get() || !entityObject.isAlive()) {
                 setDonePlaying();
             }
 
@@ -43,17 +43,18 @@ public class MovingSoundBase extends TickableSound {
                 volume = RegenUtil.randFloat(1.5F, 6F);
             }
 
-            super.xPosF = (float) entityObject.posX;
-            super.yPosF = (float) entityObject.posY;
-            super.zPosF = (float) entityObject.posZ;
+            BlockPos entityPos = entityObject.getPosition();
+            super.x = (float) entityPos.getX();
+            super.y = (float) entityPos.getY();
+            super.z = (float) entityPos.getZ();
         }
 
         if (entity instanceof TileEntity) {
             TileEntity tileObject = (TileEntity) entity;
             BlockPos pos = tileObject.getPos();
-            super.xPosF = (float) pos.getX();
-            super.yPosF = (float) pos.getY();
-            super.zPosF = (float) pos.getZ();
+            super.x = (float) pos.getX();
+            super.y = (float) pos.getY();
+            super.z = (float) pos.getZ();
         }
 
     }

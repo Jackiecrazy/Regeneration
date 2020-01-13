@@ -3,6 +3,7 @@ package me.swirtzly.regeneration.client.skinhandling;
 import me.swirtzly.regeneration.RegenerationMod;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.relauncher.Side;
 
@@ -13,7 +14,7 @@ import java.util.UUID;
  * Created by Swirtzly
  * on 19/11/2019 @ 22:51
  */
-@Mod.EventBusSubscriber(value = Side.CLIENT)
+@Mod.EventBusSubscriber(value = Dist.CLIENT)
 public class PlayerDataPool {
 
     private static HashMap<UUID, SkinInfo> PLAYER_POOL = new HashMap<>();

@@ -86,14 +86,14 @@ public class GuiPreferences extends ContainerScreen {
         drawCenteredString(Minecraft.getInstance().fontRenderer, new TranslationTextComponent("regeneration.gui.preferences").getUnformattedComponentText(), width / 2, height / 2 - 80, Color.WHITE.getRGB());
 
         String str = "Banana Phone";
-        int length = mc.fontRenderer.getStringWidth(str);
+        int length = minecraft.fontRenderer.getStringWidth(str);
 
         if (RegenConfig.infiniteRegeneration)
             str = new TranslationTextComponent("regeneration.gui.infinite_regenerations").getFormattedText(); // TODO this should be optimized
         else
             str = new TranslationTextComponent("regeneration.gui.remaining_regens.status").getFormattedText() + " " + RegenCap.get(Minecraft.getInstance().player).getRegenerationsLeft();
 
-        length = mc.fontRenderer.getStringWidth(str);
+        length = minecraft.fontRenderer.getStringWidth(str);
         fontRenderer.drawStringWithShadow(str, cx + 170 - length / 2, cy + 21, Color.WHITE.getRGB());
 
         TranslationTextComponent traitLang = new TranslationTextComponent(DnaHandler.getDnaEntry(RegenCap.get(mc.player).getDnaType()).getLangKey());

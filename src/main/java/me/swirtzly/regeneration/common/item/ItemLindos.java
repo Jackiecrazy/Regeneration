@@ -38,7 +38,7 @@ public class ItemLindos extends ItemOverrideBase {
         setMaxStackSize(1);
         addPropertyOverride(new ResourceLocation("amount"), new IItemPropertyGetter() {
             @Override
-            @SideOnly(Side.CLIENT)
+            @SideOnly(Dist.CLIENT)
             public float apply(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
 
                 if (stack.getTag() != null) {
@@ -118,7 +118,7 @@ public class ItemLindos extends ItemOverrideBase {
 
         if (!worldIn.isRemote) {
             //Entiies around
-            worldIn.getEntitiesWithinAABB(PlayerEntity.class, entityIn.getEntityBoundingBox().expand(10, 10, 10)).forEach(player -> {
+            worldIn.getEntitiesWithinAABB(PlayerEntity.class, entityIn.getBoundingBox().expand(10, 10, 10)).forEach(player -> {
                 IRegeneration data = RegenCap.get((PlayerEntity) entityIn);
                 if (data.getState() == PlayerUtil.RegenState.REGENERATING) {
                     if (worldIn.rand.nextInt(100) > 50 && isSelected) {

@@ -17,8 +17,8 @@ public class ActingForwarder {
     public static void init() {
         register(ActingServerHandler.INSTANCE, Side.SERVER);
 
-        if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
-            register(ActingClientHandler.INSTANCE, Side.CLIENT);
+        if (FMLCommonHandler.instance().getSide() == Dist.CLIENT) {
+            register(ActingClientHandler.INSTANCE, Dist.CLIENT);
         }
     }
 
@@ -31,7 +31,7 @@ public class ActingForwarder {
     }
 
     public static void register(IActingHandler handler, Side side) {
-        (side == Side.CLIENT ? CLIENT_HANDLERS : SERVER_HANDLERS).add(handler);
+        (side == Dist.CLIENT ? CLIENT_HANDLERS : SERVER_HANDLERS).add(handler);
     }
 
     public static void onRegenTick(IRegeneration cap) {

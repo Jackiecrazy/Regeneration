@@ -24,14 +24,12 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.*;
-import net.minecraft.util.HandSide;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.event.HoverEvent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import org.apache.commons.lang3.tuple.Pair;
@@ -87,8 +85,8 @@ public class RegenCap implements IRegeneration {
     }
 
     @Nonnull
-    public static LazyOptional<IRegeneration> get(Entity player) {
-        return player.getCapability(RegenCap.CAPABILITY, null);
+    public static IRegeneration get(Entity player) {
+        return player.getCapability(RegenCap.CAPABILITY, null).orElse(null);
     }
 
 

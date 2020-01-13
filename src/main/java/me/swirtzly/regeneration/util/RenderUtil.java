@@ -1,11 +1,15 @@
 package me.swirtzly.regeneration.util;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import me.swirtzly.regeneration.RegenerationMod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.model.Model;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
@@ -51,7 +55,7 @@ public class RenderUtil {
         GlStateManager.pushMatrix();
         start = start.scale(-1D);
         end = end.scale(-1D);
-        GlStateManager.translate(-start.x, -start.y, -start.z);
+        RenderSystem.translatef(-start.x, -start.y, -start.z);
         start = end.subtract(start);
         end = end.subtract(end);
 
@@ -62,8 +66,8 @@ public class RenderUtil {
             double diff = MathHelper.sqrt(x * x + z * z);
             float yaw = (float) (Math.atan2(z, x) * 180.0D / 3.141592653589793D) - 90.0F;
             float pitch = (float) -(Math.atan2(y, diff) * 180.0D / 3.141592653589793D);
-            GlStateManager.rotate(-yaw, 0.0F, 1.0F, 0.0F);
-            GlStateManager.rotate(pitch, 1.0F, 0.0F, 0.0F);
+            RenderSystem.rotatef(-yaw, 0.0F, 1.0F, 0.0F);
+            RenderSystem.rotatef(pitch, 1.0F, 0.0F, 0.0F);
         }
 
         for (int layer = 0; layer <= layers; ++layer) {
@@ -163,7 +167,7 @@ public class RenderUtil {
 
     public static void renderVignette(Vec3d color, float a, PlayerUtil.RegenState state) {
         GlStateManager.color((float) color.x, (float) color.y, (float) color.z, a);
-        GlStateManager.disableAlpha();
+        GlStateManager.disableAlphaTest();
         GlStateManager.depthMask(false);
         GlStateManager.enableBlend();
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
@@ -197,24 +201,24 @@ public class RenderUtil {
         return (0.2126 * r) + (0.7152 * g) + (0.0722 * b);
     }
 
-    public static void drawModelToGui(ModelBase model, int xPos, int yPos, float scale, float rotation) {
+    public static void drawModelToGui(Model model, int xPos, int yPos, float scale, float rotation) {
         GlStateManager.pushMatrix();
-        GlStateManager.enableDepth();
+        GlStateManager.enableDepthTest();
         GlStateManager.enableBlend();
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-        GlStateManager.translate(xPos, yPos, 100);
-        GlStateManager.rotate(-25, 1, 0, 0);
-        GlStateManager.rotate(rotation, 0, 1, 0);
-        RenderHelper.enableGUIStandardItemLighting();
+        RenderSystem.translatef(xPos, yPos, 100);
+        RenderSystem.rotatef(-25, 1, 0, 0);
+        RenderSystem.rotatef(rotation, 0, 1, 0);
+        RenderHelper.enableGuiDepthLighting();
 
         GlStateManager.glLightModel(2899, RenderHelper.setColorBuffer(0.75F, 0.75F, 0.75F, 1F));
-        GlStateManager.scale(38 * scale, 34 * scale, 38 * scale);
-        GlStateManager.scale(-1, 1, 1);
+        RenderSystem.scaled(38 * scale, 34 * scale, 38 * scale);
+        RenderSystem.scaled(-1, 1, 1);
         model.render(Minecraft.getInstance().player, 0, 0, Minecraft.getInstance().player.ticksExisted, 0, 0, 0.0625f);
         RenderHelper.disableStandardItemLighting();
         GlStateManager.disableBlend();
-        GlStateManager.disableDepth();
+        GlStateManager.disableDepthTest();
         GlStateManager.popMatrix();
     }
 

@@ -16,12 +16,12 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.ObjectHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +53,6 @@ public class RegenObjects {
 
     private static Item setUpItem(Item item, String name) {
         item.setRegistryName(RegenerationMod.MODID, name);
-        item.setTranslationKey(name);
         ITEMS.add(item);
         return item;
     }
@@ -61,7 +60,6 @@ public class RegenObjects {
 
     private static Block setUpBlock(Block block, String name) {
         block.setRegistryName(RegenerationMod.MODID, name);
-        block.setTranslationKey(RegenerationMod.MODID + "." + name);
         return block;
     }
 
@@ -107,14 +105,14 @@ public class RegenObjects {
         return new SoundEvent(new ResourceLocation(RegenerationMod.MODID, soundName)).setRegistryName(soundName);
     }
 
-    @GameRegistry.ObjectHolder(RegenerationMod.MODID)
+    @ObjectHolder(RegenerationMod.MODID)
     public static class Items {
         public static final Item FOB_WATCH = null;
         public static final Item LINDOS_VIAL = null;
         public static final Item HAND = null;
     }
 
-    @GameRegistry.ObjectHolder(RegenerationMod.MODID)
+    @ObjectHolder(RegenerationMod.MODID)
     public static class Sounds {
         public static final SoundEvent FOB_WATCH = null;
         public static final SoundEvent FOB_WATCH_DIALOGUE = null;
@@ -140,7 +138,7 @@ public class RegenObjects {
         public static final EntityEntry ENTITY_WATCHER = EntityEntryBuilder.create().entity(EntityWatcher.class).id(new ResourceLocation(RegenerationMod.MODID, "watcher"), 2).name("lindos").tracker(80, 3, false).build();
     }
 
-    @GameRegistry.ObjectHolder(RegenerationMod.MODID)
+    @ObjectHolder(RegenerationMod.MODID)
     public static class Blocks {
         public static final Block HAND_JAR = null;
     }

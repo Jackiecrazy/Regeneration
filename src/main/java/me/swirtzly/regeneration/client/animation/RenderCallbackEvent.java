@@ -6,14 +6,14 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 
 public class RenderCallbackEvent extends LivingEvent {
 
-    protected LivingRenderer<LivingEntity> renderer;
+    protected LivingRenderer renderer;
 
-    public RenderCallbackEvent(LivingEntity entity, LivingRenderer<LivingEntity> renderer) {
+    public RenderCallbackEvent(LivingEntity entity, LivingRenderer renderer) {
         super(entity);
         this.renderer = renderer;
     }
 
-    public LivingRenderer<LivingEntity> getRenderer() {
+    public LivingRenderer getRenderer() {
         return renderer;
     }
 

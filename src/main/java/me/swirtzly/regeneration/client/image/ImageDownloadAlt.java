@@ -21,7 +21,7 @@ import java.net.URL;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
-@SideOnly(Side.CLIENT)
+@SideOnly(Dist.CLIENT)
 public class ImageDownloadAlt extends SimpleTexture {
     private static final Logger logger = LogManager.getLogger();
     private static final AtomicInteger threadDownloadCounter = new AtomicInteger(0);

@@ -30,7 +30,7 @@ public class RenderWatcher extends MobRenderer<EntityWatcher> {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 0.8F);
         super.renderModel(entitylivingbaseIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1F);
-        GlStateManager.disableAlpha();
+        GlStateManager.disableAlphaTest();
         GlStateManager.disableBlend();
         GlStateManager.popMatrix();
     }

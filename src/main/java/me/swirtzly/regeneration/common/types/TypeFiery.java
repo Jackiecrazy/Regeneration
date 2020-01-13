@@ -41,18 +41,18 @@ public class TypeFiery implements IRegenType<TypeFieryRenderer> {
             return;
 
         if (player.world.getBlockState(player.getPosition()).getBlock() instanceof FireBlock)
-            player.world.setBlockToAir(player.getPosition());
+            player.world.removeBlock(player.getPosition(), false);
 
-        double x = player.posX + player.getRNG().nextGaussian() * 2;
-        double y = player.posY + 0.5 + player.getRNG().nextGaussian() * 2;
-        double z = player.posZ + player.getRNG().nextGaussian() * 2;
-        player.world.newExplosion(player, x, y, z, 0.1F, RegenConfig.fieryRegen, false);
+        double x = player.getPosition().getX() + player.getRNG().nextGaussian() * 2;
+        double y = player.getPosition().getY() + 0.5 + player.getRNG().nextGaussian() * 2;
+        double z = player.getPosition().getZ() + player.getRNG().nextGaussian() * 2;
+        player.world.createExplosion(player, x, y, z, 0.1F, RegenConfig.fieryRegen, false);
 
         RegenUtil.regenerationExplosion(player);
 
         for (BlockPos bs : BlockPos.getAllInBox(player.getPosition().north().west(), player.getPosition().south().east())) {
             if (player.world.getBlockState(bs).getBlock() instanceof FireBlock) {
-                player.world.setBlockToAir(bs);
+                player.world.removeBlock(bs, true);
             }
         }
     }

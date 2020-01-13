@@ -1,8 +1,8 @@
 package me.swirtzly.regeneration.common.traits;
 
 import me.swirtzly.regeneration.RegenerationMod;
-import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.traits.negative.DnaHunger;
 import me.swirtzly.regeneration.common.traits.negative.DnaHydrophobic;
 import me.swirtzly.regeneration.common.traits.positive.*;
@@ -13,9 +13,9 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.player.PlayerPickupXpEvent;
+import net.minecraftforge.event.entity.player.PlayerXpEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -75,8 +75,8 @@ public class DnaHandler {
     }
 
     @SubscribeEvent
-    public static void onXpPickup(PlayerPickupXpEvent e) {
-        IRegeneration data = RegenCap.get(e.getEntityPlayer());
+    public static void onXpPickup(PlayerXpEvent.PickupXp e) {
+        IRegeneration data = RegenCap.get(e.getPlayer());
         IDna dna = DnaHandler.getDnaEntry(data.getDnaType());
         if (dna.getRegistryName().equals(DnaHandler.DNA_DUMB.getRegistryName()) && data.isDnaActive()) {
             e.getOrb().xpValue *= 0.5;

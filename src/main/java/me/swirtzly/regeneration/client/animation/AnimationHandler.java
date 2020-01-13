@@ -1,13 +1,13 @@
 package me.swirtzly.regeneration.client.animation;
 
-import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.item.ItemFobWatch;
 import me.swirtzly.regeneration.util.ClientUtil;
 import me.swirtzly.regeneration.util.PlayerUtil;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
-import net.minecraft.client.model.ModelBiped;
-import net.minecraft.client.model.ModelPlayer;
+import net.minecraft.client.renderer.entity.model.BipedModel;
+import net.minecraft.client.renderer.entity.model.PlayerModel;
 import net.minecraft.item.ItemStack;
 
 public class AnimationHandler {
@@ -16,8 +16,9 @@ public class AnimationHandler {
         AbstractClientPlayerEntity player = (AbstractClientPlayerEntity) animationContext.getEntityPlayer();
         ItemStack stack = player.getHeldItemMainhand();
         ItemStack offStack = player.getHeldItemOffhand();
-        ModelBiped modelBiped = animationContext.getModelBiped();
+        BipedModel BipedModel = animationContext.getBipedModel();
         IRegeneration data = RegenCap.get(player);
+
 
         //==============FOB WATCH & JAR START==============
         boolean isOpen;
@@ -26,8 +27,8 @@ public class AnimationHandler {
         if (stack.getItem() instanceof ItemFobWatch) {
             isOpen = ItemFobWatch.getOpen(stack) == 1;
             if (isOpen) {
-                makeZombieArms(modelBiped);
-                return copyAndReturn(modelBiped, true);
+                makeZombieArms(BipedModel);
+                return copyAndReturn(BipedModel, true);
             }
         }
 
@@ -35,8 +36,8 @@ public class AnimationHandler {
         if (offStack.getItem() instanceof ItemFobWatch) {
             isOpen = ItemFobWatch.getOpen(stack) == 1;
             if (isOpen) {
-                makeZombieArms(modelBiped);
-                return copyAndReturn(modelBiped, true);
+                makeZombieArms(BipedModel);
+                return copyAndReturn(BipedModel, true);
             }
         }
         //==============FOB WATCH END==============
@@ -51,57 +52,57 @@ public class AnimationHandler {
                 armRot = 90;
             }
 
-            modelBiped.bipedLeftArm.rotateAngleX = (float) -Math.toRadians(armRot);
-            modelBiped.bipedRightArm.rotateAngleX = (float) -Math.toRadians(armRot);
+            BipedModel.bipedLeftArm.rotateAngleX = (float) -Math.toRadians(armRot);
+            BipedModel.bipedRightArm.rotateAngleX = (float) -Math.toRadians(armRot);
 
-            modelBiped.bipedBody.rotateAngleX = 0;
-            modelBiped.bipedBody.rotateAngleY = 0;
-            modelBiped.bipedBody.rotateAngleZ = 0;
+            BipedModel.bipedBody.rotateAngleX = 0;
+            BipedModel.bipedBody.rotateAngleY = 0;
+            BipedModel.bipedBody.rotateAngleZ = 0;
 
             //Legs
-            modelBiped.bipedLeftLeg.rotateAngleY = 0;
-            modelBiped.bipedRightLeg.rotateAngleY = 0;
-            modelBiped.bipedLeftLeg.rotateAngleX = 0;
-            modelBiped.bipedRightLeg.rotateAngleX = 0;
-            modelBiped.bipedLeftLeg.rotateAngleZ = (float) -Math.toRadians(5);
-            modelBiped.bipedRightLeg.rotateAngleZ = (float) Math.toRadians(5);
+            BipedModel.bipedLeftLeg.rotateAngleY = 0;
+            BipedModel.bipedRightLeg.rotateAngleY = 0;
+            BipedModel.bipedLeftLeg.rotateAngleX = 0;
+            BipedModel.bipedRightLeg.rotateAngleX = 0;
+            BipedModel.bipedLeftLeg.rotateAngleZ = (float) -Math.toRadians(5);
+            BipedModel.bipedRightLeg.rotateAngleZ = (float) Math.toRadians(5);
 
-            return copyAndReturn(modelBiped, true);
+            return copyAndReturn(BipedModel, true);
         }
 
         //STRUGGLE IN CRITICAL
         if (RegenCap.get(player).getState() == PlayerUtil.RegenState.GRACE_CRIT) {
-            modelBiped.bipedBody.rotateAngleX = 0.5F;
-            modelBiped.bipedRightArm.rotateAngleX = (float) Math.toRadians(-25);
-            modelBiped.bipedRightArm.rotateAngleY = (float) Math.toRadians(-55);
-            modelBiped.bipedLeftArm.rotateAngleX += 0.4F;
-            modelBiped.bipedRightLeg.rotationPointZ = 4.0F;
-            modelBiped.bipedLeftLeg.rotationPointZ = 4.0F;
-            modelBiped.bipedRightLeg.rotationPointY = 9.0F;
-            modelBiped.bipedLeftLeg.rotationPointY = 9.0F;
-            modelBiped.bipedHead.rotationPointY = 1.0F;
-            modelBiped.bipedHead.rotateAngleX = (float) Math.toRadians(45);
-            return copyAndReturn(modelBiped, true);
+            BipedModel.bipedBody.rotateAngleX = 0.5F;
+            BipedModel.bipedRightArm.rotateAngleX = (float) Math.toRadians(-25);
+            BipedModel.bipedRightArm.rotateAngleY = (float) Math.toRadians(-55);
+            BipedModel.bipedLeftArm.rotateAngleX += 0.4F;
+            BipedModel.bipedRightLeg.rotationPointZ = 4.0F;
+            BipedModel.bipedLeftLeg.rotationPointZ = 4.0F;
+            BipedModel.bipedRightLeg.rotationPointY = 9.0F;
+            BipedModel.bipedLeftLeg.rotationPointY = 9.0F;
+            BipedModel.bipedHead.rotationPointY = 1.0F;
+            BipedModel.bipedHead.rotateAngleX = (float) Math.toRadians(45);
+            return copyAndReturn(BipedModel, true);
         }
 
 
-        return copyAndReturn(modelBiped, false);
+        return copyAndReturn(BipedModel, false);
     }
 
-    public static boolean copyAndReturn(ModelBiped modelBiped, boolean cancel) {
-        if (modelBiped instanceof ModelPlayer) {
-            ModelPlayer playerModel = (ModelPlayer) modelBiped;
+    public static boolean copyAndReturn(BipedModel BipedModel, boolean cancel) {
+        if (BipedModel instanceof PlayerModel) {
+            PlayerModel playerModel = (PlayerModel) BipedModel;
             ClientUtil.copyAnglesToWear(playerModel);
         }
         return cancel;
     }
 
-    public static boolean makeZombieArms(ModelBiped modelBiped) {
-        modelBiped.bipedRightArm.rotateAngleY = -0.1F + modelBiped.bipedHead.rotateAngleY - 0.4F;
-        modelBiped.bipedLeftArm.rotateAngleY = 0.1F + modelBiped.bipedHead.rotateAngleY;
-        modelBiped.bipedRightArm.rotateAngleX = -((float) Math.PI / 2F) + modelBiped.bipedHead.rotateAngleX;
-        modelBiped.bipedLeftArm.rotateAngleX = -((float) Math.PI / 2F) + modelBiped.bipedHead.rotateAngleX;
-        return copyAndReturn(modelBiped, true);
+    public static boolean makeZombieArms(BipedModel BipedModel) {
+        BipedModel.bipedRightArm.rotateAngleY = -0.1F + BipedModel.bipedHead.rotateAngleY - 0.4F;
+        BipedModel.bipedLeftArm.rotateAngleY = 0.1F + BipedModel.bipedHead.rotateAngleY;
+        BipedModel.bipedRightArm.rotateAngleX = -((float) Math.PI / 2F) + BipedModel.bipedHead.rotateAngleX;
+        BipedModel.bipedLeftArm.rotateAngleX = -((float) Math.PI / 2F) + BipedModel.bipedHead.rotateAngleX;
+        return copyAndReturn(BipedModel, true);
     }
 
 

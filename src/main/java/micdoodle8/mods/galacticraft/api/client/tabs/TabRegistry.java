@@ -8,8 +8,8 @@ import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.network.play.client.CCloseWindowPacket;
 import net.minecraft.potion.EffectInstance;
 import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.FMLClientHandler;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -160,7 +160,7 @@ public class TabRegistry {
         return gui.func_194310_f().updateScreenPosition(widthTooNarrow, gui.width, gui.getXSize()) - (gui.width - 176) / 2;
     }
 
-    @SideOnly(Side.CLIENT)
+    @SideOnly(Dist.CLIENT)
     @SubscribeEvent
     public void guiPostInit(GuiScreenEvent.InitGuiEvent.Post event) {
         if (event.getGui() instanceof InventoryScreen) {

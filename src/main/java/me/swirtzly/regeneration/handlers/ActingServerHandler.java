@@ -14,8 +14,8 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.potion.Effects;
 import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -87,8 +87,8 @@ class ActingServerHandler implements IActingHandler {
         // Reduce number of hearts, but compensate with absorption
         player.setAbsorptionAmount(player.getMaxHealth() * (float) HEART_REDUCTION);
 
-        if (!player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).hasModifier(heartModifier)) {
-            player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).applyModifier(heartModifier);
+        if (!player.getAttribute(SharedMonsterAttributes.MAX_HEALTH).hasModifier(heartModifier)) {
+            player.getAttribute(SharedMonsterAttributes.MAX_HEALTH).applyModifier(heartModifier);
         }
 
         DnaHandler.IDna dna = DnaHandler.getDnaEntry(cap.getDnaType());
@@ -107,8 +107,8 @@ class ActingServerHandler implements IActingHandler {
 
         RegenTriggers.CRITICAL.trigger((ServerPlayerEntity) cap.getPlayer());
 
-        if (!cap.getPlayer().getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).hasModifier(slownessModifier)) {
-            cap.getPlayer().getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(slownessModifier);
+        if (!cap.getPlayer().getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).hasModifier(slownessModifier)) {
+            cap.getPlayer().getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(slownessModifier);
         }
     }
 
@@ -150,8 +150,8 @@ class ActingServerHandler implements IActingHandler {
     public void onRegenTrigger(IRegeneration cap) {
         PlayerEntity player = cap.getPlayer();
         NetworkHandler.INSTANCE.sendToAllAround(new MessagePlayRegenerationSound(RegenUtil.getRandomSound(TypeHandler.getTypeInstance(cap.getType()).getRegeneratingSounds(), player.world.rand), player.getUniqueID().toString()), new NetworkRegistry.TargetPoint(player.dimension, player.posX, player.posY, player.posZ, 40));
-        player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).removeModifier(MAX_HEALTH_ID);
-        player.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).removeModifier(SLOWNESS_ID);
+        player.getAttribute(SharedMonsterAttributes.MAX_HEALTH).removeModifier(MAX_HEALTH_ID);
+        player.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).removeModifier(SLOWNESS_ID);
         player.setHealth(Math.max(player.getHealth(), 8));
         player.setAbsorptionAmount(0);
 

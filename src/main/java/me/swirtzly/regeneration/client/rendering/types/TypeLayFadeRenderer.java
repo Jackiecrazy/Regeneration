@@ -4,9 +4,8 @@ import me.swirtzly.regeneration.client.animation.AnimationContext;
 import me.swirtzly.regeneration.client.animation.RenderCallbackEvent;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.types.TypeLayFade;
-import net.minecraft.client.model.ModelBiped;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.entity.LivingRenderer;
+import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.HandSide;
 import net.minecraftforge.client.event.RenderPlayerEvent;
@@ -38,18 +37,18 @@ public class TypeLayFadeRenderer extends ATypeRenderer<TypeLayFade> {
 
     @Override
     public boolean onAnimateRegen(AnimationContext animationContext) {
-        ModelBiped modelBiped = animationContext.getModelBiped();
+        BipedModel BipedModel = animationContext.getBipedModel();
 
-        modelBiped.bipedHead.rotateAngleX = (float) Math.toRadians(0);
-        modelBiped.bipedHead.rotateAngleY = (float) Math.toRadians(0);
-        modelBiped.bipedHead.rotateAngleZ = (float) Math.toRadians(0);
+        BipedModel.bipedHead.rotateAngleX = (float) Math.toRadians(0);
+        BipedModel.bipedHead.rotateAngleY = (float) Math.toRadians(0);
+        BipedModel.bipedHead.rotateAngleZ = (float) Math.toRadians(0);
 
-        modelBiped.bipedLeftLeg.rotateAngleZ = (float) -Math.toRadians(5);
-        modelBiped.bipedRightLeg.rotateAngleZ = (float) Math.toRadians(5);
+        BipedModel.bipedLeftLeg.rotateAngleZ = (float) -Math.toRadians(5);
+        BipedModel.bipedRightLeg.rotateAngleZ = (float) Math.toRadians(5);
 
-        modelBiped.bipedLeftArm.rotateAngleZ = (float) -Math.toRadians(5);
-        modelBiped.bipedRightArm.rotateAngleZ = (float) Math.toRadians(5);
-        return copyAndReturn(modelBiped, true);
+        BipedModel.bipedLeftArm.rotateAngleZ = (float) -Math.toRadians(5);
+        BipedModel.bipedRightArm.rotateAngleZ = (float) Math.toRadians(5);
+        return copyAndReturn(BipedModel, true);
     }
 
     @Override
@@ -59,8 +58,8 @@ public class TypeLayFadeRenderer extends ATypeRenderer<TypeLayFade> {
 
     @Override
     public void onRenderCallBack(RenderCallbackEvent event) {
-        GlStateManager.rotate(-90, 1, 0, 0);
-        GlStateManager.translate(0, 1, 0);
+        RenderSystem.rotatef(-90, 1, 0, 0);
+        RenderSystem.translatef(0, 1, 0);
     }
 
 }

@@ -2,23 +2,20 @@ package me.swirtzly.regeneration.util;
 
 import me.swirtzly.regeneration.client.MovingSoundBase;
 import me.swirtzly.regeneration.client.skinhandling.SkinChangingHandler;
-import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.network.MessageUpdateSkin;
 import me.swirtzly.regeneration.network.NetworkHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.toasts.SystemToast;
 import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.model.ModelPlayer;
-import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.entity.model.PlayerModel;
+import net.minecraft.client.renderer.model.ModelRenderer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -27,8 +24,8 @@ import java.util.function.Supplier;
 
 public class ClientUtil {
 
-    public static final ModelPlayer playerModelSteve = new ModelPlayer(0.1F, false);
-    public static final ModelPlayer playerModelAlex = new ModelPlayer(0.1F, true);
+    public static final PlayerModel playerModelSteve = new PlayerModel(0.1F, false);
+    public static final PlayerModel playerModelAlex = new PlayerModel(0.1F, true);
 
     public static String keyBind = "???"; //WAFFLE there was a weird thing with this somewhere that I still need to fix
 
@@ -37,7 +34,7 @@ public class ClientUtil {
     }
 
     public static void playPositionedSoundRecord(SoundEvent sound, float pitch, float volume) {
-        Minecraft.getInstance().getSoundHandler().playSound(PositionedSoundRecord.getRecord(sound, pitch, volume));
+        Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(sound, pitch, volume));
     }
 
     /**
@@ -53,9 +50,8 @@ public class ClientUtil {
         NetworkHandler.INSTANCE.sendToServer(new MessageUpdateSkin(data.getEncodedSkin(), isAlex));
     }
 
-    @SideOnly(Side.CLIENT)
     public static void playSound(Object entity, ResourceLocation soundName, SoundCategory category, boolean repeat, Supplier<Boolean> stopCondition, float volume) {
-        Minecraft.getInstance().getSoundHandler().playSound(new MovingSoundBase(entity, new SoundEvent(soundName), category, repeat, stopCondition, volume));
+        Minecraft.getInstance().getSoundHandler().play(new MovingSoundBase(entity, new SoundEvent(soundName), category, repeat, stopCondition, volume));
     }
 
     /**

@@ -1,5 +1,7 @@
 package me.swirtzly.regeneration.client;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import me.swirtzly.regeneration.RegenerationMod;
 import me.swirtzly.regeneration.asm.RegenClientHooks;
 import me.swirtzly.regeneration.client.animation.AnimationContext;
@@ -8,8 +10,8 @@ import me.swirtzly.regeneration.client.animation.ModelRotationEvent;
 import me.swirtzly.regeneration.client.animation.RenderCallbackEvent;
 import me.swirtzly.regeneration.client.gui.GuiPreferences;
 import me.swirtzly.regeneration.client.gui.parts.InventoryTabRegeneration;
-import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.types.TypeHandler;
 import me.swirtzly.regeneration.handlers.RegenObjects;
 import me.swirtzly.regeneration.util.ClientUtil;
@@ -17,17 +19,17 @@ import me.swirtzly.regeneration.util.EnumCompatModids;
 import me.swirtzly.regeneration.util.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
-import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.model.ModelPlayer;
-import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.renderer.entity.model.EntityModel;
+import net.minecraft.client.renderer.entity.model.PlayerModel;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
 import net.minecraft.potion.Effects;
-import net.minecraft.util.*;
 import net.minecraft.util.HandSide;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -39,8 +41,8 @@ import net.minecraftforge.client.event.*;
 import net.minecraftforge.client.event.sound.PlaySoundEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -54,7 +56,7 @@ import static me.swirtzly.regeneration.util.PlayerUtil.RegenState.*;
  * Created by Sub
  * on 16/09/2018.
  */
-@Mod.EventBusSubscriber(value = Side.CLIENT, modid = RegenerationMod.MODID)
+@Mod.EventBusSubscriber(value = Dist.CLIENT, modid = RegenerationMod.MODID)
 public class ClientEventHandler {
 
     public static final ResourceLocation[] SHADERS_TEXTURES = new ResourceLocation[]{new ResourceLocation("shaders/post/notch.json"), new ResourceLocation("shaders/post/fxaa.json"), new ResourceLocation("shaders/post/art.json"), new ResourceLocation("shaders/post/bumpy.json"), new ResourceLocation("shaders/post/blobs2.json"), new ResourceLocation("shaders/post/pencil.json"), new ResourceLocation("shaders/post/color_convolve.json"), new ResourceLocation("shaders/post/deconverge.json"), new ResourceLocation("shaders/post/flip.json"), new ResourceLocation("shaders/post/invert.json"), new ResourceLocation("shaders/post/ntsc.json"), new ResourceLocation("shaders/post/outline.json"), new ResourceLocation("shaders/post/phosphor.json"), new ResourceLocation("shaders/post/scan_pincushion.json"), new ResourceLocation("shaders/post/sobel.json"), new ResourceLocation("shaders/post/bits.json"), new ResourceLocation("shaders/post/desaturate.json"), new ResourceLocation("shaders/post/green.json"), new ResourceLocation("shaders/post/blur.json"), new ResourceLocation("shaders/post/wobble.json"), new ResourceLocation("shaders/post/blobs.json"), new ResourceLocation("shaders/post/antialias.json"), new ResourceLocation("shaders/post/creeper.json"), new ResourceLocation("shaders/post/spider.json")};
@@ -89,7 +91,7 @@ public class ClientEventHandler {
         IRegeneration cap = RegenCap.get(player);
 
         //Horrible Sound repairs
-        Minecraft.getInstance().addScheduledTask(() -> {
+        Minecraft.getInstance().enqueue(() -> {
             if (player.ticksExisted == 50) {
                 if (SIDE != null) {
                     SIDE = Minecraft.getInstance().gameSettings.mainHand;
@@ -182,8 +184,8 @@ public class ClientEventHandler {
             return;
 
         if (e.getName().equals("entity.generic.explode")) {
-            ISound sound = PositionedSoundRecord.getRecord(SoundEvents.ENTITY_GENERIC_EXPLODE, 1F, 0.2F);
-            mc.world.playerEntities.forEach(player -> {
+            ISound sound = SimpleSound.master(SoundEvents.ENTITY_GENERIC_EXPLODE, 1F, 0.2F);
+            mc.world.getPlayers().forEach(player -> {
                 if (mc.player != player && mc.player.getDistance(player) < 40) {
                     if (RegenCap.get(player).getState().equals(REGENERATING)) {
                         e.setResultSound(sound);
@@ -206,14 +208,14 @@ public class ClientEventHandler {
             IRegeneration data = RegenCap.get(player);
 
             if (data.getState() == GRACE_CRIT) {
-                GlStateManager.setFog(GlStateManager.FogMode.EXP);
+                RenderSystem.fogMode(GlStateManager.FogMode.EXP);
                 event.setCanceled(true);
                 float amount = MathHelper.cos(data.getPlayer().ticksExisted * 0.06F) * -0.09F;
                 event.setDensity(amount);
             }
 
             if (data.getType() == TypeHandler.RegenType.LAY_FADE && data.getAnimationTicks() > 0) {
-                GlStateManager.setFog(GlStateManager.FogMode.EXP);
+                RenderSystem.fogMode(GlStateManager.FogMode.EXP);
                 event.setCanceled(true);
                 float opacity = MathHelper.clamp(MathHelper.sin((player.ticksExisted + Minecraft.getInstance().getRenderPartialTicks()) / 10F) * 0.1F + 0.1F, 0.11F, 1F);
                 event.setDensity(opacity);
@@ -221,7 +223,7 @@ public class ClientEventHandler {
         }
     }
 
-    @SideOnly(Side.CLIENT)
+    @SideOnly(Dist.CLIENT)
     @SubscribeEvent
     public static void onClientChatRecieved(ClientChatReceivedEvent e) {
         ClientPlayerEntity player = Minecraft.getInstance().player;
@@ -229,7 +231,7 @@ public class ClientEventHandler {
         if (RegenCap.get(player).getState() != POST) return;
 
         if (player.world.rand.nextBoolean()) {
-            String message = e.getMessage().getUnformattedText();
+            String message = e.getMessage().getFormattedText();
             StringTextComponent newMessage = new StringTextComponent("");
             String[] words = message.split(" ");
             for (String word : words) {
@@ -294,14 +296,14 @@ public class ClientEventHandler {
         GlStateManager.pushMatrix();
 
         float leftHandedFactor = mc.gameSettings.mainHand.equals(HandSide.RIGHT) ? 1 : -1;
-        GlStateManager.translate(0.33F * leftHandedFactor, -0.23F, -0.5F); // move in place
-        GlStateManager.translate(-.8F * player.swingProgress * leftHandedFactor, -.8F * player.swingProgress, -.4F * player.swingProgress); // compensate for 'punching' motion
-        GlStateManager.translate(-(player.renderArmYaw - player.prevRenderArmYaw) / 400F, (player.renderArmPitch - player.prevRenderArmPitch) / 500F, 0); // compensate for 'swinging' motion
+        RenderSystem.translatef(0.33F * leftHandedFactor, -0.23F, -0.5F); // move in place
+        RenderSystem.translatef(-.8F * player.swingProgress * leftHandedFactor, -.8F * player.swingProgress, -.4F * player.swingProgress); // compensate for 'punching' motion
+        RenderSystem.translatef(-(player.renderArmYaw - player.prevRenderArmYaw) / 400F, (player.renderArmPitch - player.prevRenderArmPitch) / 500F, 0); // compensate for 'swinging' motion
 
         RenderUtil.setupRenderLightning();
-        GlStateManager.rotate((mc.player.ticksExisted + RenderUtil.renderTick) / 2F, 0, 1, 0);
+        RenderSystem.rotatef((mc.player.ticksExisted + RenderUtil.renderTick) / 2F, 0, 1, 0);
         for (int i = 0; i < 15; i++) {
-            GlStateManager.rotate((mc.player.ticksExisted + RenderUtil.renderTick) * i / 70F, 1, 1, 0);
+            RenderSystem.rotatef((mc.player.ticksExisted + RenderUtil.renderTick) * i / 70F, 1, 1, 0);
             Vec3d primaryColor = cap.getPrimaryColor();
 
             Random rand = player.world.rand;
@@ -324,12 +326,12 @@ public class ClientEventHandler {
             }
 
             if (data.getState() == GRACE_CRIT) {
-                GlStateManager.translate(0, 0.125D, 0);
+                RenderSystem.translatef(0, 0.125D, 0);
             }
 
-            ModelBase model = event.getRenderer().getMainModel();
-            if (model instanceof ModelPlayer) {
-                ModelPlayer modelPlayer = (ModelPlayer) model;
+            EntityModel model = event.getRenderer().getEntityModel();
+            if (model instanceof PlayerModel) {
+                PlayerModel modelPlayer = (PlayerModel) model;
                 if (data.hasDroppedHand()) {
                     if (data.getCutoffHand() == HandSide.LEFT) {
                         modelPlayer.bipedRightArmwear.isHidden = modelPlayer.bipedRightArm.isHidden = true;

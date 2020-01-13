@@ -13,7 +13,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.awt.*;
 
-@SideOnly(Side.CLIENT)
+@SideOnly(Dist.CLIENT)
 public class GuiHij extends ContainerScreen {
     public static final int ID = 77;
     private static final ResourceLocation TEXTURE = new ResourceLocation(RegenerationMod.MODID, "textures/gui/hij.png");
@@ -39,7 +39,7 @@ public class GuiHij extends ContainerScreen {
 
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.getTextureManager().bindTexture(TEXTURE);
+        this.minecraft.getTextureManager().bindTexture(TEXTURE);
         int i = (this.width - this.xSize) / 2;
         int j = (this.height - this.ySize) / 2;
         this.blit(i, j, 0, 0, this.xSize, this.ySize);

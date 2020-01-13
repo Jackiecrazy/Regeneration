@@ -1,22 +1,23 @@
 package me.swirtzly.regeneration.client.rendering.types;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import me.swirtzly.regeneration.client.animation.AnimationContext;
 import me.swirtzly.regeneration.client.animation.RenderCallbackEvent;
 import me.swirtzly.regeneration.client.skinhandling.SkinChangingHandler;
 import me.swirtzly.regeneration.client.skinhandling.SkinInfo;
-import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.types.TypeFiery;
 import me.swirtzly.regeneration.common.types.TypeHandler;
 import me.swirtzly.regeneration.util.RenderUtil;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelPlayer;
 import net.minecraft.client.renderer.BufferBuilder;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.LivingRenderer;
+import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -44,8 +45,8 @@ public class TypeFieryRenderer extends ATypeRenderer<TypeFiery> {
 
         for (int i = 0; i < 8; i++) {
             GlStateManager.pushMatrix();
-            GlStateManager.rotate(entityPlayer.ticksExisted * 4 + i * 45, 0.0F, 1.0F, 0.0F);
-            GlStateManager.scale(1.0f, 1.0f, 0.65f);
+            RenderSystem.rotatef(entityPlayer.ticksExisted * 4 + i * 45, 0.0F, 1.0F, 0.0F);
+            RenderSystem.scaled(1.0f, 1.0f, 0.65f);
             vertexBuffer.begin(6, DefaultVertexFormats.POSITION_COLOR);
             vertexBuffer.pos(0.0D, 0.0D, 0.0D).color((float) color.x, (float) color.y, (float) color.z, 55).endVertex();
             vertexBuffer.pos(-0.266D * scale, scale, -0.5F * scale).color((float) color.x, (float) color.y, (float) color.z, 55).endVertex();
@@ -77,7 +78,7 @@ public class TypeFieryRenderer extends ATypeRenderer<TypeFiery> {
                 modelAlex.render(entityPlayer, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
             }
         } else {
-            GlStateManager.scale(1.1, 1.1, 1.);
+            RenderSystem.scaled(1.1, 1.1, 1.);
             base.render(entityPlayer, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
         }
         RenderUtil.restoreLightMap();
@@ -112,7 +113,7 @@ public class TypeFieryRenderer extends ATypeRenderer<TypeFiery> {
         RenderUtil.setLightmapTextureCoords(65, 65);
 
         if (capability.isSyncingToJar()) {
-            GlStateManager.rotate(-20, 1, 0, 0);
+            RenderSystem.rotatef(-20, 1, 0, 0);
         }
 
         renderCone(player, primaryScale, primaryScale, primaryColor);
@@ -122,7 +123,7 @@ public class TypeFieryRenderer extends ATypeRenderer<TypeFiery> {
         RenderUtil.restoreLightMap();
         GlStateManager.depthMask(false);
         GlStateManager.disableBlend();
-        GlStateManager.disableAlpha();
+        GlStateManager.disableAlphaTest();
         GlStateManager.color(255, 255, 255, 255);
         GlStateManager.enableTexture2D();
         GlStateManager.popAttrib();
@@ -141,7 +142,7 @@ public class TypeFieryRenderer extends ATypeRenderer<TypeFiery> {
     public boolean onAnimateRegen(AnimationContext animationContext) {
         PlayerEntity player = animationContext.getEntityPlayer();
         IRegeneration data = RegenCap.get(player);
-        ModelBiped playerModel = animationContext.getModelBiped();
+        BipedModel playerModel = animationContext.getBipedModel();
         double animationProgress = data.getAnimationTicks();
         double arm_shake = player.getRNG().nextDouble();
 
@@ -234,8 +235,8 @@ public class TypeFieryRenderer extends ATypeRenderer<TypeFiery> {
             player.bipedHead.postRender(0.0625F);
         }
 
-        //GlStateManager.translate(0f, 0.1f, 0f);
-        GlStateManager.rotate(180, 1.0f, 0.0f, 0.0f);
+        //RenderSystem.translatef(0f, 0.1f, 0f);
+        RenderSystem.rotatef(180, 1.0f, 0.0f, 0.0f);
 
         renderCone(entityPlayer, primaryScale / 1.6F, primaryScale * .75F, primaryColor);
         renderCone(entityPlayer, secondaryScale / 1.6F, secondaryScale / 1.5F, secondaryColor);
@@ -249,7 +250,7 @@ public class TypeFieryRenderer extends ATypeRenderer<TypeFiery> {
         RenderUtil.restoreLightMap();
         GlStateManager.depthMask(false);
         GlStateManager.disableBlend();
-        GlStateManager.disableAlpha();
+        GlStateManager.disableAlphaTest();
         GlStateManager.color(255, 255, 255, 255);
         GlStateManager.enableTexture2D();
         GlStateManager.popAttrib();

@@ -1,5 +1,6 @@
 package me.swirtzly.regeneration.client.rendering.tile;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import me.swirtzly.regeneration.client.models.ModelHand;
 import me.swirtzly.regeneration.client.skinhandling.SkinChangingHandler;
 import me.swirtzly.regeneration.common.item.ItemHand;
@@ -7,7 +8,6 @@ import me.swirtzly.regeneration.common.tiles.TileEntityHandInJar;
 import me.swirtzly.regeneration.handlers.RegenObjects;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.util.ResourceLocation;
@@ -35,13 +35,13 @@ public class RenderTileEntityHand extends TileEntityRenderer<TileEntityHandInJar
     @Override
     public void render(TileEntityHandInJar te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
         GlStateManager.pushMatrix();
-        GlStateManager.translate(x, y, z);
+        RenderSystem.translatef(x, y, z);
 
         if (te.getHand().getItem() == RegenObjects.Items.HAND) {
             String handType = ItemHand.getSkinType(te.getHand());
             Minecraft.getInstance().getTextureManager().bindTexture(getOrCreateTexture(te));
-            GlStateManager.rotate(180, 1, 0, 0);
-            GlStateManager.translate(0.5, -1.5, -0.5);
+            RenderSystem.rotatef(180, 1, 0, 0);
+            RenderSystem.translatef(0.5, -1.5, -0.5);
             if (handType.equals("ALEX")) {
                 ALEX_ARM.render(null, 0, 0, 0, 0, 0, 0.0625F);
                 if (te.getLindosAmont() >= 100) {

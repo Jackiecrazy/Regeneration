@@ -1,8 +1,8 @@
 package me.swirtzly.regeneration.network;
 
 import io.netty.buffer.ByteBuf;
-import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.util.ClientUtil;
 import me.swirtzly.regeneration.util.PlayerUtil;
 import net.minecraft.client.Minecraft;
@@ -50,7 +50,7 @@ public class MessagePlayRegenerationSound implements IMessage {
         @Override
         public IMessage onMessage(MessagePlayRegenerationSound message, MessageContext ctx) {
 
-            Minecraft.getInstance().addScheduledTask(() -> {
+            Minecraft.getInstance().enqueue(() -> {
                 PlayerEntity player = Minecraft.getInstance().world.getPlayerEntityByUUID(UUID.fromString(message.playerUUID));
                 if (player != null) {
                     IRegeneration data = RegenCap.get(player);

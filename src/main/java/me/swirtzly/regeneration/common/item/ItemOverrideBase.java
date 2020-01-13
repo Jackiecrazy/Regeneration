@@ -10,6 +10,11 @@ import net.minecraft.world.World;
 import javax.annotation.Nullable;
 
 public class ItemOverrideBase extends Item implements IEntityOverride {
+
+    public ItemOverrideBase(Properties p_i48487_1_) {
+        super(p_i48487_1_);
+    }
+
     @Override
     public void update(EntityItemOverride itemOverride) {
 

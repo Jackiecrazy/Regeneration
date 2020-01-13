@@ -5,8 +5,8 @@ import me.swirtzly.regeneration.RegenConfig;
 import me.swirtzly.regeneration.RegenerationMod;
 import me.swirtzly.regeneration.client.image.ImageBufferDownloadAlt;
 import me.swirtzly.regeneration.client.image.ImageDownloadAlt;
-import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.types.IRegenType;
 import me.swirtzly.regeneration.common.types.TypeHandler;
 import me.swirtzly.regeneration.network.MessageUpdateSkin;
@@ -26,8 +26,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.RenderPlayerEvent;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -46,7 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-@SideOnly(Side.CLIENT)
+@SideOnly(Dist.CLIENT)
 public class SkinChangingHandler {
 
     public static final File SKIN_DIRECTORY = new File(RegenConfig.skins.skinDir + "/Regeneration/skins/");
@@ -277,7 +278,7 @@ public class SkinChangingHandler {
 
     @SubscribeEvent
     public void onRenderPlayer(RenderPlayerEvent.Post e) {
-        AbstractClientPlayerEntity player = (AbstractClientPlayerEntity) e.getEntityPlayer();
+        AbstractClientPlayerEntity player = (AbstractClientPlayerEntity) e.getPlayer();
         IRegeneration cap = RegenCap.get(player);
         IRegenType type = TypeHandler.getTypeInstance(cap.getType());
 
@@ -303,7 +304,7 @@ public class SkinChangingHandler {
     @SubscribeEvent
     public void onRenderPlayer(RenderPlayerEvent.Pre e) {
         if (MinecraftForgeClient.getRenderPass() == -1) return;
-        AbstractClientPlayerEntity player = (AbstractClientPlayerEntity) e.getEntityPlayer();
+        AbstractClientPlayerEntity player = (AbstractClientPlayerEntity) e.getPlayer();
         IRegeneration cap = RegenCap.get(player);
         IRegenType type = TypeHandler.getTypeInstance(cap.getType());
         SkinInfo skinData = PlayerDataPool.get(player);

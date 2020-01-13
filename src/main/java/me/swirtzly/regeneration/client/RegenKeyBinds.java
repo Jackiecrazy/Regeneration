@@ -1,8 +1,8 @@
 package me.swirtzly.regeneration.client;
 
 import me.swirtzly.regeneration.RegenerationMod;
-import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.network.MessageTriggerForcedRegen;
 import me.swirtzly.regeneration.network.MessageTriggerRegeneration;
 import me.swirtzly.regeneration.network.NetworkHandler;
@@ -12,12 +12,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.MovementInput;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputUpdateEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import org.lwjgl.input.Keyboard;
+import org.lwjgl.glfw.GLFW;
 
 import static me.swirtzly.regeneration.util.PlayerUtil.RegenState.REGENERATING;
 
@@ -25,17 +25,17 @@ import static me.swirtzly.regeneration.util.PlayerUtil.RegenState.REGENERATING;
  * Created by Sub
  * on 17/09/2018.
  */
-@EventBusSubscriber(Side.CLIENT)
+@EventBusSubscriber(Dist.CLIENT)
 public class RegenKeyBinds {
     public static KeyBinding REGEN_NOW;
     public static KeyBinding REGEN_FORCEFULLY;
 
     public static void init() {
 
-        REGEN_NOW = new KeyBinding("regeneration.keybinds.regenerate", Keyboard.KEY_R, RegenerationMod.NAME);
+        REGEN_NOW = new KeyBinding("regeneration.keybinds.regenerate", GLFW.GLFW_KEY_R, RegenerationMod.NAME);
         ClientRegistry.registerKeyBinding(REGEN_NOW);
 
-        REGEN_FORCEFULLY = new KeyBinding("regeneration.keybinds.regenerate_forced", Keyboard.KEY_Y, RegenerationMod.NAME);
+        REGEN_FORCEFULLY = new KeyBinding("regeneration.keybinds.regenerate_forced", GLFW.GLFW_KEY_Y, RegenerationMod.NAME);
         ClientRegistry.registerKeyBinding(REGEN_FORCEFULLY);
     }
 
@@ -75,7 +75,7 @@ public class RegenKeyBinds {
             moveType.backKeyDown = false;
             moveType.jump = false;
             moveType.moveForward = 0.0F;
-            moveType.sneak = false;
+            moveType.sneaking = false;
             moveType.moveStrafe = 0.0F;
         }
 
@@ -86,7 +86,7 @@ public class RegenKeyBinds {
      * Handles LCCore compatibility
      */
     public static String getRegenerateNowDisplayName() {
-        return REGEN_NOW.getDisplayName();
+        return REGEN_NOW.getTranslationKey();
     }
 
 }

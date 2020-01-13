@@ -1,18 +1,17 @@
 package me.swirtzly.regeneration.client;
 
-import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.util.PlayerUtil;
 import net.minecraft.client.GameSettings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import org.lwjgl.input.Mouse;
 
-@EventBusSubscriber(value = Side.CLIENT)
+@EventBusSubscriber(value = Dist.CLIENT)
 public class CameraHandler {
 
     private static float prevYaw = 0;
@@ -23,7 +22,7 @@ public class CameraHandler {
     private static float playerOriginalPitch = 0;
     private static float playerOriginalYawHead = 0;
     private static int playerOriginalSlotId = 0;
-    private static float originalFOV = 0;
+    private static double originalFOV = 0;
 
     private static boolean initFreeCam = true;
     private static boolean pendingExit = false;
@@ -61,7 +60,7 @@ public class CameraHandler {
                 playerOriginaLook = player.rotationYaw;
                 playerOriginalPitch = player.rotationPitch;
                 playerOriginalYawHead = player.rotationYawHead;
-                originalFOV = gameSettings.fovSetting;
+                originalFOV = gameSettings.fov;
                 playerOriginalSlotId = player.inventory.currentItem;
             }
 
@@ -71,8 +70,8 @@ public class CameraHandler {
 
             double sensitivity = Math.pow(gameSettings.mouseSensitivity * 0.6F + 0.2F, 3) * 8.0F;
 
-            double deltaX = mc.mouseHelper.deltaX * sensitivity * 0.15D;
-            double deltaY = -mc.mouseHelper.deltaY * sensitivity * 0.15D;
+            double deltaX = mc.mouseHelper.getMouseX() * sensitivity * 0.15D;
+            double deltaY = -mc.mouseHelper.getMouseY() * sensitivity * 0.15D;
 
             event.setYaw((float) deltaX + prevYaw + playerOriginaLook - 180);
             event.setPitch((float) deltaY + prevPitch + player.rotationPitch);
@@ -98,29 +97,29 @@ public class CameraHandler {
 
         while (prevScrollWheelKnot >= 120) {
             prevScrollWheelKnot -= 120;
-            gameSettings.fovSetting -= sensitivity * 4;
+            gameSettings.fov -= sensitivity * 4;
         }
         while (prevScrollWheelKnot <= -120) {
             prevScrollWheelKnot += 120;
-            gameSettings.fovSetting += sensitivity * 4;
+            gameSettings.fov += sensitivity * 4;
         }
 
-        if (gameSettings.fovSetting < 20) {
-            gameSettings.fovSetting = 20;
+        if (gameSettings.fov < 20) {
+            gameSettings.fov = 20;
         }
 
-        if (gameSettings.fovSetting > 140) {
-            gameSettings.fovSetting = 140;
+        if (gameSettings.fov > 140) {
+            gameSettings.fov = 140;
         }
 
-        if (gameSettings.fovSetting > 120 && gameSettings.thirdPersonView == 0) {
+        if (gameSettings.fov > 120 && gameSettings.thirdPersonView == 0) {
             gameSettings.thirdPersonView = 1;
-            gameSettings.fovSetting = 40;
+            gameSettings.fov = 40;
         }
 
-        if (gameSettings.fovSetting < 40 && gameSettings.thirdPersonView == 1) {
+        if (gameSettings.fov < 40 && gameSettings.thirdPersonView == 1) {
             gameSettings.thirdPersonView = 0;
-            gameSettings.fovSetting = 120;
+            gameSettings.fov = 120;
         }
     }
 
@@ -129,7 +128,7 @@ public class CameraHandler {
         initFreeCam = true;
         prevYaw = 0;
         prevPitch = 0;
-        gameSettings.fovSetting = originalFOV;
+        gameSettings.fov = originalFOV;
         pendingExit = false;
     }
 

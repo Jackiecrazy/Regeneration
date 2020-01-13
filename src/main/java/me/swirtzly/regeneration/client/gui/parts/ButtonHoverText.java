@@ -1,8 +1,9 @@
 package me.swirtzly.regeneration.client.gui.parts;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraftforge.fml.client.config.GuiButtonExt;
 import net.minecraftforge.fml.client.config.GuiUtils;
@@ -33,10 +34,10 @@ public class ButtonHoverText extends GuiButtonExt {
         super.drawButton(mc, mouseX, mouseY, partial);
         GlStateManager.pushMatrix();
         if (hovered) {
-            GlStateManager.translate(-x * 2, y + 5, 0);
+            RenderSystem.translatef(-x * 2, y + 5, 0);
             int x = mouseX + mc.fontRenderer.getStringWidth(desc);
             GuiUtils.drawHoveringText(Collections.singletonList(desc), x, y, width, height, 300, mc.fontRenderer);
-            GlStateManager.translate(x, -(y + 5), 0);
+            RenderSystem.translatef(x, -(y + 5), 0);
         }
         GlStateManager.popMatrix();
     }
@@ -48,7 +49,7 @@ public class ButtonHoverText extends GuiButtonExt {
         GlStateManager.disableRescaleNormal();
         RenderHelper.disableStandardItemLighting();
         GlStateManager.disableLighting();
-        GlStateManager.disableDepth();
+        GlStateManager.disableDepthTest();
         int k = 0;
         Iterator iterator = list.iterator();
 
@@ -80,17 +81,17 @@ public class ButtonHoverText extends GuiButtonExt {
         this.zLevel = 900.0F;
         Minecraft.getInstance().getRenderItem().zLevel = 900.0F;
         int j1 = -267386864;
-        this.drawGradientRect(j2 - 3, k2 - 4, j2 + k + 3, k2 - 3, j1, j1);
-        this.drawGradientRect(j2 - 3, k2 + i1 + 3, j2 + k + 3, k2 + i1 + 4, j1, j1);
-        this.drawGradientRect(j2 - 3, k2 - 3, j2 + k + 3, k2 + i1 + 3, j1, j1);
-        this.drawGradientRect(j2 - 4, k2 - 3, j2 - 3, k2 + i1 + 3, j1, j1);
-        this.drawGradientRect(j2 + k + 3, k2 - 3, j2 + k + 4, k2 + i1 + 3, j1, j1);
+        this.blit(j2 - 3, k2 - 4, j2 + k + 3, k2 - 3, j1, j1);
+        this.blit(j2 - 3, k2 + i1 + 3, j2 + k + 3, k2 + i1 + 4, j1, j1);
+        this.blit(j2 - 3, k2 - 3, j2 + k + 3, k2 + i1 + 3, j1, j1);
+        this.blit(j2 - 4, k2 - 3, j2 - 3, k2 + i1 + 3, j1, j1);
+        this.blit(j2 + k + 3, k2 - 3, j2 + k + 4, k2 + i1 + 3, j1, j1);
         int k1 = 1347420415;
         int l1 = (k1 & 16711422) >> 1 | k1 & -16777216;
-        this.drawGradientRect(j2 - 3, k2 - 3 + 1, j2 - 3 + 1, k2 + i1 + 3 - 1, k1, l1);
-        this.drawGradientRect(j2 + k + 2, k2 - 3 + 1, j2 + k + 3, k2 + i1 + 3 - 1, k1, l1);
-        this.drawGradientRect(j2 - 3, k2 - 3, j2 + k + 3, k2 - 3 + 1, k1, k1);
-        this.drawGradientRect(j2 - 3, k2 + i1 + 2, j2 + k + 3, k2 + i1 + 3, l1, l1);
+        this.blit(j2 - 3, k2 - 3 + 1, j2 - 3 + 1, k2 + i1 + 3 - 1, k1, l1);
+        this.blit(j2 + k + 2, k2 - 3 + 1, j2 + k + 3, k2 + i1 + 3 - 1, k1, l1);
+        this.blit(j2 - 3, k2 - 3, j2 + k + 3, k2 - 3 + 1, k1, k1);
+        this.blit(j2 - 3, k2 + i1 + 2, j2 + k + 3, k2 + i1 + 3, l1, l1);
 
         for (int i2 = 0; i2 < list.size(); ++i2) {
             String s1 = (String) list.get(i2);
@@ -106,8 +107,8 @@ public class ButtonHoverText extends GuiButtonExt {
         this.zLevel = 0.0F;
         Minecraft.getInstance().getRenderItem().zLevel = 0.0F;
         GlStateManager.enableLighting();
-        GlStateManager.enableDepth();
-        RenderHelper.enableStandardItemLighting();
+        GlStateManager.enableDepthTest();
+        RenderHelper.enableGuiDepthLighting();
         GlStateManager.enableRescaleNormal();
     }
 }

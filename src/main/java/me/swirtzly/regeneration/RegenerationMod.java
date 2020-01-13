@@ -5,19 +5,16 @@ import com.google.gson.GsonBuilder;
 import me.swirtzly.regeneration.client.gui.GuiHandler;
 import me.swirtzly.regeneration.common.RegenPermission;
 import me.swirtzly.regeneration.common.advancements.RegenTriggers;
-import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.RegenerationStorage;
 import me.swirtzly.regeneration.common.commands.RegenDebugCommand;
 import me.swirtzly.regeneration.common.tiles.TileEntityHandInJar;
 import me.swirtzly.regeneration.common.traits.DnaHandler;
 import me.swirtzly.regeneration.common.types.TypeHandler;
-import me.swirtzly.regeneration.compat.lucraft.LucraftCoreHandler;
-import me.swirtzly.regeneration.compat.tardis.TardisModHandler;
 import me.swirtzly.regeneration.handlers.ActingForwarder;
 import me.swirtzly.regeneration.network.NetworkHandler;
 import me.swirtzly.regeneration.proxy.CommonProxy;
-import me.swirtzly.regeneration.util.EnumCompatModids;
 import me.swirtzly.regeneration.util.PlayerUtil;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.util.ResourceLocation;
@@ -29,10 +26,9 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -87,7 +83,7 @@ public class RegenerationMod {
     }
 
     @EventHandler
-    public void serverStart(FMLServerStartingEvent event) {
+    public void serverStart(FMLServerStartedEvent event) {
         event.registerServerCommand(new RegenDebugCommand());
     }
 

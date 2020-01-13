@@ -1,7 +1,7 @@
 package me.swirtzly.regeneration.common.tiles;
 
-import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.handlers.RegenObjects;
 import me.swirtzly.regeneration.util.PlayerUtil;
 import net.minecraft.block.BlockState;
@@ -14,14 +14,13 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ITickable;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.LazyOptional;
 
 import javax.annotation.Nullable;
 
@@ -29,6 +28,10 @@ public class TileEntityHandInJar extends TileEntity implements ITickableTileEnti
 
     public int lindosAmont = 0;
     private NonNullList<ItemStack> handInv = NonNullList.withSize(7, ItemStack.EMPTY);
+
+    public TileEntityHandInJar(TileEntityType<?> p_i48289_1_) {
+        super(p_i48289_1_);
+    }
 
     public int getLindosAmont() {
         return lindosAmont;
@@ -47,15 +50,12 @@ public class TileEntityHandInJar extends TileEntity implements ITickableTileEnti
 
         PlayerEntity player = world.getClosestPlayer(getPos().getX(), getPos().getY(), getPos().getZ(), 56, false);
         if (player != null) {
-            LazyOptional<IRegeneration> data = RegenCap.get(player);
-
-            data.ifPresent((iRegeneration) -> {
-                if (iRegeneration.getState() == PlayerUtil.RegenState.REGENERATING) {
+            IRegeneration data = RegenCap.get(player);
+            if (data.getState() == PlayerUtil.RegenState.REGENERATING) {
                     if (world.rand.nextInt(90) < 10) {
                         lindosAmont = lindosAmont + 1;
                     }
                 }
-            });
         }
     }
 
@@ -152,33 +152,8 @@ public class TileEntityHandInJar extends TileEntity implements ITickableTileEnti
     }
 
     @Override
-    public int getField(int id) {
-        return 0;
-    }
-
-    @Override
-    public void setField(int id, int value) {
-
-    }
-
-    @Override
-    public int getFieldCount() {
-        return 0;
-    }
-
-    @Override
     public void clear() {
         handInv.clear();
-    }
-
-    @Override
-    public String getName() {
-        return getDisplayName().getUnformattedText();
-    }
-
-    @Override
-    public boolean hasCustomName() {
-        return true;
     }
 
     @Nullable
@@ -209,6 +184,7 @@ public class TileEntityHandInJar extends TileEntity implements ITickableTileEnti
         world.scheduleBlockUpdate(pos, getBlockType(), 0, 0);
         markDirty();
     }
+
 
     @Override
     public boolean shouldRefresh(World world, BlockPos pos, BlockState oldState, BlockState newSate) {

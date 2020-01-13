@@ -85,7 +85,7 @@ public class RegenUtil {
                 if (entity instanceof PlayerEntity && !RegenConfig.onRegen.regenerationKnocksbackPlayers || !victim.isNonBoss())
                     return;
 
-                float densMod = world.getBlockDensity(new Vec3d(pos), entity.getEntityBoundingBox());
+                float densMod = world.getBlockDensity(new Vec3d(pos), entity.getBoundingBox());
 
                 int xr, zr;
                 xr = (int) -(victim.posX - exploder.posX);

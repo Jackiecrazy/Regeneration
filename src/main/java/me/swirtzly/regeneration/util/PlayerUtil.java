@@ -3,15 +3,15 @@ package me.swirtzly.regeneration.util;
 import me.swirtzly.regeneration.client.skinhandling.SkinChangingHandler;
 import me.swirtzly.regeneration.network.MessageSetPerspective;
 import me.swirtzly.regeneration.network.MessageUpdateModel;
-import me.swirtzly.regeneration.network.NetworkHandler;
+import me.swirtzly.regeneration.network.NetworkDispatcher;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.potion.Effects;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
@@ -55,7 +55,7 @@ public class PlayerUtil {
     }
 
     public static void setPerspective(ServerPlayerEntity player, boolean thirdperson, boolean resetPitch) {
-        NetworkHandler.INSTANCE.sendTo(new MessageSetPerspective(thirdperson, resetPitch), player);
+        NetworkDispatcher.INSTANCE.sendTo(new MessageSetPerspective(thirdperson, resetPitch), player);
     }
 
     public static boolean canEntityAttack(Entity entity) { // NOTE unused
@@ -71,7 +71,7 @@ public class PlayerUtil {
     }
 
     public static void updateModel(SkinChangingHandler.EnumChoices choice) {
-        NetworkHandler.INSTANCE.sendToServer(new MessageUpdateModel(choice.name()));
+        NetworkDispatcher.INSTANCE.sendToServer(new MessageUpdateModel(choice.name()));
     }
 
     public static boolean applyPotionIfAbsent(PlayerEntity player, Effect potion, int length, int amplifier, boolean ambient, boolean showParticles) {

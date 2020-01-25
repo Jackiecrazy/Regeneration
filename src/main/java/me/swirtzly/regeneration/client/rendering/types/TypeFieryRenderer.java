@@ -13,7 +13,6 @@ import me.swirtzly.regeneration.common.types.TypeHandler;
 import me.swirtzly.regeneration.util.RenderUtil;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.model.ModelPlayer;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.LivingRenderer;
@@ -105,7 +104,7 @@ public class TypeFieryRenderer extends ATypeRenderer<TypeFiery> {
 
         // State manager changes
         GlStateManager.pushAttrib();
-        GlStateManager.disableTexture2D();
+        GlStateManager.disableTexture();
         GlStateManager.enableAlpha();
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
@@ -126,7 +125,7 @@ public class TypeFieryRenderer extends ATypeRenderer<TypeFiery> {
         GlStateManager.disableBlend();
         GlStateManager.disableAlphaTest();
         GlStateManager.color(255, 255, 255, 255);
-        GlStateManager.enableTexture2D();
+        GlStateManager.enableTexture();
         GlStateManager.popAttrib();
     }
 
@@ -208,7 +207,7 @@ public class TypeFieryRenderer extends ATypeRenderer<TypeFiery> {
 
         // State manager changes
         GlStateManager.pushAttrib();
-        GlStateManager.disableTexture2D();
+        GlStateManager.disableTexture();
         GlStateManager.enableAlpha();
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
@@ -253,7 +252,7 @@ public class TypeFieryRenderer extends ATypeRenderer<TypeFiery> {
         GlStateManager.disableBlend();
         GlStateManager.disableAlphaTest();
         GlStateManager.color(255, 255, 255, 255);
-        GlStateManager.enableTexture2D();
+        GlStateManager.enableTexture();
         GlStateManager.popAttrib();
     }
 

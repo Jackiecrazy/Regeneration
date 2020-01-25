@@ -3,7 +3,7 @@ package me.swirtzly.regeneration.common.item;
 import me.swirtzly.regeneration.RegenConfig;
 import me.swirtzly.regeneration.RegenerationMod;
 import me.swirtzly.regeneration.common.capability.RegenCap;
-import me.swirtzly.regeneration.common.entity.OverrideEntity;
+import me.swirtzly.regeneration.common.entity.EntityItemOverride;
 import me.swirtzly.regeneration.handlers.RegenObjects;
 import me.swirtzly.regeneration.util.ClientUtil;
 import me.swirtzly.regeneration.util.PlayerUtil;
@@ -21,7 +21,7 @@ import net.minecraft.world.World;
  * Created by Sub
  * on 16/09/2018.
  */
-public class ItemFobWatch extends OverrideItem {
+public class ItemFobWatch extends ItemOverrideBase {
 
     public ItemFobWatch() {
         super(new Item.Properties().setNoRepair().maxStackSize(1).group(ItemGroup.MISC));
@@ -163,7 +163,7 @@ public class ItemFobWatch extends OverrideItem {
     }
 
     @Override
-    public void update(OverrideEntity itemOverride) {
+    public void update(EntityItemOverride itemOverride) {
         if (!itemOverride.world.isRemote) return;
         ItemStack itemStack = itemOverride.getItem();
         if (itemStack.getItem() == this && itemStack.getDamage() != RegenConfig.COMMON.regenCapacity.get()) {

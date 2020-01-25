@@ -1,21 +1,19 @@
 package me.swirtzly.regeneration.util;
 
+import com.mojang.blaze3d.platform.GLX;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.swirtzly.regeneration.RegenerationMod;
+import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.model.Model;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.client.model.ModelLoader;
 import org.lwjgl.opengl.GL11;
 
 /**
@@ -26,22 +24,19 @@ public class RenderUtil {
 
     private static final ResourceLocation VIGNETTE_TEX_PATH = new ResourceLocation(RegenerationMod.MODID, "textures/misc/vignette.png");
     public static float renderTick = Minecraft.getInstance().getRenderPartialTicks();
-    private static float lastBrightnessX = OpenGlHelper.lastBrightnessX;
-    private static float lastBrightnessY = OpenGlHelper.lastBrightnessY;
+    private static float lastBrightnessX = GlStateManager.lastBrightnessX;
+    private static float lastBrightnessY = GlStateManager.lastBrightnessY;
 
     public static void setLightmapTextureCoords(float x, float y) {
-        lastBrightnessX = OpenGlHelper.lastBrightnessX;
-        lastBrightnessY = OpenGlHelper.lastBrightnessY;
-        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, x, y);
+        lastBrightnessX = GlStateManager.lastBrightnessX;
+        lastBrightnessY = GlStateManager.lastBrightnessY;
+        RenderSystem.glMultiTexCoord2f(GLX.GL_TEXTURE1, x, y);
     }
 
     public static void restoreLightMap() {
-        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lastBrightnessX, lastBrightnessY);
+        RenderSystem.glMultiTexCoord2f(GLX.GL_TEXTURE1, lastBrightnessX, lastBrightnessY);
     }
 
-    public static void setItemRender(Item item) {
-        ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory"));
-    }
 
     public static void drawGlowingLine(Vec3d start, Vec3d end, float thickness, Vec3d color, float alpha) {
         if (start == null || end == null)
@@ -49,13 +44,13 @@ public class RenderUtil {
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bb = tessellator.getBuffer();
-        int smoothFactor = Minecraft.getInstance().gameSettings.ambientOcclusion;
+        int smoothFactor = Minecraft.getInstance().gameSettings.ambientOcclusionStatus.func_216572_a();
         int layers = 10 + smoothFactor * 20;
 
         GlStateManager.pushMatrix();
         start = start.scale(-1D);
         end = end.scale(-1D);
-        RenderSystem.translatef(-start.x, -start.y, -start.z);
+        RenderSystem.translated(-start.x, -start.y, -start.z);
         start = end.subtract(start);
         end = end.subtract(end);
 
@@ -72,10 +67,10 @@ public class RenderUtil {
 
         for (int layer = 0; layer <= layers; ++layer) {
             if (layer < layers) {
-                GlStateManager.color((float) color.x, (float) color.y, (float) color.z, 1.0F / layers / 2);
+                GlStateManager.color4f((float) color.x, (float) color.y, (float) color.z, 1.0F / layers / 2);
                 GlStateManager.depthMask(false);
             } else {
-                GlStateManager.color(1.0F, 1.0F, 1.0F, alpha); // SUB does this actually do anything? We're always passing in an alpha of 0...
+                GlStateManager.color4f(1.0F, 1.0F, 1.0F, alpha); // SUB does this actually do anything? We're always passing in an alpha of 0...
                 GlStateManager.depthMask(true);
             }
             double size = thickness + (layer < layers ? layer * (1.25D / layers) : 0.0D);
@@ -117,7 +112,7 @@ public class RenderUtil {
 
     public static void setupRenderLightning() {
         GlStateManager.pushMatrix();
-        GlStateManager.disableTexture2D();
+        GlStateManager.disableTexture();
         GlStateManager.disableLighting();
         GlStateManager.disableCull();
         GlStateManager.enableBlend();
@@ -129,7 +124,7 @@ public class RenderUtil {
     public static void finishRenderLightning() {
         restoreLightMap();
         GlStateManager.enableLighting();
-        GlStateManager.enableTexture2D();
+        GlStateManager.enableTexture();
         GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
         GlStateManager.disableBlend();
         GlStateManager.popMatrix();
@@ -151,22 +146,22 @@ public class RenderUtil {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder worldrenderer = tessellator.getBuffer();
         GlStateManager.enableBlend();
-        GlStateManager.disableTexture2D();
+        GlStateManager.disableTexture();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
-        GlStateManager.color(red, green, blue, alpha);
+        GlStateManager.color4f(red, green, blue, alpha);
         worldrenderer.begin(7, DefaultVertexFormats.POSITION);
         worldrenderer.pos(left, bottom, 0.0D).endVertex();
         worldrenderer.pos(right, bottom, 0.0D).endVertex();
         worldrenderer.pos(right, top, 0.0D).endVertex();
         worldrenderer.pos(left, top, 0.0D).endVertex();
         tessellator.draw();
-        GlStateManager.enableTexture2D();
+        GlStateManager.enableTexture();
         GlStateManager.disableBlend();
-        GlStateManager.color(1, 1, 1, 1);
+        GlStateManager.color4f(1, 1, 1, 1);
     }
 
     public static void renderVignette(Vec3d color, float a, PlayerUtil.RegenState state) {
-        GlStateManager.color((float) color.x, (float) color.y, (float) color.z, a);
+        GlStateManager.color4f((float) color.x, (float) color.y, (float) color.z, a);
         GlStateManager.disableAlphaTest();
         GlStateManager.depthMask(false);
         GlStateManager.enableBlend();
@@ -175,7 +170,7 @@ public class RenderUtil {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
 
-        ScaledResolution scaledRes = new ScaledResolution(Minecraft.getInstance());
+        MainWindow scaledRes = Minecraft.getInstance().getWindow();
         int z = -89; // below the HUD
         bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
         bufferbuilder.pos(0, scaledRes.getScaledHeight(), z).tex(0, 1).endVertex();
@@ -185,7 +180,7 @@ public class RenderUtil {
         tessellator.draw();
 
         GlStateManager.depthMask(true);
-        GlStateManager.enableAlpha();
+        GlStateManager.enableAlphaTest();
         GlStateManager.color(1, 1, 1, 1);
     }
 

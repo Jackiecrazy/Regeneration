@@ -7,7 +7,7 @@ import me.swirtzly.regeneration.common.entity.EntityLindos;
 import me.swirtzly.regeneration.common.traits.DnaHandler;
 import me.swirtzly.regeneration.common.types.TypeHandler;
 import me.swirtzly.regeneration.network.MessagePlayRegenerationSound;
-import me.swirtzly.regeneration.network.NetworkHandler;
+import me.swirtzly.regeneration.network.NetworkDispatcher;
 import me.swirtzly.regeneration.util.PlayerUtil;
 import me.swirtzly.regeneration.util.RegenUtil;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -149,7 +149,7 @@ class ActingServerHandler implements IActingHandler {
     @Override
     public void onRegenTrigger(IRegeneration cap) {
         PlayerEntity player = cap.getPlayer();
-        NetworkHandler.INSTANCE.sendToAllAround(new MessagePlayRegenerationSound(RegenUtil.getRandomSound(TypeHandler.getTypeInstance(cap.getType()).getRegeneratingSounds(), player.world.rand), player.getUniqueID().toString()), new NetworkRegistry.TargetPoint(player.dimension, player.posX, player.posY, player.posZ, 40));
+        NetworkDispatcher.INSTANCE.sendToAllAround(new MessagePlayRegenerationSound(RegenUtil.getRandomSound(TypeHandler.getTypeInstance(cap.getType()).getRegeneratingSounds(), player.world.rand), player.getUniqueID().toString()), new NetworkRegistry.TargetPoint(player.dimension, player.posX, player.posY, player.posZ, 40));
         player.getAttribute(SharedMonsterAttributes.MAX_HEALTH).removeModifier(MAX_HEALTH_ID);
         player.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).removeModifier(SLOWNESS_ID);
         player.setHealth(Math.max(player.getHealth(), 8));

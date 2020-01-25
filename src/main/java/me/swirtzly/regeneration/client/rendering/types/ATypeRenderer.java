@@ -17,7 +17,7 @@ public abstract class ATypeRenderer<T> {
 
     protected abstract void onRenderRegeneratingPost(T type, RenderPlayerEvent.Post event, IRegeneration capability);
 
-    protected abstract void onRenderLayer(T type, LivingRenderer<?> renderLivingBase, IRegeneration capability, PlayerEntity entityPlayer, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale);
+    protected abstract void onRenderLayer(T type, LivingRenderer renderLivingBase, IRegeneration capability, PlayerEntity entityPlayer, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale);
 
     // Generic casting convenience methods:
 
@@ -40,7 +40,7 @@ public abstract class ATypeRenderer<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public final void onRenderRegenerationLayer(IRegenType<?> type, LivingRenderer<?> renderLivingBase, IRegeneration capability, PlayerEntity entityPlayer, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+    public final void onRenderRegenerationLayer(IRegenType<?> type, LivingRenderer renderLivingBase, IRegeneration capability, PlayerEntity entityPlayer, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
         try {
             onRenderLayer((T) type, renderLivingBase, capability, entityPlayer, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
         } catch (ClassCastException e) {
@@ -50,7 +50,7 @@ public abstract class ATypeRenderer<T> {
 
     public abstract boolean onAnimateRegen(AnimationContext animationContext);
 
-    public abstract void renderHand(PlayerEntity player, HandSide handSide, LivingRenderer<?> render);
+    public abstract void renderHand(PlayerEntity player, HandSide handSide, LivingRenderer render);
 
     public abstract void onRenderCallBack(RenderCallbackEvent event);
 

@@ -4,12 +4,12 @@ import me.swirtzly.regeneration.RegenerationMod;
 import me.swirtzly.regeneration.client.gui.parts.BlankContainer;
 import me.swirtzly.regeneration.client.gui.parts.GuiColorSlider;
 import me.swirtzly.regeneration.client.gui.parts.InventoryTabRegeneration;
-import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
+import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.types.IRegenType;
 import me.swirtzly.regeneration.common.types.TypeHandler;
 import me.swirtzly.regeneration.network.MessageSaveStyle;
-import me.swirtzly.regeneration.network.NetworkHandler;
+import me.swirtzly.regeneration.network.NetworkDispatcher;
 import me.swirtzly.regeneration.util.RenderUtil;
 import micdoodle8.mods.galacticraft.api.client.tabs.TabRegistry;
 import net.minecraft.client.Minecraft;
@@ -99,7 +99,7 @@ public class GuiCustomizer extends ContainerScreen {
         nbt.putFloat("SecondaryGreen", (float) slideSecondaryGreen.getValue());
         nbt.putFloat("SecondaryBlue", (float) slideSecondaryBlue.getValue());
 
-        NetworkHandler.INSTANCE.sendToServer(new MessageSaveStyle(nbt));
+        NetworkDispatcher.INSTANCE.sendToServer(new MessageSaveStyle(nbt));
     }
 
     @Override

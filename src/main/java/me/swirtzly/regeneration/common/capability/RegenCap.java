@@ -13,7 +13,7 @@ import me.swirtzly.regeneration.handlers.ActingForwarder;
 import me.swirtzly.regeneration.handlers.RegenObjects;
 import me.swirtzly.regeneration.network.MessageSynchronisationRequest;
 import me.swirtzly.regeneration.network.MessageSynchroniseRegeneration;
-import me.swirtzly.regeneration.network.NetworkHandler;
+import me.swirtzly.regeneration.network.NetworkDispatcher;
 import me.swirtzly.regeneration.util.DebuggableScheduledAction;
 import me.swirtzly.regeneration.util.PlayerUtil;
 import net.minecraft.block.BlockState;
@@ -93,7 +93,7 @@ public class RegenCap implements IRegeneration {
     @Override
     public void tick() {
         if (!didSetup && player.world.isRemote) {
-            NetworkHandler.INSTANCE.sendToServer(new MessageSynchronisationRequest(player));
+            NetworkDispatcher.INSTANCE.sendToServer(new MessageSynchronisationRequest(player));
             didSetup = true;
         }
 
@@ -147,7 +147,7 @@ public class RegenCap implements IRegeneration {
         handsAreGlowingClient = state.isGraceful() && stateManager.handGlowTimer.getTransition() == PlayerUtil.RegenState.Transition.HAND_GLOW_TRIGGER;
         CompoundNBT nbt = serializeNBT();
         nbt.remove("stateManager");
-        NetworkHandler.INSTANCE.sendToAll(new MessageSynchroniseRegeneration(player, nbt));
+        NetworkDispatcher.INSTANCE.sendToAll(new MessageSynchroniseRegeneration(player, nbt));
     }
 
 

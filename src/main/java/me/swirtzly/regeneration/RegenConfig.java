@@ -1,7 +1,7 @@
 package me.swirtzly.regeneration;
 
 import net.minecraftforge.common.ForgeConfigSpec;
-import org.apache.commons.lang3.tuple.Pair;
+import org.antlr.v4.runtime.misc.Pair;
 
 public class RegenConfig {
     public static Common COMMON;

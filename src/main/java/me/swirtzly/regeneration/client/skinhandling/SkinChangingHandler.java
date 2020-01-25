@@ -10,7 +10,7 @@ import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.types.IRegenType;
 import me.swirtzly.regeneration.common.types.TypeHandler;
 import me.swirtzly.regeneration.network.MessageUpdateSkin;
-import me.swirtzly.regeneration.network.NetworkHandler;
+import me.swirtzly.regeneration.network.NetworkDispatcher;
 import me.swirtzly.regeneration.util.ClientUtil;
 import me.swirtzly.regeneration.util.FileUtil;
 import me.swirtzly.regeneration.util.PlayerUtil;
@@ -29,8 +29,6 @@ import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.OnlyIn;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
@@ -108,13 +106,13 @@ public class SkinChangingHandler {
                 RegenerationMod.LOG.info(skin + " was choosen");
                 try {
                     pixelData = SkinChangingHandler.imageToPixelData(skin);
-                    NetworkHandler.INSTANCE.sendToServer(new MessageUpdateSkin(pixelData, isAlex));
+                    NetworkDispatcher.INSTANCE.sendToServer(new MessageUpdateSkin(pixelData, isAlex));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             } else {
                 pixelData = cap.getNextSkin();
-                NetworkHandler.INSTANCE.sendToServer(new MessageUpdateSkin(pixelData, cap.getNextSkinType() == SkinInfo.SkinType.ALEX));
+                NetworkDispatcher.INSTANCE.sendToServer(new MessageUpdateSkin(pixelData, cap.getNextSkinType() == SkinInfo.SkinType.ALEX));
             }
 
         } else {

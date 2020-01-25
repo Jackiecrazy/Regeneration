@@ -1,19 +1,16 @@
 package me.swirtzly.regeneration.client.gui;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import me.swirtzly.regeneration.RegenerationMod;
 import me.swirtzly.regeneration.client.gui.parts.HIJContainer;
 import me.swirtzly.regeneration.common.tiles.TileEntityHandInJar;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.OnlyIn;
 
 import java.awt.*;
 
-@OnlyIn(Dist.CLIENT)
 public class GuiHij extends ContainerScreen {
     public static final int ID = 77;
     private static final ResourceLocation TEXTURE = new ResourceLocation(RegenerationMod.MODID, "textures/gui/hij.png");
@@ -33,23 +30,24 @@ public class GuiHij extends ContainerScreen {
     }
 
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        this.fontRenderer.drawString(this.handInventory.getDisplayName().getUnformattedText(), 8, 6, Color.BLACK.getRGB());
-        this.fontRenderer.drawString("Residual Energy: " + jar.getLindosAmont(), 8, this.ySize - 96 + 2, Color.BLACK.getRGB());
+        minecraft.fontRenderer.drawString(this.handInventory.getDisplayName().getUnformattedText(), 8, 6, Color.BLACK.getRGB());
+        minecraft.fontRenderer.drawString("Residual Energy: " + jar.getLindosAmont(), 8, this.ySize - 96 + 2, Color.BLACK.getRGB());
     }
 
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.minecraft.getTextureManager().bindTexture(TEXTURE);
         int i = (this.width - this.xSize) / 2;
         int j = (this.height - this.ySize) / 2;
         this.blit(i, j, 0, 0, this.xSize, this.ySize);
     }
 
-    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        this.drawDefaultBackground();
+    @Override
+    public void render(int mouseX, int mouseY, float partialTicks) {
+        renderBackground();
         this.mousePosx = (float) mouseX;
         this.mousePosY = (float) mouseY;
-        super.drawScreen(mouseX, mouseY, partialTicks);
+        super.render(mouseX, mouseY, partialTicks);
         this.renderHoveredToolTip(mouseX, mouseY);
     }
 }

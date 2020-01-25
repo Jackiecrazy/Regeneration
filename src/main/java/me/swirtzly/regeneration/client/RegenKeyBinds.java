@@ -5,7 +5,7 @@ import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.network.MessageTriggerForcedRegen;
 import me.swirtzly.regeneration.network.MessageTriggerRegeneration;
-import me.swirtzly.regeneration.network.NetworkHandler;
+import me.swirtzly.regeneration.network.NetworkDispatcher;
 import me.swirtzly.regeneration.util.ClientUtil;
 import me.swirtzly.regeneration.util.EnumCompatModids;
 import net.minecraft.client.Minecraft;
@@ -31,7 +31,6 @@ public class RegenKeyBinds {
     public static KeyBinding REGEN_FORCEFULLY;
 
     public static void init() {
-
         REGEN_NOW = new KeyBinding("regeneration.keybinds.regenerate", GLFW.GLFW_KEY_R, RegenerationMod.NAME);
         ClientRegistry.registerKeyBinding(REGEN_NOW);
 
@@ -58,12 +57,12 @@ public class RegenKeyBinds {
 
         //Regenerate if in Grace & Keybind is pressed
         if (REGEN_NOW.isPressed() && RegenCap.get(player).getState().isGraceful()) {
-            NetworkHandler.INSTANCE.sendToServer(new MessageTriggerRegeneration(player));
+            NetworkDispatcher.INSTANCE.sendToServer(new MessageTriggerRegeneration(player));
         }
 
         //
         if (RegenKeyBinds.REGEN_FORCEFULLY.isPressed()) {
-            NetworkHandler.INSTANCE.sendToServer(new MessageTriggerForcedRegen());
+            NetworkDispatcher.INSTANCE.sendToServer(new MessageTriggerForcedRegen());
         }
 
 

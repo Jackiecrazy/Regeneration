@@ -21,7 +21,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.entity.model.PlayerModel;
 import net.minecraft.entity.player.PlayerEntity;
@@ -37,6 +36,8 @@ import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.event.HoverEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.client.event.sound.PlaySoundEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -156,20 +157,12 @@ public class ClientEventHandler {
 
             case REGENERATING:
                 RenderUtil.renderVignette(cap.getSecondaryColor(), 0.5F, cap.getState());
-                if (cap.getAnimationTicks() < 3) {
-                    RegenClientHooks.handleShader();
-                }
                 break;
 
             case POST:
                 if (player.hurtTime > 0 || player.getActivePotionEffect(Effects.NAUSEA) != null) {
                     RenderUtil.renderVignette(cap.getSecondaryColor(), 0.5F, cap.getState());
                 }
-
-                if (player.hurtTime == 1 || player.ticksExisted % 600 == 0) {
-                    RegenClientHooks.handleShader();
-                }
-
                 break;
         }
 
@@ -258,15 +251,6 @@ public class ClientEventHandler {
     }
 
     @SubscribeEvent
-    public static void registerModels(ModelRegistryEvent ev) {
-        RegenObjects.ITEMS.forEach(RenderUtil::setItemRender);
-        RegenObjects.ITEM_BLOCKS.forEach(RenderUtil::setItemRender);
-
-        RegenObjects.ITEMS = new ArrayList<>();
-        RegenObjects.ITEM_BLOCKS = new ArrayList<>();
-    }
-
-    @SubscribeEvent
     public static void onDeath(LivingDeathEvent e) {
         if (e.getEntityLiving() instanceof PlayerEntity) {
             PlayerEntity player = (PlayerEntity) e.getEntityLiving();
@@ -326,7 +310,7 @@ public class ClientEventHandler {
             }
 
             if (data.getState() == GRACE_CRIT) {
-                RenderSystem.translatef(0, 0.125D, 0);
+                RenderSystem.translated(0, 0.125D, 0);
             }
 
             EntityModel model = event.getRenderer().getEntityModel();

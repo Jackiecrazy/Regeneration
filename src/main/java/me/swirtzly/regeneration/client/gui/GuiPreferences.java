@@ -11,7 +11,7 @@ import me.swirtzly.regeneration.common.traits.DnaHandler;
 import me.swirtzly.regeneration.common.types.TypeHandler;
 import me.swirtzly.regeneration.network.MessageChangeType;
 import me.swirtzly.regeneration.network.MessageUpdateModel;
-import me.swirtzly.regeneration.network.NetworkHandler;
+import me.swirtzly.regeneration.network.NetworkDispatcher;
 import me.swirtzly.regeneration.util.ClientUtil;
 import micdoodle8.mods.galacticraft.api.client.tabs.TabRegistry;
 import net.minecraft.client.Minecraft;
@@ -88,19 +88,19 @@ public class GuiPreferences extends ContainerScreen {
         String str = "Banana Phone";
         int length = minecraft.fontRenderer.getStringWidth(str);
 
-        if (RegenConfig.infiniteRegeneration)
+        if (RegenConfig.COMMON.infiniteRegeneration.get())
             str = new TranslationTextComponent("regeneration.gui.infinite_regenerations").getFormattedText(); // TODO this should be optimized
         else
             str = new TranslationTextComponent("regeneration.gui.remaining_regens.status").getFormattedText() + " " + RegenCap.get(Minecraft.getInstance().player).getRegenerationsLeft();
 
         length = minecraft.fontRenderer.getStringWidth(str);
-        fontRenderer.drawStringWithShadow(str, cx + 170 - length / 2, cy + 21, Color.WHITE.getRGB());
+        minecraft.fontRenderer.drawStringWithShadow(str, cx + 170 - length / 2, cy + 21, Color.WHITE.getRGB());
 
         TranslationTextComponent traitLang = new TranslationTextComponent(DnaHandler.getDnaEntry(RegenCap.get(mc.player).getDnaType()).getLangKey());
-        fontRenderer.drawStringWithShadow(traitLang.getUnformattedText(), cx + 170 - length / 2, cy + 40, Color.WHITE.getRGB());
+        minecraft.fontRenderer.drawStringWithShadow(traitLang.getUnformattedText(), cx + 170 - length / 2, cy + 40, Color.WHITE.getRGB());
 
         TranslationTextComponent traitLangDesc = new TranslationTextComponent(DnaHandler.getDnaEntry(RegenCap.get(mc.player).getDnaType()).getLocalDesc());
-        fontRenderer.drawStringWithShadow(traitLangDesc.getUnformattedText(), cx + 170 - length / 2, cy + 50, Color.WHITE.getRGB());
+        minecraft.fontRenderer.drawStringWithShadow(traitLangDesc.getUnformattedText(), cx + 170 - length / 2, cy + 50, Color.WHITE.getRGB());
 
     }
 
@@ -119,7 +119,7 @@ public class GuiPreferences extends ContainerScreen {
                     SELECTED_TYPE = TypeHandler.RegenType.FIERY;
                 }
                 button.displayString = new TranslationTextComponent("regeneration.gui.type", new TranslationTextComponent("regentype." + SELECTED_TYPE.name().toLowerCase()).getUnformattedComponentText()).getUnformattedComponentText();
-                NetworkHandler.INSTANCE.sendToServer(new MessageChangeType(SELECTED_TYPE));
+                NetworkDispatcher.INSTANCE.sendToServer(new MessageChangeType(SELECTED_TYPE));
                 break;
             case 99:
                 Minecraft.getInstance().player.openGui(RegenerationMod.INSTANCE, GuiCustomizer.ID, Minecraft.getInstance().world, 0, 0, 0);
@@ -136,7 +136,7 @@ public class GuiPreferences extends ContainerScreen {
                     CHOICES = SkinChangingHandler.EnumChoices.ALEX;
                 }
                 button.displayString = new TranslationTextComponent("regeneration.gui.skintype", new TranslationTextComponent("skintype." + CHOICES.name().toLowerCase())).getUnformattedComponentText();
-                NetworkHandler.INSTANCE.sendToServer(new MessageUpdateModel(CHOICES.name()));
+                NetworkDispatcher.INSTANCE.sendToServer(new MessageUpdateModel(CHOICES.name()));
                 break;
             case 34:
                 ClientUtil.sendSkinChange(true);
@@ -149,9 +149,8 @@ public class GuiPreferences extends ContainerScreen {
 
 
     @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        drawDefaultBackground();
-        super.drawScreen(mouseX, mouseY, partialTicks);
+    public void render(int p_render_1_, int p_render_2_, float p_render_3_) {
+        renderBackground();
+        super.render(p_render_1_, p_render_2_, p_render_3_);
     }
-
 }

@@ -6,7 +6,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import org.apache.commons.lang3.tuple.Pair;
+import org.antlr.v4.runtime.misc.Pair;
 
 public interface IRegenerationStateManager extends INBTSerializable<CompoundNBT> {
 

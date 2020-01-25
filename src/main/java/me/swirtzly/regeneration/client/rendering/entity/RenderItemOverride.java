@@ -7,7 +7,6 @@ import me.swirtzly.regeneration.common.entity.EntityItemOverride;
 import me.swirtzly.regeneration.handlers.RegenObjects;
 import me.swirtzly.regeneration.util.RenderUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
@@ -17,7 +16,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TranslationTextComponent;
 
-import javax.annotation.Nullable;
 import java.util.Random;
 
 public class RenderItemOverride extends EntityRenderer<EntityItemOverride> {
@@ -40,7 +38,6 @@ public class RenderItemOverride extends EntityRenderer<EntityItemOverride> {
         RenderUtil.finishRenderLightning();
     }
 
-    @Nullable
     @Override
     protected ResourceLocation getEntityTexture(EntityItemOverride entity) {
         return null;
@@ -58,7 +55,7 @@ public class RenderItemOverride extends EntityRenderer<EntityItemOverride> {
         Random rand = entity.world.rand;
 
         GlStateManager.pushMatrix();
-        if (entity.getItem().getItem() == RegenObjects.Items.FOB_WATCH && entity.getItem().getItemDamage() != RegenConfig.regenCapacity) {
+        if (entity.getItem().getItem() == RegenObjects.Items.FOB_WATCH && entity.getItem().getDamage() != RegenConfig.COMMON.regenCapacity.get()) {
             for (int j = 0; j < 2; j++) {
                 RenderUtil.setupRenderLightning();
                 RenderSystem.translated(x, y + 0.20, z);

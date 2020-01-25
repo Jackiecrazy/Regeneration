@@ -1,7 +1,7 @@
 package me.swirtzly.regeneration.common.item;
 
 import me.swirtzly.regeneration.common.capability.RegenCap;
-import me.swirtzly.regeneration.common.entity.OverrideEntity;
+import me.swirtzly.regeneration.common.entity.EntityItemOverride;
 import me.swirtzly.regeneration.handlers.RegenObjects;
 import me.swirtzly.regeneration.util.PlayerUtil;
 import net.minecraft.block.BlockState;
@@ -24,7 +24,7 @@ import net.minecraft.world.World;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class ItemLindos extends OverrideItem {
+public class ItemLindos extends ItemOverrideBase {
 
     public ItemLindos() {
         super(new Item.Properties().group(ItemGroup.MISC).maxStackSize(1));
@@ -210,7 +210,7 @@ public class ItemLindos extends OverrideItem {
 
 
     @Override
-    public void update(OverrideEntity itemOverride) {
+    public void update(EntityItemOverride itemOverride) {
         if (itemOverride.world.isRemote) return;
         ItemStack itemStack = itemOverride.getItem();
         if (itemStack.getItem().getItem() == this) {

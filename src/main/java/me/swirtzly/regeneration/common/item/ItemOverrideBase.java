@@ -1,21 +1,20 @@
 package me.swirtzly.regeneration.common.item;
 
-import me.swirtzly.regeneration.common.entity.OverrideEntity;
+import com.sun.istack.internal.Nullable;
+import me.swirtzly.regeneration.common.entity.EntityItemOverride;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
-import javax.annotation.Nullable;
+public class ItemOverrideBase extends Item implements EntityItemOverride.IEntityOverride {
 
-public class OverrideItem extends Item implements OverrideEntity.IEntityOverride {
-
-    public OverrideItem(Properties p_i48487_1_) {
+    public ItemOverrideBase(Properties p_i48487_1_) {
         super(p_i48487_1_);
     }
 
     @Override
-    public void update(OverrideEntity itemOverride) {
+    public void update(EntityItemOverride itemOverride) {
 
     }
 
@@ -27,7 +26,7 @@ public class OverrideItem extends Item implements OverrideEntity.IEntityOverride
     @Nullable
     @Override
     public Entity createEntity(World world, Entity location, ItemStack itemstack) {
-        OverrideEntity item = new OverrideEntity(world, location.posX, location.posY, location.posZ, itemstack);
+        EntityItemOverride item = new EntityItemOverride(world, location.getX(), location.getY(), location.getZ(), itemstack);
         item.setEntitySize(item.getHeight(), item.getWidth());
         item.setMotion(location.getMotion());
         return item;

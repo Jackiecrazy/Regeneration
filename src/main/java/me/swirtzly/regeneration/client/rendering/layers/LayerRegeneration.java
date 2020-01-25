@@ -1,5 +1,7 @@
 package me.swirtzly.regeneration.client.rendering.layers;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.types.IRegenType;
@@ -7,9 +9,10 @@ import me.swirtzly.regeneration.common.types.TypeHandler;
 import me.swirtzly.regeneration.util.PlayerUtil;
 import me.swirtzly.regeneration.util.RenderUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.ModelPlayer;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
+import net.minecraft.client.renderer.entity.model.PlayerModel;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.HandSide;
 import net.minecraft.util.math.Vec3d;
@@ -25,8 +28,8 @@ import static me.swirtzly.regeneration.util.RenderUtil.drawGlowingLine;
  */
 public class LayerRegeneration implements LayerRenderer<PlayerEntity> {
 
-    public static final ModelPlayer modelSteve = new ModelPlayer(0.1F, false);
-    public static final ModelPlayer modelAlex = new ModelPlayer(0.1F, true);
+    public static final PlayerModel modelSteve = new PlayerModel(0.1F, false);
+    public static final PlayerModel modelAlex = new PlayerModel(0.1F, true);
     private static PlayerRenderer playerRenderer;
 
     public LayerRegeneration(PlayerRenderer playerRenderer) {
@@ -53,9 +56,10 @@ public class LayerRegeneration implements LayerRenderer<PlayerEntity> {
         RenderUtil.finishRenderLightning();
     }
 
+
     @Override
-    public void doRenderLayer(PlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
-        IRegeneration cap = RegenCap.get(player);
+    public void render(MatrixStack p_225628_1_, IRenderTypeBuffer p_225628_2_, int p_225628_3_, PlayerEntity p_225628_4_, float p_225628_5_, float p_225628_6_, float p_225628_7_, float p_225628_8_, float p_225628_9_, float p_225628_10_) {
+        IRegeneration cap = RegenCap.get(p_225628_4_);
         IRegenType type = TypeHandler.getTypeInstance(cap.getType());
         if (cap.getState() == PlayerUtil.RegenState.REGENERATING) {
             type.getRenderer().onRenderRegenerationLayer(type, playerRenderer, cap, player, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
@@ -65,11 +69,4 @@ public class LayerRegeneration implements LayerRenderer<PlayerEntity> {
             renderOverlay(player, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale, null);
         }
     }
-
-
-    @Override
-    public boolean shouldCombineTextures() {
-        return false;
-    }
-
 }

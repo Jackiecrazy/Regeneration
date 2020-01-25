@@ -13,7 +13,7 @@ import me.swirtzly.regeneration.common.tiles.TileEntityHandInJar;
 import me.swirtzly.regeneration.common.traits.DnaHandler;
 import me.swirtzly.regeneration.common.types.TypeHandler;
 import me.swirtzly.regeneration.handlers.ActingForwarder;
-import me.swirtzly.regeneration.network.NetworkHandler;
+import me.swirtzly.regeneration.network.NetworkDispatcher;
 import me.swirtzly.regeneration.proxy.CommonProxy;
 import me.swirtzly.regeneration.util.PlayerUtil;
 import net.minecraft.launchwrapper.Launch;
@@ -68,7 +68,7 @@ public class RegenerationMod {
     @EventHandler
     public void init(FMLInitializationEvent event) {
         proxy.init();
-        NetworkHandler.init();
+        NetworkDispatcher.init();
         LootTables.register(LOOT_FILE);
         DnaHandler.init();
         NetworkRegistry.INSTANCE.registerGuiHandler(INSTANCE, new GuiHandler());

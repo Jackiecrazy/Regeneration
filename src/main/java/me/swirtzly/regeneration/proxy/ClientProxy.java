@@ -66,11 +66,6 @@ public class ClientProxy extends CommonProxy {
             TabRegistry.registerTab(new InventoryTabVanilla());
         }
         TabRegistry.registerTab(new InventoryTabRegeneration());
-
-        // LC Core
-        if (EnumCompatModids.LCCORE.isLoaded()) {
-            LucraftCoreHandler.registerEntry();
-        }
     }
 
 }

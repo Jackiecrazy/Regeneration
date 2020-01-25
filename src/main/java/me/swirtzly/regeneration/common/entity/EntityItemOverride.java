@@ -258,7 +258,7 @@ public class EntityItemOverride extends Entity {
 
     public interface IEntityOverride {
 
-        void update(OverrideEntity itemOverride);
+        void update(EntityItemOverride itemOverride);
 
         boolean shouldDie(ItemStack stack);
     }

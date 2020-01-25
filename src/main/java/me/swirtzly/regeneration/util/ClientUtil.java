@@ -4,12 +4,11 @@ import me.swirtzly.regeneration.client.MovingSoundBase;
 import me.swirtzly.regeneration.client.skinhandling.SkinChangingHandler;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.capability.RegenCap;
-import me.swirtzly.regeneration.network.MessageUpdateSkin;
-import me.swirtzly.regeneration.network.NetworkHandler;
+import me.swirtzly.regeneration.network.NetworkDispatcher;
+import me.swirtzly.regeneration.network.messages.UpdateSkinMessage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.toasts.SystemToast;
-import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.entity.model.PlayerModel;
 import net.minecraft.client.renderer.model.ModelRenderer;
 import net.minecraft.util.ResourceLocation;
@@ -42,12 +41,12 @@ public class ClientUtil {
      * back to the ones supplied by Mojang
      */
     public static void sendSkinResetPacket() {
-        NetworkHandler.INSTANCE.sendToServer(new MessageUpdateSkin("none", SkinChangingHandler.getSkinType(Minecraft.getInstance().player, true).getMojangType().equals("slim")));
+        NetworkDispatcher.INSTANCE.sendToServer(new UpdateSkinMessage("none", SkinChangingHandler.getSkinType(Minecraft.getInstance().player, true).getMojangType().equals("slim")));
     }
 
     public static void sendSkinChange(boolean isAlex) {
         IRegeneration data = RegenCap.get(Minecraft.getInstance().player);
-        NetworkHandler.INSTANCE.sendToServer(new MessageUpdateSkin(data.getEncodedSkin(), isAlex));
+        NetworkDispatcher.INSTANCE.sendToServer(new UpdateSkinMessage(data.getEncodedSkin(), isAlex));
     }
 
     public static void playSound(Object entity, ResourceLocation soundName, SoundCategory category, boolean repeat, Supplier<Boolean> stopCondition, float volume) {

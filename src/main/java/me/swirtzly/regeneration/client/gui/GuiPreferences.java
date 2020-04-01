@@ -1,5 +1,6 @@
 package me.swirtzly.regeneration.client.gui;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import me.swirtzly.regeneration.RegenConfig;
 import me.swirtzly.regeneration.RegenerationMod;
 import me.swirtzly.regeneration.client.gui.parts.BlankContainer;
@@ -9,14 +10,13 @@ import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
 import me.swirtzly.regeneration.common.traits.DnaHandler;
 import me.swirtzly.regeneration.common.types.TypeHandler;
 import me.swirtzly.regeneration.network.MessageChangeType;
-import me.swirtzly.regeneration.network.MessageUpdateModel;
+import me.swirtzly.regeneration.network.MessagetickModel;
 import me.swirtzly.regeneration.network.NetworkHandler;
 import micdoodle8.mods.galacticraft.api.client.tabs.TabRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
 import net.minecraft.client.gui.widget.button.Button;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.client.config.GuiButtonExt;
@@ -40,7 +40,7 @@ public class GuiPreferences extends ContainerScreen {
     @Override
     public void initGui() {
         super.initGui();
-        TabRegistry.updateTabValues(guiLeft, guiTop, InventoryTabRegeneration.class);
+        TabRegistry.tickTabValues(guiLeft, guiTop, InventoryTabRegeneration.class);
         TabRegistry.addTabsToList(this.buttonList);
         int cx = (width - xSize) / 2;
         int cy = (height - ySize) / 2;
@@ -128,7 +128,7 @@ public class GuiPreferences extends ContainerScreen {
                     CHOICES = SkinChangingHandler.EnumChoices.ALEX;
                 }
                 button.displayString = new TranslationTextComponent("regeneration.gui.skintype", new TranslationTextComponent("skintype." + CHOICES.name().toLowerCase())).getUnformattedComponentText();
-                NetworkHandler.INSTANCE.sendToServer(new MessageUpdateModel(CHOICES.name()));
+                NetworkHandler.INSTANCE.sendToServer(new MessagetickModel(CHOICES.name()));
                 break;
         }
     }

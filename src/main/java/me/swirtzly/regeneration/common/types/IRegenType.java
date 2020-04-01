@@ -23,7 +23,7 @@ public interface IRegenType<R extends ATypeRenderer<?>> {
     default void onStartRegeneration(PlayerEntity player, IRegeneration capability) {
     }
 
-    default void onUpdateMidRegen(PlayerEntity player, IRegeneration capability) {
+    default void ontickMidRegen(PlayerEntity player, IRegeneration capability) {
     }
 
     default void onFinishRegeneration(PlayerEntity player, IRegeneration capability) {

@@ -4,7 +4,6 @@ import me.swirtzly.regeneration.RegenConfig;
 import me.swirtzly.regeneration.common.advancements.RegenTriggers;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.entity.EntityLindos;
-import me.swirtzly.regeneration.common.traits.DnaHandler;
 import me.swirtzly.regeneration.common.types.TypeHandler;
 import me.swirtzly.regeneration.network.MessagePlayRegenerationSound;
 import me.swirtzly.regeneration.network.NetworkHandler;
@@ -14,11 +13,10 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.potion.Effects;
 import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
 
 import java.util.UUID;
 
@@ -62,12 +60,12 @@ class ActingServerHandler implements IActingHandler {
                 float nauseaPercentage = 0.5F;
 
                 if (stateProgress > nauseaPercentage) {
-                    PlayerUtil.applyPotionIfAbsent(player, Effects.NAUSEA, (int) (RegenConfig.grace.criticalPhaseLength * 20 * (1 - nauseaPercentage) * 1.5F), 0, false, false);
+                    PlayerUtil.applyPotionIfAbsent(player, Effects.NAUSEA, (int) (RegenConfig.COMMON.criticalPhaseLength * 20 * (1 - nauseaPercentage) * 1.5F), 0, false, false);
                 }
 
-                PlayerUtil.applyPotionIfAbsent(player, Effects.WEAKNESS, (int) (RegenConfig.grace.criticalPhaseLength * 20 * (1 - stateProgress)), 0, false, false);
+                PlayerUtil.applyPotionIfAbsent(player, Effects.WEAKNESS, (int) (RegenConfig.COMMON.criticalPhaseLength * 20 * (1 - stateProgress)), 0, false, false);
 
-                if (player.world.rand.nextDouble() < (RegenConfig.grace.criticalDamageChance / 100F))
+                if (player.world.rand.nextDouble() < (RegenConfig.COMMON.criticalDamageChance.get() / 100F))
                     player.attackEntityFrom(RegenObjects.REGEN_DMG_CRITICAL, player.world.rand.nextFloat() + .5F);
 
                 break;
@@ -76,7 +74,7 @@ class ActingServerHandler implements IActingHandler {
                 float weaknessPercentage = 0.5F;
 
                 if (stateProgress > weaknessPercentage) {
-                    PlayerUtil.applyPotionIfAbsent(player, Effects.WEAKNESS, (int) (RegenConfig.grace.gracePhaseLength * 20 * (1 - weaknessPercentage) + RegenConfig.grace.criticalPhaseLength * 20), 0, false, false);
+                    PlayerUtil.applyPotionIfAbsent(player, Effects.WEAKNESS, (int) (RegenConfig.COMMON.gracePhaseLength.get() * 20 * (1 - weaknessPercentage) + RegenConfig.COMMON.criticalPhaseLength.get() * 20), 0, false, false);
                 }
 
                 break;
@@ -94,12 +92,10 @@ class ActingServerHandler implements IActingHandler {
         // Reduce number of hearts, but compensate with absorption
         player.setAbsorptionAmount(player.getMaxHealth() * (float) HEART_REDUCTION);
 
-        if (!player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).hasModifier(heartModifier)) {
-            player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).applyModifier(heartModifier);
+        if (!player.getAttribute(SharedMonsterAttributes.MAX_HEALTH).hasModifier(heartModifier)) {
+            player.getAttribute(SharedMonsterAttributes.MAX_HEALTH).applyModifier(heartModifier);
         }
 
-        DnaHandler.IDna dna = DnaHandler.getDnaEntry(cap.getDnaType());
-        dna.onRemoved(cap);
         cap.setDnaActive(false);
         player.setHealth(player.getMaxHealth());
     }
@@ -114,8 +110,8 @@ class ActingServerHandler implements IActingHandler {
 
         RegenTriggers.CRITICAL.trigger((ServerPlayerEntity) cap.getPlayer());
 
-        if (!cap.getPlayer().getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).hasModifier(slownessModifier)) {
-            cap.getPlayer().getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(slownessModifier);
+        if (!cap.getPlayer().getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).hasModifier(slownessModifier)) {
+            cap.getPlayer().getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(slownessModifier);
         }
     }
 
@@ -125,14 +121,7 @@ class ActingServerHandler implements IActingHandler {
         RegenTriggers.FIRST_REGENERATION.trigger((ServerPlayerEntity) cap.getPlayer());
         player.addPotionEffect(new EffectInstance(Effects.REGENERATION, RegenConfig.postRegen.postRegenerationDuration * 2, RegenConfig.postRegen.postRegenerationLevel - 1, false, false));
         player.setHealth(player.getMaxHealth());
-        player.setAbsorptionAmount(RegenConfig.postRegen.absorbtionLevel * 2);
-        if (RegenConfig.onRegen.traitsEnabled) {
-            cap.setDnaType(DnaHandler.getRandomDna(player.world.rand).getRegistryName());
-            DnaHandler.IDna newDna = DnaHandler.getDnaEntry(cap.getDnaType());
-            newDna.onAdded(cap);
-            cap.setDnaActive(true);
-            PlayerUtil.sendMessage(player, new TranslationTextComponent(newDna.getLangKey()), true);
-        }
+        player.setAbsorptionAmount(RegenConfig.COMMON.absorbtionLevel.get() * 2);
         RegenUtil.resetNextSkin(player);
     }
 
@@ -147,7 +136,7 @@ class ActingServerHandler implements IActingHandler {
         if (player.world.rand.nextBoolean()) {
             EntityLindos lindos = new EntityLindos(player.world);
             lindos.setLocationAndAngles(player.posX, player.posY + player.getEyeHeight(), player.posZ, 0, 0);
-            player.world.spawnEntity(lindos);
+            player.world.addEntity(lindos);
             player.world.playSound(null, player.getPosition(), RegenObjects.Sounds.REGEN_BREATH, SoundCategory.PLAYERS, 1, 1);
         }
         cap.setDroppedHand(false);
@@ -157,19 +146,18 @@ class ActingServerHandler implements IActingHandler {
     public void onRegenTrigger(IRegeneration cap) {
         PlayerEntity player = cap.getPlayer();
         NetworkHandler.INSTANCE.sendToAllAround(new MessagePlayRegenerationSound(RegenUtil.getRandomSound(TypeHandler.getTypeInstance(cap.getType()).getRegeneratingSounds(), player.world.rand), player.getUniqueID().toString()), new NetworkRegistry.TargetPoint(player.dimension, player.posX, player.posY, player.posZ, 40));
-        player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).removeModifier(MAX_HEALTH_ID);
-        player.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).removeModifier(SLOWNESS_ID);
+        player.getAttribute(SharedMonsterAttributes.MAX_HEALTH).removeModifier(MAX_HEALTH_ID);
+        player.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).removeModifier(SLOWNESS_ID);
         player.setHealth(Math.max(player.getHealth(), 8));
         player.setAbsorptionAmount(0);
 
         player.extinguish();
         player.removePassengers();
         player.clearActivePotions();
-        player.dismountRidingEntity();
 
-        if (RegenConfig.postRegen.resetHunger) player.getFoodStats().setFoodLevel(20);
+        if (RegenConfig.COMMON.resetHunger.get()) player.getFoodStats().setFoodLevel(20);
 
-        if (RegenConfig.postRegen.resetOxygen) player.setAir(300);
+        if (RegenConfig.COMMON.resetOxygen.get()) player.setAir(300);
 
         cap.extractRegeneration(1);
     }

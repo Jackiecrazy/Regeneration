@@ -49,4 +49,9 @@ public class ArchInventory implements IItemHandlerModifiable {
         return archInv.getSlotLimit(slot);
     }
 
+    @Override
+    public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+        return stack.getCapability(CapabilityArch.CAPABILITY).isPresent();
+    }
+
 }

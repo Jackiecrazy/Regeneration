@@ -24,6 +24,7 @@ import me.swirtzly.regeneration.util.EnumCompatModids;
 import me.swirtzly.regeneration.util.PlayerUtil;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -34,12 +35,8 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
 
 @Mod(RegenerationMod.MODID)
 public class RegenerationMod {
@@ -47,7 +44,7 @@ public class RegenerationMod {
     public static final String MODID = "regeneration";
     public static final String NAME = "Regeneration";
     public static final String VERSION = "2.1.7";
-    public static final String UPDATE_URL = "https://raw.githubusercontent.com/Swirtzly/Regeneration/skins/update.json";
+    public static final String tick_URL = "https://raw.githubusercontent.com/Swirtzly/Regeneration/skins/tick.json";
     public static final String DEPS = "required:forge@[14.23.5.2768,);after:tardis@[0.0.7,];after:lucraftcore@[1.12.2-2.4.0,]";
 
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
@@ -72,14 +69,14 @@ public class RegenerationMod {
 
         if (EnumCompatModids.TARDIS.isLoaded()) {
             LOG.info("Tardis mod Detected - Enabling Compatibility");
-            ActingForwarder.register(TardisModHandler.class, Side.SERVER);
+            ActingForwarder.register(TardisModHandler.class, Dist.DEDICATED_SERVER);
             TardisModHandler.registerEventBus();
 
         }
 
         if (EnumCompatModids.LCCORE.isLoaded()) {
             LOG.info("Lucraft Core Detected - Enabling Compatibility");
-            ActingForwarder.register(LucraftCoreHandler.class, Side.SERVER);
+            ActingForwarder.register(LucraftCoreHandler.class, Dist.DEDICATED_SERVER);
             LucraftCoreHandler.registerEventBus();
         }
 

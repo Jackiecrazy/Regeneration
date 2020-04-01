@@ -4,8 +4,7 @@ import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.network.MessageRegenStateEvent;
 import me.swirtzly.regeneration.network.NetworkHandler;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.api.distmarker.Dist;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,14 +14,14 @@ public class ActingForwarder {
     private static List<IActingHandler> SERVER_HANDLERS = new ArrayList<>(), CLIENT_HANDLERS = new ArrayList<>();
 
     public static void init() {
-        register(ActingServerHandler.INSTANCE, Side.SERVER);
+        register(ActingServerHandler.INSTANCE, Dist.DEDICATED_SERVER);
 
-        if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
-            register(ActingClientHandler.INSTANCE, Side.CLIENT);
+        if (FMLCommonHandler.instance().getSide() == Dist.CLIENT) {
+            register(ActingClientHandler.INSTANCE, Dist.CLIENT);
         }
     }
 
-    public static void register(Class<? extends IActingHandler> handlerClass, Side side) {
+    public static void register(Class<? extends IActingHandler> handlerClass, Dist side) {
         try {
             register(handlerClass.newInstance(), side);
         } catch (ReflectiveOperationException e) {
@@ -30,8 +29,8 @@ public class ActingForwarder {
         }
     }
 
-    public static void register(IActingHandler handler, Side side) {
-        (side == Side.CLIENT ? CLIENT_HANDLERS : SERVER_HANDLERS).add(handler);
+    public static void register(IActingHandler handler, Dist side) {
+        (side == Dist.CLIENT ? CLIENT_HANDLERS : SERVER_HANDLERS).add(handler);
     }
 
     public static void onRegenTick(IRegeneration cap) {

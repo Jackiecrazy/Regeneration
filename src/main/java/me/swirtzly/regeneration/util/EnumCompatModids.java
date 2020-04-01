@@ -1,6 +1,7 @@
 package me.swirtzly.regeneration.util;
 
-import net.minecraftforge.fml.common.Loader;
+
+import net.minecraftforge.fml.ModList;
 
 /**
  * This is a helper enum for compat
@@ -19,6 +20,6 @@ public enum EnumCompatModids {
     }
 
     public boolean isLoaded() {
-        return Loader.isModLoaded(getModid());
+        return ModList.get().isLoaded(getModid());
     }
 }

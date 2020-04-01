@@ -1,5 +1,6 @@
 package me.swirtzly.regeneration.client.rendering.layers;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.types.IRegenType;
@@ -7,10 +8,9 @@ import me.swirtzly.regeneration.common.types.TypeHandler;
 import me.swirtzly.regeneration.util.PlayerUtil;
 import me.swirtzly.regeneration.util.RenderUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.ModelPlayer;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
+import net.minecraft.client.renderer.entity.model.PlayerModel;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
 
@@ -24,8 +24,8 @@ import static me.swirtzly.regeneration.util.RenderUtil.drawGlowingLine;
  */
 public class LayerRegeneration implements LayerRenderer<PlayerEntity> {
 
-    public static final ModelPlayer modelSteve = new ModelPlayer(0.1F, false);
-    public static final ModelPlayer modelAlex = new ModelPlayer(0.1F, true);
+    public static final PlayerModel modelSteve = new PlayerModel(0.1F, false);
+    public static final PlayerModel modelAlex = new PlayerModel(0.1F, true);
     private static PlayerRenderer playerRenderer;
 
     public LayerRegeneration(PlayerRenderer playerRenderer) {

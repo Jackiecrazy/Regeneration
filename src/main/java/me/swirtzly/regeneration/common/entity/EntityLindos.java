@@ -55,8 +55,8 @@ public class EntityLindos extends FlyingEntity {
 	}
 
 	@Override
-	public void onUpdate() {
-		super.onUpdate();
+    public void ontick() {
+        super.ontick();
 
 		setNoGravity(true);
 
@@ -96,7 +96,7 @@ public class EntityLindos extends FlyingEntity {
 	}
 
 	@Override
-	protected void updateFallState(double y, boolean onGroundIn, BlockState state, BlockPos pos) {
+    protected void tickFallState(double y, boolean onGroundIn, BlockState state, BlockPos pos) {
 	}
 
 	@Override
@@ -108,9 +108,9 @@ public class EntityLindos extends FlyingEntity {
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getAttributeMap().registerAttribute(SharedMonsterAttributes.FLYING_SPEED);
-		this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(6.0D);
-		this.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).setBaseValue(0.4000000059604645D);
-		this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.20000000298023224D);
+        this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(6.0D);
+        this.getAttribute(SharedMonsterAttributes.FLYING_SPEED).setBaseValue(0.4000000059604645D);
+        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.20000000298023224D);
 	}
 	
 }

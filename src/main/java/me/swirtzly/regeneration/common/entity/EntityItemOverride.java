@@ -6,15 +6,15 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.SoundEvents;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -91,8 +91,8 @@ public class EntityItemOverride extends Entity {
     protected void writeEntityToNBT(CompoundNBT compound) {
         if (!this.getItem().isEmpty()) compound.setTag("Item", this.getItem().writeToNBT(new CompoundNBT()));
 
-        compound.setFloat("Height", getHeight());
-        compound.setFloat("Width", getWidth());
+        compound.putFloat("Height", getHeight());
+        compound.putFloat("Width", getWidth());
     }
 
     public ItemStack getItem() {
@@ -178,8 +178,8 @@ public class EntityItemOverride extends Entity {
      * Gets called every tick from main Entity class
      */
     @Override
-    public void onEntityUpdate() {
-        super.onEntityUpdate();
+    public void onEntitytick() {
+        super.onEntitytick();
         this.prevPosX = this.posX;
         this.prevPosY = this.posY;
         this.prevPosZ = this.posZ;
@@ -194,7 +194,7 @@ public class EntityItemOverride extends Entity {
             if (iEntityOverride.shouldDie(itemStack)) {
                 setDead();
             }
-            iEntityOverride.update(this);
+            iEntityOverride.tick(this);
         }
 
         this.setSize(getWidth(), getHeight());

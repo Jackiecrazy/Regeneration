@@ -19,16 +19,16 @@ import net.minecraft.entity.ai.goal.AvoidEntityGoal;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.inventory.InventoryHelper;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.potion.Effects;
-import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.HandSide;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
 import net.minecraftforge.common.ForgeVersion;
@@ -41,10 +41,10 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerChangedDimensionEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent;
@@ -60,7 +60,7 @@ public class RegenEventHandler {
     // =========== CAPABILITY HANDLING =============
 
     @SubscribeEvent
-    public static void onPlayerUpdate(LivingEvent.LivingUpdateEvent event) {
+    public static void onPlayertick(LivingEvent.LivingtickEvent event) {
         if (event.getEntityLiving() instanceof PlayerEntity) {
             PlayerEntity player = (PlayerEntity) event.getEntityLiving();
             IRegeneration data = CapabilityRegeneration.getForPlayer(player);
@@ -207,20 +207,20 @@ public class RegenEventHandler {
         CompoundNBT nbt = event.player.getEntityData(), persist = nbt.getCompoundTag(PlayerEntity.PERSISTED_NBT_TAG);
         if (!persist.getBoolean("loggedInBefore"))
             CapabilityRegeneration.getForPlayer(event.player).receiveRegenerations(RegenConfig.freeRegenerations);
-        persist.setBoolean("loggedInBefore", true);
+        persist.putBoolean("loggedInBefore", true);
         nbt.setTag(PlayerEntity.PERSISTED_NBT_TAG, persist);
     }
 
     /**
-     * Update checker thing, tells the player that the mods out of date if they're on a old build
+     * tick checker thing, tells the player that the mods out of date if they're on a old build
      */
     @SubscribeEvent
     public static void onPlayerLogin(PlayerLoggedInEvent e) {
         PlayerEntity player = e.player;
-        if (!player.world.isRemote && RegenConfig.enableUpdateChecker) {
+        if (!player.world.isRemote && RegenConfig.enabletickChecker) {
             ForgeVersion.CheckResult version = ForgeVersion.getResult(Loader.instance().activeModContainer());
             if (version.status.equals(ForgeVersion.Status.OUTDATED)) {
-                StringTextComponent url = new StringTextComponent(TextFormatting.AQUA + TextFormatting.BOLD.toString() + "UPDATE");
+                StringTextComponent url = new StringTextComponent(TextFormatting.AQUA + TextFormatting.BOLD.toString() + "tick");
                 url.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://minecraft.curseforge.com/projects/regeneration"));
                 url.getStyle().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new StringTextComponent("Open URL")));
 

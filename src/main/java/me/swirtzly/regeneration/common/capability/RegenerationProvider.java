@@ -4,6 +4,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
+import net.minecraftforge.common.util.LazyOptional;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -20,17 +21,6 @@ public class RegenerationProvider implements ICapabilitySerializable<CompoundNBT
     }
 
     @Override
-    public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable Direction facing) {
-        return CapabilityRegeneration.CAPABILITY != null && capability == CapabilityRegeneration.CAPABILITY;
-    }
-
-    @Nullable
-    @Override
-    public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable Direction facing) {
-        return capability == CapabilityRegeneration.CAPABILITY ? CapabilityRegeneration.CAPABILITY.cast(this.capability) : null;
-    }
-
-    @Override
     public CompoundNBT serializeNBT() {
         return (CompoundNBT) CapabilityRegeneration.CAPABILITY.getStorage().writeNBT(CapabilityRegeneration.CAPABILITY, capability, null);
     }
@@ -39,5 +29,10 @@ public class RegenerationProvider implements ICapabilitySerializable<CompoundNBT
     public void deserializeNBT(CompoundNBT nbt) {
         CapabilityRegeneration.CAPABILITY.getStorage().readNBT(CapabilityRegeneration.CAPABILITY, capability, null, nbt);
     }
-	
+
+    @Nonnull
+    @Override
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+        return CapabilityRegeneration.CAPABILITY != null && capability == CapabilityRegeneration.CAPABILITY;
+    }
 }

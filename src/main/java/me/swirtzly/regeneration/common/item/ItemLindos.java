@@ -9,27 +9,26 @@ import me.swirtzly.regeneration.common.entity.EntityItemOverride;
 import me.swirtzly.regeneration.common.item.arch.IDontStore;
 import me.swirtzly.regeneration.common.tiles.TileEntityHandInJar;
 import me.swirtzly.regeneration.util.PlayerUtil;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.material.Material;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.block.Blocks;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.item.UseAction;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.UseAction;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -40,7 +39,7 @@ public class ItemLindos extends ItemOverrideBase implements IDontStore {
         setMaxStackSize(1);
         addPropertyOverride(new ResourceLocation("amount"), new IItemPropertyGetter() {
             @Override
-            @SideOnly(Side.CLIENT)
+            @OnlyIn(Dist.CLIENT)
             public float apply(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
 
                 if (stack.getTagCompound() != null) {
@@ -85,7 +84,7 @@ public class ItemLindos extends ItemOverrideBase implements IDontStore {
     }
 
     public static int getAmount(ItemStack stack) {
-        return getStackTag(stack).getInteger("amount");
+        return getStackTag(stack).getInt("amount");
     }
 
     public static void setAmount(ItemStack stack, int amount) {
@@ -97,7 +96,7 @@ public class ItemLindos extends ItemOverrideBase implements IDontStore {
     }
 
     public static void setWater(ItemStack stack, boolean water) {
-        getStackTag(stack).setBoolean("water", water);
+        getStackTag(stack).putBoolean("water", water);
     }
 
     @Override
@@ -149,13 +148,13 @@ public class ItemLindos extends ItemOverrideBase implements IDontStore {
     }
 
     @Override
-    public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
+    public void ontick(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
 
         if (stack.getTagCompound() == null) {
             stack.setTagCompound(new CompoundNBT());
-            stack.getTagCompound().setBoolean("live", true);
+            stack.getTagCompound().putBoolean("live", true);
         } else {
-            stack.getTagCompound().setBoolean("live", true);
+            stack.getTagCompound().putBoolean("live", true);
         }
 
         if (!worldIn.isRemote) {
@@ -179,14 +178,14 @@ public class ItemLindos extends ItemOverrideBase implements IDontStore {
                 }
             }
         }
-        super.onUpdate(stack, worldIn, entityIn, itemSlot, isSelected);
+        super.ontick(stack, worldIn, entityIn, itemSlot, isSelected);
     }
 
     @Override
     public ActionResultType onItemUse(PlayerEntity player, World worldIn, BlockPos pos, Hand hand, Direction facing, float hitX, float hitY, float hitZ) {
         if (!worldIn.isRemote) {
             ItemStack itemStack = player.getHeldItem(hand);
-            RayTraceResult raytraceresult = this.rayTrace(worldIn, player, true);
+            RayTraceResult raytraceresult = rayTrace(worldIn, player, true);
 
             if (raytraceresult == null || raytraceresult.getBlockPos() == null) {
                 return ActionResultType.FAIL;
@@ -254,7 +253,7 @@ public class ItemLindos extends ItemOverrideBase implements IDontStore {
     }
 
     @Override
-    public void update(EntityItemOverride itemOverride) {
+    public void tick(EntityItemOverride itemOverride) {
         if (itemOverride.world.isRemote) return;
         ItemStack itemStack = itemOverride.getItem();
         if (itemStack.getItem() == this) {

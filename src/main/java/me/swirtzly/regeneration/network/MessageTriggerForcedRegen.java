@@ -68,7 +68,7 @@ public class MessageTriggerForcedRegen implements IMessage {
                                 RegenTriggers.HAND_JAR_FIRST.trigger(player);
                                 data.getStateManager().fastForward();
                                 detected.markDirty();
-                                detected.sendUpdates();
+                                detected.sendticks();
                                 return;
                             }
                         }
@@ -93,7 +93,7 @@ public class MessageTriggerForcedRegen implements IMessage {
                                         RegenTriggers.HAND_JAR_FIRST.trigger(player);
                                         data.getStateManager().fastForward();
                                         handInJar.markDirty();
-                                        handInJar.sendUpdates();
+                                        handInJar.sendticks();
                                         return;
                                     }
                                 }

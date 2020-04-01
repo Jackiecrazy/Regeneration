@@ -11,9 +11,9 @@ import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
+import net.minecraft.network.play.server.StickTileEntityPacket;
+import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ITickable;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
@@ -23,7 +23,7 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
-public class TileEntityHandInJar extends TileEntity implements ITickable, IInventory {
+public class TileEntityHandInJar extends TileEntity implements ITickableTileEntity, IInventory {
 
 	public int lindosAmont = 0;
 	private NonNullList<ItemStack> handInv = NonNullList.withSize(7, ItemStack.EMPTY);
@@ -37,7 +37,7 @@ public class TileEntityHandInJar extends TileEntity implements ITickable, IInven
 	}
 
 	@Override
-	public void update() {
+	public void tick() {
 
 		if (world.getWorldTime() % 45 == 0 && hasHand()) {
 			world.playSound(null, getPos().getX(), getPos().getY(), getPos().getZ(), RegenObjects.Sounds.JAR_BUBBLES, SoundCategory.PLAYERS, 0.2F, 0.2F);
@@ -64,15 +64,15 @@ public class TileEntityHandInJar extends TileEntity implements ITickable, IInven
 
 	@Override
 	public CompoundNBT writeToNBT(CompoundNBT compound) {
-		compound.setFloat("lindos", lindosAmont);
-		compound.setBoolean("hasHand", hasHand());
+		compound.putFloat("lindos", lindosAmont);
+		compound.putBoolean("hasHand", hasHand());
 		ItemStackHelper.saveAllItems(compound, this.handInv);
 		return super.writeToNBT(compound);
 	}
 
 	@Override
 	public void readFromNBT(CompoundNBT compound) {
-		lindosAmont = compound.getInteger("lindos");
+		lindosAmont = compound.getInt("lindos");
 		ItemStackHelper.loadAllItems(compound, this.handInv);
 		super.readFromNBT(compound);
 	}
@@ -178,25 +178,25 @@ public class TileEntityHandInJar extends TileEntity implements ITickable, IInven
 	}
 
 	@Override
-	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(pos, 3, getUpdateTag());
+	public StickTileEntityPacket gettickPacket() {
+		return new StickTileEntityPacket(pos, 3, gettickTag());
 	}
 
 	@Override
-	public CompoundNBT getUpdateTag() {
+	public CompoundNBT gettickTag() {
 		return writeToNBT(new CompoundNBT());
 	}
 
 	@Override
-	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
+	public void onDataPacket(NetworkManager net, StickTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(pkt.getNbtCompound());
+		handletickTag(pkt.getNbtCompound());
 	}
 
-	public void sendUpdates() {
-		world.markBlockRangeForRenderUpdate(pos, pos);
-		world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
-		world.scheduleBlockUpdate(pos, getBlockType(), 0, 0);
+	public void sendticks() {
+		world.markBlockRangeForRendertick(pos, pos);
+		world.notifyBlocktick(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
+		world.scheduleBlocktick(pos, getBlockType(), 0, 0);
 		markDirty();
 	}
 

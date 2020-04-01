@@ -12,11 +12,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.MovementInput;
-import net.minecraftforge.client.event.InputUpdateEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.InputtickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
 import org.lwjgl.input.Keyboard;
 
 import static me.swirtzly.regeneration.util.PlayerUtil.RegenState.REGENERATING;
@@ -24,7 +24,7 @@ import static me.swirtzly.regeneration.util.PlayerUtil.RegenState.REGENERATING;
 /**
  * Created by Sub on 17/09/2018.
  */
-@EventBusSubscriber(Side.CLIENT)
+@EventBusSubscriber(Dist.CLIENT)
 public class RegenKeyBinds {
     public static KeyBinding REGEN_NOW;
     public static KeyBinding REGEN_FORCEFULLY;
@@ -39,11 +39,11 @@ public class RegenKeyBinds {
     }
 
     @SubscribeEvent
-    public static void keyInput(InputUpdateEvent e) {
+    public static void keyInput(InputtickEvent e) {
         handleGeneralInputs(e);
     }
 
-    public static void handleGeneralInputs(InputUpdateEvent e) {
+    public static void handleGeneralInputs(InputtickEvent e) {
         PlayerEntity player = Minecraft.getInstance().player;
 
         if (player == null || Minecraft.getInstance().currentScreen != null) return;

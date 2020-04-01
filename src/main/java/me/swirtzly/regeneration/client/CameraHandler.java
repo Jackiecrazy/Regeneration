@@ -3,16 +3,16 @@ package me.swirtzly.regeneration.client;
 import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.util.PlayerUtil;
+import net.minecraft.client.GameSettings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.client.GameSettings;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
 import org.lwjgl.input.Mouse;
 
-@EventBusSubscriber(value = Side.CLIENT)
+@EventBusSubscriber(value = Dist.CLIENT)
 public class CameraHandler {
 
     private static float prevYaw = 0;

@@ -1,8 +1,8 @@
 package me.swirtzly.regeneration.client.rendering.entity;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import me.swirtzly.regeneration.util.RenderUtil;
 import net.minecraft.client.Minecraft;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.entity.Entity;
@@ -29,8 +29,8 @@ public class RenderLindos extends EntityRenderer<Entity> {
         float f = 0.1F;
         for (int j = 0; j < 2; j++) {
             RenderUtil.setupRenderLightning();
-            GlStateManager.translate(x, y + 0.20, z);
-            GlStateManager.scale(0.9F, 0.9F, 0.9F);
+            GlStateManager.translated(x, y + 0.20, z);
+            GlStateManager.scalef(0.9F, 0.9F, 0.9F);
             RenderItemOverride.makeGlowingBall(mc, f, rand, primaryColor, secondaryColor);
         }
         GlStateManager.popMatrix();

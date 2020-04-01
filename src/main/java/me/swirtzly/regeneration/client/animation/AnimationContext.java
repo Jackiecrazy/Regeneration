@@ -1,16 +1,16 @@
 package me.swirtzly.regeneration.client.animation;
 
-import net.minecraft.client.model.ModelBiped;
+import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.entity.player.PlayerEntity;
 
 public class AnimationContext {
 
     private float limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch;
-    private ModelBiped modelBiped;
+    private BipedModel BipedModel;
     private PlayerEntity entityPlayer;
 
-    public AnimationContext(ModelBiped model, PlayerEntity player, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        this.modelBiped = model;
+    public AnimationContext(BipedModel model, PlayerEntity player, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+        this.BipedModel = model;
         this.entityPlayer = player;
         this.limbSwing = limbSwing;
         this.limbSwingAmount = limbSwingAmount;
@@ -23,8 +23,8 @@ public class AnimationContext {
         return entityPlayer;
     }
 
-    public ModelBiped getModelBiped() {
-        return modelBiped;
+    public BipedModel getBipedModel() {
+        return BipedModel;
     }
 
     public float getAgeInTicks() {

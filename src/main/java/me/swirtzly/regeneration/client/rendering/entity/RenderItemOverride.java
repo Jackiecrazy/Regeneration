@@ -5,9 +5,10 @@ import me.swirtzly.regeneration.RegenConfig;
 import me.swirtzly.regeneration.common.entity.EntityItemOverride;
 import me.swirtzly.regeneration.handlers.RegenObjects;
 import me.swirtzly.regeneration.util.RenderUtil;
-import net.minecraft.client.Minecraft;;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
@@ -26,17 +27,16 @@ public class RenderItemOverride extends EntityRenderer<EntityItemOverride> {
     }
 
     static void makeGlowingBall(Minecraft mc, float f, Random rand, Vec3d primaryColor, Vec3d secondaryColor) {
-        GlStateManager.rotate((mc.player.ticksExisted + RenderUtil.renderTick) / 2F, 0, 1, 0);
+        GlStateManager.rotated((mc.player.ticksExisted + RenderUtil.renderTick) / 2F, 0, 1, 0);
 
         for (int i = 0; i < 3; i++) {
-            GlStateManager.rotate((mc.player.ticksExisted + RenderUtil.renderTick) * i / 70F, 1, 1, 0);
+            GlStateManager.rotated((mc.player.ticksExisted + RenderUtil.renderTick) * i / 70F, 1, 1, 0);
             RenderUtil.drawGlowingLine(new Vec3d((-f / 2F) + rand.nextFloat() * f, (-f / 2F) + rand.nextFloat() * f, (-f / 2F) + rand.nextFloat() * f), new Vec3d((-f / 2F) + rand.nextFloat() * f, (-f / 2F) + rand.nextFloat() * f, (-f / 2F) + rand.nextFloat() * f), 0.1F, primaryColor, 0);
             RenderUtil.drawGlowingLine(new Vec3d((-f / 2F) + rand.nextFloat() * f, (-f / 2F) + rand.nextFloat() * f, (-f / 2F) + rand.nextFloat() * f), new Vec3d((-f / 2F) + rand.nextFloat() * f, (-f / 2F) + rand.nextFloat() * f, (-f / 2F) + rand.nextFloat() * f), 0.1F, secondaryColor, 0);
         }
         RenderUtil.finishRenderLightning();
     }
 
-    @Nullable
     @Override
     protected ResourceLocation getEntityTexture(EntityItemOverride entity) {
         return null;
@@ -56,8 +56,8 @@ public class RenderItemOverride extends EntityRenderer<EntityItemOverride> {
         if (entity.getItem().getItem() == RegenObjects.Items.FOB_WATCH && entity.getItem().getItemDamage() != RegenConfig.regenCapacity) {
             for (int j = 0; j < 2; j++) {
                 RenderUtil.setupRenderLightning();
-                GlStateManager.translate(x, y + 0.20, z);
-                GlStateManager.scale(0.7F, 0.7F, 0.7F);
+                GlStateManager.translatef(x, y + 0.20, z);
+                GlStateManager.scalef(0.7F, 0.7F, 0.7F);
                 makeGlowingBall(mc, f, rand, primaryColor, secondaryColor);
             }
         }
@@ -68,8 +68,8 @@ public class RenderItemOverride extends EntityRenderer<EntityItemOverride> {
             if (look != null && look == entity) {
                 float offset = MathHelper.cos(entity.ticksExisted * 0.1F) * -0.09F;
                 GlStateManager.pushMatrix();
-                GlStateManager.translate(0, 0.4F, 0);
-                GlStateManager.scale(0.60F, 0.60F, 0.60F);
+                GlStateManager.translatef(0, 0.4F, 0);
+                GlStateManager.scalef(0.60F, 0.60F, 0.60F);
                 this.renderLivingLabel(entity, new TranslationTextComponent("right.click", Minecraft.getInstance().gameSettings.keyBindUseItem.getDisplayName()).getUnformattedComponentText(), x, y + 0.4 + offset, z, 46);
                 GlStateManager.popMatrix();
             }
@@ -77,9 +77,9 @@ public class RenderItemOverride extends EntityRenderer<EntityItemOverride> {
 
         GlStateManager.popMatrix();
 
-        GlStateManager.translate(x, y + 0.17F, z);
-        GlStateManager.rotate(-entity.rotationYaw, 0, 1, 0);
-        Minecraft.getInstance().getRenderItem().renderItem(entity.getItem(), ItemCameraTransforms.TransformType.GROUND);
+        GlStateManager.translatef(fx, y + 0.17F, z);
+        GlStateManager.rotatef(-entity.rotationYaw, 0, 1, 0);
+        Minecraft.getInstance().getItemRenderer().renderItem(entity.getItem(), ItemCameraTransforms.TransformType.GROUND);
         GlStateManager.popMatrix();
     }
 	

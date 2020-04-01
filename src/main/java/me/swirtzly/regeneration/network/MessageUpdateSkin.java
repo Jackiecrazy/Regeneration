@@ -13,15 +13,15 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 /**
  * Created by Sub on 20/09/2018.
  */
-public class MessageUpdateSkin implements IMessage {
+public class MessagetickSkin implements IMessage {
 
     private boolean isAlex;
     private String encodedSkin;
 
-    public MessageUpdateSkin() {
+    public MessagetickSkin() {
     }
 
-    public MessageUpdateSkin(String pixelData, boolean isAlex) {
+    public MessagetickSkin(String pixelData, boolean isAlex) {
         encodedSkin = pixelData;
         this.isAlex = isAlex;
     }
@@ -38,9 +38,9 @@ public class MessageUpdateSkin implements IMessage {
         buf.writeBoolean(isAlex);
     }
 
-    public static class Handler implements IMessageHandler<MessageUpdateSkin, IMessage> {
+    public static class Handler implements IMessageHandler<MessagetickSkin, IMessage> {
         @Override
-        public IMessage onMessage(MessageUpdateSkin message, MessageContext ctx) {
+        public IMessage onMessage(MessagetickSkin message, MessageContext ctx) {
             ctx.getServerHandler().player.getServerWorld().addScheduledTask(() -> {
                 ServerPlayerEntity player = ctx.getServerHandler().player;
                 IRegeneration cap = CapabilityRegeneration.getForPlayer(player);

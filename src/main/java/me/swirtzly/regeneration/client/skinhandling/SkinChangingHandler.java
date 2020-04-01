@@ -9,7 +9,7 @@ import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.types.IRegenType;
 import me.swirtzly.regeneration.common.types.TypeHandler;
-import me.swirtzly.regeneration.network.MessageUpdateSkin;
+import me.swirtzly.regeneration.network.MessagetickSkin;
 import me.swirtzly.regeneration.network.NetworkHandler;
 import me.swirtzly.regeneration.util.ClientUtil;
 import me.swirtzly.regeneration.util.FileUtil;
@@ -24,13 +24,13 @@ import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.client.resources.SkinManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.RenderPlayerEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -46,7 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class SkinChangingHandler {
 
     public static final File SKIN_DIRECTORY = new File(RegenConfig.skins.skinDir + "/Regeneration/skins/");
@@ -88,7 +88,7 @@ public class SkinChangingHandler {
         return image;
     }
 
-    public static void sendSkinUpdate(Random random, PlayerEntity player) {
+    public static void sendSkintick(Random random, PlayerEntity player) {
         if (Minecraft.getInstance().player.getUniqueID() != player.getUniqueID()) // Not our Player
             return;
 
@@ -105,13 +105,13 @@ public class SkinChangingHandler {
                 RegenerationMod.LOG.info(skin + " was choosen");
                 try {
                     pixelData = SkinChangingHandler.imageToPixelData(skin);
-                    NetworkHandler.INSTANCE.sendToServer(new MessageUpdateSkin(pixelData, isAlex));
+                    NetworkHandler.INSTANCE.sendToServer(new MessagetickSkin(pixelData, isAlex));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             } else {
                 pixelData = cap.getNextSkin();
-                NetworkHandler.INSTANCE.sendToServer(new MessageUpdateSkin(pixelData, cap.getNextSkinType() == SkinInfo.SkinType.ALEX));
+                NetworkHandler.INSTANCE.sendToServer(new MessagetickSkin(pixelData, cap.getNextSkinType() == SkinInfo.SkinType.ALEX));
             }
 
         } else {
@@ -137,7 +137,7 @@ public class SkinChangingHandler {
         return (File) skins.toArray()[rand.nextInt(skins.size())];
     }
 
-    public static SkinInfo update(AbstractClientPlayerEntity player) {
+    public static SkinInfo tick(AbstractClientPlayerEntity player) {
         IRegeneration data = CapabilityRegeneration.getForPlayer(player);
         SkinInfo skinData = PlayerDataPool.get(player);
         boolean shouldBeMojang = data.getEncodedSkin().toLowerCase().equals("none") || data.getEncodedSkin().equals(" ") || data.getEncodedSkin().equals("");
@@ -162,8 +162,8 @@ public class SkinChangingHandler {
             }
         }
 
-        SkinInfo newData = skinData.setSkintype(getSkinType(player, false)).setUpdateRequired(false);
-        PlayerDataPool.updatePlayer(player, newData);
+        SkinInfo newData = skinData.setSkintype(getSkinType(player, false)).settickRequired(false);
+        PlayerDataPool.tickPlayer(player, newData);
         return newData;
     }
 
@@ -302,12 +302,12 @@ public class SkinChangingHandler {
         SkinInfo skinData = PlayerDataPool.get(player);
 
         if (skinData == null) {
-            skinData = update(player);
+            skinData = tick(player);
             PlayerDataPool.addPlayer(player, skinData);
         }
 
-        if (player.ticksExisted < 20 || skinData.isUpdateRequired()) {
-            update(player);
+        if (player.ticksExisted < 20 || skinData.istickRequired()) {
+            tick(player);
         }
 
         setPlayerSkin(player, skinData.getTextureLocation());
@@ -315,7 +315,7 @@ public class SkinChangingHandler {
 
         if (cap.getState() == PlayerUtil.RegenState.REGENERATING) {
             if (type.getAnimationProgress(cap) > 0.7) {
-                // update(player);
+                // tick(player);
             }
             type.getRenderer().onRenderRegeneratingPlayerPre(type, e, cap);
         }

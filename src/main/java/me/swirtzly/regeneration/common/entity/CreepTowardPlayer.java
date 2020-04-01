@@ -26,7 +26,7 @@ public class CreepTowardPlayer extends MeleeAttackGoal {
 
     private boolean isPlayerLookingInMyGeneralDirection() {
         BlockPos position = eyes.getPosition().up();
-        float blockLight = eyes.world.getLight(position, false);
+        float blockLight = eyes.world.getLight(position);
         if (blockLight >= 8) return true;
 
         Vector3d selfPos = new Vector3d(eyes.posX, eyes.posY, eyes.posZ);

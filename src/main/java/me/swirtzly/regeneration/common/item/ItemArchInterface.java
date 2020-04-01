@@ -2,19 +2,20 @@ package me.swirtzly.regeneration.common.item;
 
 import me.swirtzly.regeneration.common.item.arch.IDontStore;
 import me.swirtzly.regeneration.common.item.arch.capability.CapabilityArch;
-import net.minecraft.client.gui.screen.inventory.InventoryScreen;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemGroup;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTBase;
-import net.minecraft.util.*;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -95,7 +96,7 @@ public class ItemArchInterface extends Item implements IDontStore {
     public void readNBTShareTag(ItemStack stack, @Nullable CompoundNBT nbt) {
         super.readNBTShareTag(stack, nbt);
         if (nbt != null && stack != null) {
-            if (nbt.hasKey("cap_sync")) {
+            if (nbt.contains("cap_sync")) {
                 CapabilityArch.getForStack(stack).deserializeNBT((CompoundNBT) nbt.getTag("arch_sync"));
             }
         }
@@ -157,7 +158,7 @@ public class ItemArchInterface extends Item implements IDontStore {
 
         tooltip.add(new TranslationTextComponent("item.info.purpose").getUnformattedComponentText());
 
-        if (InventoryScreen.isShiftKeyDown()) {
+        if (Screen.hasShiftDown()) {
             tooltip.add(new TranslationTextComponent("item.info.arch_power").getUnformattedComponentText());
             tooltip.add(new TranslationTextComponent("item.info.arch_power2").getUnformattedComponentText());
             tooltip.add(new TranslationTextComponent("item.info.arch_use").getUnformattedComponentText());

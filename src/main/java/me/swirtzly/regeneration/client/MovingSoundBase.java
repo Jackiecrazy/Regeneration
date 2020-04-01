@@ -29,7 +29,7 @@ public class MovingSoundBase extends TickableSound {
     }
 
     @Override
-    public void update() {
+    public void tick() {
 
         if (entity instanceof Entity) {
             Entity entityObject = (Entity) entity;

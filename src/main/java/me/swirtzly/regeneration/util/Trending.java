@@ -28,7 +28,7 @@ public class Trending {
     public static File USER_STEVE = new File(SKIN_DIRECTORY_STEVE + "/the_past");
 
     public static void downloadPreviousSkins() {
-        if (!RegenConfig.skins.downloadPastSkins) return;
+        if (!RegenConfig.CLIENT.downloadPreviousSkins.get()) return;
         RegenerationMod.LOG.warn("Refreshing users past skins");
 
         if (!USER_ALEX.exists()) {
@@ -78,7 +78,7 @@ public class Trending {
     }
 
     public static void downloadTrendingSkins() throws IOException {
-        if (!RegenConfig.skins.downloadTrendingSkins) return;
+        if (!RegenConfig.CLIENT.downloadTrendingSkins.get()) return;
         File trendingDir = TRENDING_ALEX;
         if (!trendingDir.exists()) {
             trendingDir.mkdirs();
@@ -95,7 +95,7 @@ public class Trending {
     }
 
     public static void handleDownloads() throws IOException {
-        if (!RegenConfig.skins.downloadInternalSkins) return;
+        if (!RegenConfig.CLIENT.downloadInteralSkins.get()) return;
         String PACKS_URL = "https://raw.githubusercontent.com/Swirtzly/Regeneration/skins/index.json";
         String[] links = RegenerationMod.GSON.fromJson(getJsonFromURL(PACKS_URL), String[].class);
         for (String link : links) {

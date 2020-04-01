@@ -6,11 +6,11 @@ import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.tiles.TileEntityHandInJar;
 import me.swirtzly.regeneration.handlers.RegenObjects;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.block.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
@@ -60,7 +60,7 @@ public class RegenUtil {
                                     TileEntity tileEntity = world.getTileEntity(new BlockPos(x, y, z));
                                     if (tileEntity instanceof IInventory) {
                                         InventoryHelper.dropInventoryItems(world, pos, (IInventory) tileEntity);
-                                        world.updateComparatorOutputLevel(pos, block.getBlock());
+                                        world.tickComparatorOutputLevel(pos, block.getBlock());
                                     }
                                 }
 

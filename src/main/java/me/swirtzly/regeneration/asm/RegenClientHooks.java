@@ -7,10 +7,10 @@ import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.util.PlayerUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.entity.LivingRenderer;
+import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.monster.CreeperEntity;
@@ -30,7 +30,7 @@ public class RegenClientHooks {
     public static int colorModeCache;
     public static float savedGreen, savedRed, savedBlue;
 
-    public static void handleRotations(ModelBiped model, float f, float f1, float f2, float f3, float f4, float f5, Entity entity) {
+    public static void handleRotations(BipedModel model, float f, float f1, float f2, float f3, float f4, float f5, Entity entity) {
         if (entity == null) return;
         ModelRotationEvent rotationEvent = new ModelRotationEvent(entity, model, f, f1, f2, f3, f4, f5);
         MinecraftForge.EVENT_BUS.post(rotationEvent);

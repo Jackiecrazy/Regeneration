@@ -1,11 +1,12 @@
 package me.swirtzly.regeneration.client.rendering.entity;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import me.swirtzly.regeneration.RegenerationMod;
 import me.swirtzly.regeneration.common.entity.EntityWatcher;
-import net.minecraft.client.model.ModelPlayer;
-import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.entity.MobRenderer;
+import net.minecraft.client.renderer.entity.model.PlayerModel;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nullable;
@@ -18,7 +19,13 @@ public class RenderWatcher extends MobRenderer<EntityWatcher> {
     private ResourceLocation texture = new ResourceLocation(RegenerationMod.MODID, "textures/entity/the_watcher.png");
 
     public RenderWatcher(EntityRendererManager rendermanagerIn) {
-        super(rendermanagerIn, new ModelPlayer(0.1F, false), 0);
+        super(rendermanagerIn, new PlayerModel(0.1F, false), 0);
+    }
+
+    @Nullable
+    @Override
+    protected ResourceLocation getEntityTexture(Entity entity) {
+        return texture;
     }
 
     @Override
@@ -32,11 +39,5 @@ public class RenderWatcher extends MobRenderer<EntityWatcher> {
         GlStateManager.disableAlpha();
         GlStateManager.disableBlend();
         GlStateManager.popMatrix();
-    }
-
-    @Nullable
-    @Override
-    protected ResourceLocation getEntityTexture(EntityWatcher entity) {
-        return texture;
     }
 }

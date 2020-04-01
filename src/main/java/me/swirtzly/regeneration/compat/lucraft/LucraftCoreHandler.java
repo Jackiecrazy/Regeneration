@@ -17,12 +17,12 @@ import me.swirtzly.regeneration.util.ClientUtil;
 import me.swirtzly.regeneration.util.PlayerUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraftforge.client.event.InputUpdateEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.event.InputtickEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import static me.swirtzly.regeneration.util.PlayerUtil.RegenState.REGENERATING;
 
@@ -46,8 +46,8 @@ public class LucraftCoreHandler implements IActingHandler {
     }
 
     @SubscribeEvent
-    @SideOnly(Side.CLIENT)
-    public void onInput(InputUpdateEvent tickEvent) {
+    @OnlyIn(Dist.CLIENT)
+    public void onInput(InputtickEvent tickEvent) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.currentScreen == null && minecraft.player != null) {
             ClientUtil.keyBind = getKeyBindDisplayName();
@@ -113,7 +113,7 @@ public class LucraftCoreHandler implements IActingHandler {
     }
 
     @SubscribeEvent(receiveCanceled = true)
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public void onAnimation(RenderModelEvent.SetRotationAngels ev) {
         if (ev.getEntity() instanceof PlayerEntity) {
             AnimationContext context = new AnimationContext(ev.model, (PlayerEntity) ev.getEntity(), ev.limbSwing, ev.limbSwingAmount, ev.ageInTicks, ev.netHeadYaw, ev.headPitch);

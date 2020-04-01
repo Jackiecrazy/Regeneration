@@ -4,7 +4,7 @@ import net.minecraft.item.ItemStack;
 
 public interface IEntityOverride {
 
-    void update(EntityItemOverride itemOverride);
+    void tick(EntityItemOverride itemOverride);
 
     boolean shouldDie(ItemStack stack);
 }

@@ -1,5 +1,6 @@
 package me.swirtzly.regeneration.client.gui;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import me.swirtzly.regeneration.RegenerationMod;
 import me.swirtzly.regeneration.client.gui.parts.BlankContainer;
 import me.swirtzly.regeneration.client.gui.parts.FileButton;
@@ -14,9 +15,8 @@ import me.swirtzly.regeneration.util.FileUtil;
 import micdoodle8.mods.galacticraft.api.client.tabs.TabRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.client.config.GuiButtonExt;
@@ -70,7 +70,7 @@ public class GuiSkinChange extends ContainerScreen {
             }
     }
 
-    public static void updateModels(File file) {
+    public static void tickModels(File file) {
         try {
             isAlex = ImageDownloadAlt.isAlexSkin(ImageIO.read(file));
         } catch (IOException e) {
@@ -86,7 +86,7 @@ public class GuiSkinChange extends ContainerScreen {
                 FileButton BUTTON = new FileButton(scrollButtonList.size() + 3, posX + 8, posY + 7 + (24 * (scrollButtonList.size())), skin.getName().replaceAll(".png", ""));
                 BUTTON.setFile(skin);
                 this.scrollButtonList.add(BUTTON);
-                updateButtonsList();
+                tickButtonsList();
             }
         } else {
             if (textFieldValue.getText().isEmpty()) {
@@ -96,7 +96,7 @@ public class GuiSkinChange extends ContainerScreen {
                         FileButton BUTTON = new FileButton(scrollButtonList.size() + 3, posX + 8, posY + 7 + (24 * (scrollButtonList.size())), skin.getName().replaceAll(".png", ""));
                         BUTTON.setFile(skin);
                         this.scrollButtonList.add(BUTTON);
-                        updateButtonsList();
+                        tickButtonsList();
                     }
                 }
             }
@@ -132,9 +132,9 @@ public class GuiSkinChange extends ContainerScreen {
     }
 
     @Override
-    public void updateScreen() {
-        super.updateScreen();
-        textFieldValue.updateCursorCounter();
+    public void tickScreen() {
+        super.tickScreen();
+        textFieldValue.tickCursorCounter();
     }
 
     @Override
@@ -161,12 +161,12 @@ public class GuiSkinChange extends ContainerScreen {
         }
 
         if (button instanceof FileButton) {
-            FileButton buttonUpdate = (FileButton) button;
-            PLAYER_TEXTURE = SkinChangingHandler.createGuiTexture(buttonUpdate.getFile());
-            updateModels(buttonUpdate.getFile());
-            skinName = buttonUpdate.getFile().getName().substring(0, 1).toUpperCase() + buttonUpdate.getFile().getName().substring(1).replaceAll(".png", "");
+            FileButton buttontick = (FileButton) button;
+            PLAYER_TEXTURE = SkinChangingHandler.createGuiTexture(buttontick.getFile());
+            tickModels(buttontick.getFile());
+            skinName = buttontick.getFile().getName().substring(0, 1).toUpperCase() + buttontick.getFile().getName().substring(1).replaceAll(".png", "");
             btnSave.enabled = true;
-            skinData = SkinChangingHandler.imageToPixelData(buttonUpdate.getFile());
+            skinData = SkinChangingHandler.imageToPixelData(buttontick.getFile());
         }
     }
 
@@ -190,7 +190,7 @@ public class GuiSkinChange extends ContainerScreen {
         textFieldValue.setEnableBackgroundDrawing(true);
 
         super.initGui();
-        TabRegistry.updateTabValues(guiLeft, guiTop, InventoryTabRegeneration.class);
+        TabRegistry.tickTabValues(guiLeft, guiTop, InventoryTabRegeneration.class);
         TabRegistry.addTabsToList(this.buttonList);
         final int btnW = 68, btnH = 17;
 
@@ -203,14 +203,14 @@ public class GuiSkinChange extends ContainerScreen {
 
         skinName = skinName.substring(0, 1).toUpperCase() + skinName.substring(1).replaceAll(".png", "");
 
-        this.updateButtonsList();
+        this.tickButtonsList();
     }
 
     public boolean needsScrollbar() {
         return this.scrollButtonList.size() > 8;
     }
 
-    public void updateButtonsList() {
+    public void tickButtonsList() {
         this.buttonList.clear();
         addButton(btnOpenFolder);
         addButton(btnBack);
@@ -228,32 +228,32 @@ public class GuiSkinChange extends ContainerScreen {
         }
     }
 
-    public void updateScrollPositon(int change) {
+    public void tickScrollPositon(int change) {
         if (change != 0 && this.needsScrollbar()) {
             this.scrollbarPosY = change;
             if (this.scrollbarPosY > 85) this.scrollbarPosY = 85;
             if (this.scrollbarPosY < 00) this.scrollbarPosY = 00;
-            this.updateScrollIndex();
+            this.tickScrollIndex();
         }
     }
 
-    public void updateScrollIndex() {
+    public void tickScrollIndex() {
         if (this.scrollbarPosY <= this.scrollbarChangeReq) {
             this.scrollbarIndex = 0;
             this.scrollbarChange = this.scrollbarPosY;
 
-            this.updateButtonsList();
+            this.tickButtonsList();
         } else if (this.scrollbarPosY - this.scrollbarChange >= this.scrollbarChangeReq) {
             this.scrollbarIndex++;
             this.scrollbarChange = this.scrollbarPosY;
-            this.updateButtonsList();
+            this.tickButtonsList();
         } else if (this.scrollbarPosY - this.scrollbarChange <= (-1 * this.scrollbarChangeReq)) {
             this.scrollbarIndex--;
             this.scrollbarChange = this.scrollbarPosY;
 
             if (this.scrollbarIndex < 0) this.scrollbarIndex = 0;
 
-            this.updateButtonsList();
+            this.tickButtonsList();
         }
     }
 
@@ -271,7 +271,7 @@ public class GuiSkinChange extends ContainerScreen {
 
         int wheelState;
         if ((wheelState = Mouse.getEventDWheel()) != 0)
-            this.updateScrollPositon(this.scrollbarPosY - (wheelState / 10));
+            this.tickScrollPositon(this.scrollbarPosY - (wheelState / 10));
     }
 
     @Override
@@ -303,7 +303,7 @@ public class GuiSkinChange extends ContainerScreen {
         int posY = (this.height - this.ySize) / 2;
 
         if (Mouse.isButtonDown(0) && this.isScrollPressed) {
-            this.updateScrollPositon(mouseY - posY);
+            this.tickScrollPositon(mouseY - posY);
 
             if (!Mouse.isButtonDown(0)) this.isScrollPressed = false;
         }

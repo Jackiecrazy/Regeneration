@@ -1,5 +1,6 @@
 package me.swirtzly.regeneration.client.gui;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import me.swirtzly.regeneration.RegenerationMod;
 import me.swirtzly.regeneration.client.gui.parts.ContainerArch;
 import me.swirtzly.regeneration.client.gui.parts.InventoryTabArch;
@@ -10,17 +11,16 @@ import micdoodle8.mods.galacticraft.api.client.tabs.TabRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.button.Button;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.client.config.GuiButtonExt;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.IOException;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class GuiArchInterface extends ContainerScreen {
     private static final ResourceLocation TEXTURE = new ResourceLocation(RegenerationMod.MODID, "textures/gui/hij.png");
     private final ArchInventory archInv;
@@ -35,7 +35,7 @@ public class GuiArchInterface extends ContainerScreen {
     @Override
     public void initGui() {
         super.initGui();
-        TabRegistry.updateTabValues(guiLeft, guiTop, InventoryTabArch.class);
+        TabRegistry.tickTabValues(guiLeft, guiTop, InventoryTabArch.class);
         TabRegistry.addTabsToList(this.buttonList);
 
         int cx = (width - xSize) / 2;

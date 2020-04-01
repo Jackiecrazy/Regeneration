@@ -1,5 +1,6 @@
 package me.swirtzly.regeneration.client.rendering.types;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import me.swirtzly.regeneration.client.animation.AnimationContext;
 import me.swirtzly.regeneration.client.animation.RenderCallbackEvent;
 import me.swirtzly.regeneration.client.skinhandling.SkinChangingHandler;
@@ -9,14 +10,12 @@ import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.types.TypeFiery;
 import me.swirtzly.regeneration.common.types.TypeHandler;
 import me.swirtzly.regeneration.util.RenderUtil;
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.model.ModelBiped;
-import net.minecraft.client.model.ModelPlayer;
 import net.minecraft.client.renderer.BufferBuilder;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.LivingRenderer;
+import net.minecraft.client.renderer.entity.model.BipedModel;
+import net.minecraft.client.renderer.entity.model.PlayerModel;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -44,8 +43,8 @@ public class TypeFieryRenderer extends ATypeRenderer<TypeFiery> {
 
         for (int i = 0; i < 8; i++) {
             GlStateManager.pushMatrix();
-            GlStateManager.rotate(entityPlayer.ticksExisted * 4 + i * 45, 0.0F, 1.0F, 0.0F);
-            GlStateManager.scale(1.0f, 1.0f, 0.65f);
+            GlStateManager.rotatef(entityPlayer.ticksExisted * 4 + i * 45, 0.0F, 1.0F, 0.0F);
+            GlStateManager.scalef(1.0f, 1.0f, 0.65f);
             vertexBuffer.begin(6, DefaultVertexFormats.POSITION_COLOR);
             vertexBuffer.pos(0.0D, 0.0D, 0.0D).color((float) color.x, (float) color.y, (float) color.z, 55).endVertex();
             vertexBuffer.pos(-0.266D * scale, scale, -0.5F * scale).color((float) color.x, (float) color.y, (float) color.z, 55).endVertex();
@@ -66,10 +65,10 @@ public class TypeFieryRenderer extends ATypeRenderer<TypeFiery> {
         GlStateManager.blendFunc(770, 1);
         Vec3d color = CapabilityRegeneration.getForPlayer(entityPlayer).getPrimaryColor();
         float opacity = MathHelper.clamp(MathHelper.sin((entityPlayer.ticksExisted + partialTicks) / 10F) * 0.1F + 0.1F, 0.11F, 1F);
-        GlStateManager.color((float) color.x, (float) color.y, (float) color.z, opacity);
+        GlStateManager.color4f((float) color.x, (float) color.y, (float) color.z, opacity);
 
         if (base == null) {
-            if (SkinChangingHandler.getSkinType((AbstractClientPlayerEntity) entityPlayer, false) == SkinInfo.SkinType.STEVE) {
+            if (SkinChangingHandler.getSkinType(entityPlayer, false) == SkinInfo.SkinType.STEVE) {
                 modelSteve.isChild = false;
                 modelSteve.render(entityPlayer, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
             } else {
@@ -77,7 +76,7 @@ public class TypeFieryRenderer extends ATypeRenderer<TypeFiery> {
                 modelAlex.render(entityPlayer, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
             }
         } else {
-            GlStateManager.scale(1.1, 1.1, 1.);
+            GlStateManager.scaled(1.1, 1.1, 1.);
             base.render(entityPlayer, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
         }
         RenderUtil.restoreLightMap();
@@ -140,7 +139,7 @@ public class TypeFieryRenderer extends ATypeRenderer<TypeFiery> {
     public boolean onAnimateRegen(AnimationContext animationContext) {
         PlayerEntity player = animationContext.getEntityPlayer();
         IRegeneration data = CapabilityRegeneration.getForPlayer(player);
-        ModelBiped playerModel = animationContext.getModelBiped();
+        BipedModel playerModel = animationContext.getBipedModel();
         double animationProgress = data.getAnimationTicks();
         double arm_shake = player.getRNG().nextDouble();
 
@@ -234,8 +233,8 @@ public class TypeFieryRenderer extends ATypeRenderer<TypeFiery> {
         // Render head cone
         GlStateManager.pushMatrix();
 
-        if (renderLivingBase.getMainModel() instanceof ModelPlayer) {
-            ModelPlayer player = (ModelPlayer) renderLivingBase.getMainModel();
+        if (renderLivingBase.getMainModel() instanceof PlayerModel) {
+            PlayerModel player = (PlayerModel) renderLivingBase.getMainModel();
             player.bipedHead.postRender(0.0625F);
         }
 

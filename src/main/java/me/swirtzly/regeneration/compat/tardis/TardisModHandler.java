@@ -9,22 +9,16 @@ import me.swirtzly.regeneration.handlers.RegenObjects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.play.server.SSpawnParticlePacket;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Hand;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.tardis.mod.common.dimensions.TDimensions;
-import net.tardis.mod.common.dimensions.WorldProviderTardis;
-import net.tardis.mod.common.entities.controls.ControlDoor;
-import net.tardis.mod.common.sounds.TSounds;
-import net.tardis.mod.common.systems.SystemDimension;
-import net.tardis.mod.common.systems.TardisSystems;
-import net.tardis.mod.common.tileentity.TileEntityTardis;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.tardis.mod.dimensions.TardisDimension;
 
 import java.util.Random;
 
@@ -41,7 +35,7 @@ public class TardisModHandler implements IActingHandler {
 
     @Override
     public void onEnterGrace(IRegeneration cap) {
-        if (cap.getPlayer().world.provider instanceof WorldProviderTardis) {
+        if (cap.getPlayer().world.dimension instanceof TardisDimension) {
             playBells(cap, true);
         }
 
@@ -49,14 +43,14 @@ public class TardisModHandler implements IActingHandler {
 
     @Override
     public void onHandsStartGlowing(IRegeneration cap) {
-        if (cap.getPlayer().world.provider instanceof WorldProviderTardis) {
+        if (cap.getPlayer().world.dimension instanceof TardisDimension) {
             playBells(cap, true);
         }
     }
 
     @Override
     public void onRegenFinish(IRegeneration cap) {
-        if (cap.getPlayer().world.provider instanceof WorldProviderTardis) {
+        if (cap.getPlayer().world.dimension instanceof TardisDimension) {
             playBells(cap, true);
         }
     }
@@ -80,13 +74,13 @@ public class TardisModHandler implements IActingHandler {
 
     @Override
     public void onGoCritical(IRegeneration cap) {
-        if (cap.getPlayer().world.provider instanceof WorldProviderTardis) {
+        if (cap.getPlayer().world.dimension instanceof TardisDimension) {
             playBells(cap, true);
         }
     }
 
     private void playBells(IRegeneration cap, boolean force) {
-        if (cap.getPlayer().ticksExisted % 1200 == 0 && cap.getPlayer().world.provider instanceof WorldProviderTardis || force) {
+        if (cap.getPlayer().ticksExisted % 1200 == 0 && cap.getPlayer().world.dimension instanceof TardisDimension || force) {
             cap.getPlayer().world.playSound(null, cap.getPlayer().getPosition(), TSounds.cloister_bell, SoundCategory.BLOCKS, 1, 1);
         }
     }
@@ -105,7 +99,7 @@ public class TardisModHandler implements IActingHandler {
             if (controlDoor != null && controlDoor.isOpen()) {
                 controlDoor.processInitialInteract(player, Hand.MAIN_HAND);
             }
-
+            ParticleTypes
             // Lets damage some systems
             TardisSystems.BaseSystem[] systems = tileEntityTardis.systems;
             for (TardisSystems.BaseSystem system : systems) {
@@ -132,7 +126,7 @@ public class TardisModHandler implements IActingHandler {
     }
 
     @SubscribeEvent
-    public void onLivingUpdate(LivingEvent.LivingUpdateEvent event) {
+    public void onLivingtick(LivingEvent.LivingtickEvent event) {
         if (event.getEntityLiving() instanceof PlayerEntity) {
             PlayerEntity player = (PlayerEntity) event.getEntityLiving();
             IRegeneration data = CapabilityRegeneration.getForPlayer(player);

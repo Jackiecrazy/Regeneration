@@ -4,33 +4,30 @@ import me.swirtzly.regeneration.client.MovingSoundBase;
 import me.swirtzly.regeneration.client.skinhandling.SkinChangingHandler;
 import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
-import me.swirtzly.regeneration.network.MessageUpdateSkin;
+import me.swirtzly.regeneration.network.MessagetickSkin;
 import me.swirtzly.regeneration.network.NetworkHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.toasts.SystemToast;
 import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.model.ModelPlayer;
-import net.minecraft.client.model.ModelRenderer;
+import net.minecraft.client.renderer.entity.model.PlayerModel;
+import net.minecraft.client.renderer.entity.model.RendererModel;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.ScreenShotHelper;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import java.io.File;
-import java.io.IOException;
 import java.util.function.Supplier;
 
 public class ClientUtil {
 
-    public static final ModelPlayer playerModelSteve = new ModelPlayer(0.1F, false);
-    public static final ModelPlayer playerModelAlex = new ModelPlayer(0.1F, true);
+    public static final PlayerModel playerModelSteve = new PlayerModel(0.1F, false);
+    public static final PlayerModel playerModelAlex = new PlayerModel(0.1F, true);
 
     public static String keyBind = "???"; // WAFFLE there was a weird thing with this somewhere that I still need to fix
 
@@ -46,25 +43,25 @@ public class ClientUtil {
      * This is a method that sends a packet to the server telling the server to reset the players Player model and skin back to the ones supplied by Mojang
      */
     public static void sendSkinResetPacket() {
-        NetworkHandler.INSTANCE.sendToServer(new MessageUpdateSkin("none", SkinChangingHandler.getSkinType(Minecraft.getInstance().player, true).getMojangType().equals("slim")));
+        NetworkHandler.INSTANCE.sendToServer(new MessagetickSkin("none", SkinChangingHandler.getSkinType(Minecraft.getInstance().player, true).getMojangType().equals("slim")));
     }
 
     public static void sendSkinChange(boolean isAlex) {
         IRegeneration data = CapabilityRegeneration.getForPlayer(Minecraft.getInstance().player);
-        NetworkHandler.INSTANCE.sendToServer(new MessageUpdateSkin(data.getEncodedSkin(), isAlex));
+        NetworkHandler.INSTANCE.sendToServer(new MessagetickSkin(data.getEncodedSkin(), isAlex));
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public static void playSound(Object entity, ResourceLocation soundName, SoundCategory category, boolean repeat, Supplier<Boolean> stopCondition, float volume) {
         Minecraft.getInstance().getSoundHandler().playSound(new MovingSoundBase(entity, new SoundEvent(soundName), category, repeat, stopCondition, volume));
     }
 
     /**
-     * Helper method that copy pastes the angles of the ModelPlayer limbs to the players wear
+     * Helper method that copy pastes the angles of the PlayerModel limbs to the players wear
      *
      * @param biped
      */
-    public static void copyAnglesToWear(ModelPlayer biped) {
+    public static void copyAnglesToWear(PlayerModel biped) {
         ModelBase.copyModelAngles(biped.bipedRightArm, biped.bipedRightArmwear);
         ModelBase.copyModelAngles(biped.bipedLeftArm, biped.bipedLeftArmwear);
         ModelBase.copyModelAngles(biped.bipedRightLeg, biped.bipedRightLegwear);
@@ -81,21 +78,12 @@ public class ClientUtil {
 
     }
 
-    public static void copyRotationPoints(ModelRenderer src, ModelRenderer dest) {
+    public static void copyRotationPoints(RendererModel src, RendererModel dest) {
         dest.rotationPointX = src.rotationPointX;
         dest.rotationPointY = src.rotationPointY;
         dest.rotationPointZ = src.rotationPointZ;
     }
 
-    public static void takeScreenshot() {
-        File ah = Minecraft.getInstance().gameDir;
-        ScreenShotHelper.saveScreenshot(ah, "bio.png", 1920, 1080, Minecraft.getInstance().getFramebuffer());
-        try {
-            System.out.println(SkinChangingHandler.imageToPixelData(new File(ah + "/screenshots/bio.png")));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     public static class ImageFixer {
 

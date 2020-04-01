@@ -1,17 +1,17 @@
 package micdoodle8.mods.galacticraft.api.client.tabs;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.network.play.client.CCloseWindowPacket;
 import net.minecraft.potion.EffectInstance;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.FMLClientHandler;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +60,7 @@ public class TabRegistry {
         TabRegistry.mc.displayGuiScreen(inventory);
     }
 
-    public static void updateTabValues(int cornerX, int cornerY, Class<?> selectedButton) {
+    public static void tickTabValues(int cornerX, int cornerY, Class<?> selectedButton) {
         int count = 2;
         for (int i = 0; i < TabRegistry.tabList.size(); i++) {
             AbstractTab t = TabRegistry.tabList.get(i);
@@ -87,7 +87,7 @@ public class TabRegistry {
 
     public static int getPotionOffset() {
         /**
-         * Disabled in 1.12.2 because a vanilla bug means potion offsets are currently not a thing The vanilla bug is that GuiInventory.initGui() resets GuiLeft to the recipe book version of GuiLeft, and in GuiRecipeBook.updateScreenPosition() it takes no account of potion offset even if the recipe book is inactive.
+         * Disabled in 1.12.2 because a vanilla bug means potion offsets are currently not a thing The vanilla bug is that GuiInventory.initGui() resets GuiLeft to the recipe book version of GuiLeft, and in GuiRecipeBook.tickScreenPosition() it takes no account of potion offset even if the recipe book is inactive.
          *
          * // If at least one potion is active... if (doPotionOffsetVanilla()) { initWithPotion = true; return 60 + getPotionOffsetJEI() + getPotionOffsetNEI(); }
          */
@@ -150,10 +150,10 @@ public class TabRegistry {
     public static int getRecipeBookOffset(InventoryScreen gui) {
         boolean widthTooNarrow = gui.width < 379;
         gui.func_194310_f().func_194303_a(gui.width, gui.height, mc, widthTooNarrow, ((PlayerContainer) gui.inventorySlots).craftMatrix);
-        return gui.func_194310_f().updateScreenPosition(widthTooNarrow, gui.width, gui.getXSize()) - (gui.width - 176) / 2;
+        return gui.func_194310_f().tickScreenPosition(widthTooNarrow, gui.width, gui.getXSize()) - (gui.width - 176) / 2;
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
     public void guiPostInit(GuiScreenEvent.InitGuiEvent.Post event) {
         if (event.getGui() instanceof InventoryScreen) {
@@ -162,7 +162,7 @@ public class TabRegistry {
             recipeBookOffset = getRecipeBookOffset((InventoryScreen) event.getGui());
             guiLeft += getPotionOffset() + recipeBookOffset;
 
-            TabRegistry.updateTabValues(guiLeft, guiTop, InventoryTabVanilla.class);
+            TabRegistry.tickTabValues(guiLeft, guiTop, InventoryTabVanilla.class);
             TabRegistry.addTabsToList(event.getButtonList());
         }
     }

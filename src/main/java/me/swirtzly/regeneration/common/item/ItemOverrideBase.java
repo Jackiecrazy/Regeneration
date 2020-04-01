@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 
 public class ItemOverrideBase extends Item implements IEntityOverride {
 	@Override
-	public void update(EntityItemOverride itemOverride) {
+    public void tick(EntityItemOverride itemOverride) {
 
 	}
 
@@ -34,7 +34,7 @@ public class ItemOverrideBase extends Item implements IEntityOverride {
 	@Override
 	public boolean shouldDie(ItemStack stack) {
 		if (stack.getTagCompound() != null) {
-			return !stack.getTagCompound().hasKey("live");
+            return !stack.getTagCompound().contains("live");
 		}
 		return true;
 	}

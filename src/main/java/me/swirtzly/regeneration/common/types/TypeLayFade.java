@@ -29,7 +29,7 @@ public class TypeLayFade implements IRegenType<TypeLayFadeRenderer> {
     }
 
     @Override
-    public void onUpdateMidRegen(PlayerEntity player, IRegeneration capability) {
+    public void ontickMidRegen(PlayerEntity player, IRegeneration capability) {
         if (!player.world.isRemote) {
             PlayerUtil.setPerspective((ServerPlayerEntity) player, true, false);
         }

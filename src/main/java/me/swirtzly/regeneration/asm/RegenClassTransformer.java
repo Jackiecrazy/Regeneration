@@ -67,7 +67,7 @@ public class RegenClassTransformer implements IClassTransformer, Opcodes {
         return writer.toByteArray();
     }
 
-    public static byte[] patchModelBiped(byte[] bytes) {
+    public static byte[] patchBipedModel(byte[] bytes) {
         String renderMethod = RegenerationMod.isDevEnv() ? "setRotationAngles" : "func_78087_a";
         String renderDesc = "(FFFFFFLnet/minecraft/entity/Entity;)V";
 
@@ -93,7 +93,7 @@ public class RegenClassTransformer implements IClassTransformer, Opcodes {
                         newInstructions.add(new VarInsnNode(FLOAD, 5));
                         newInstructions.add(new VarInsnNode(FLOAD, 6));
                         newInstructions.add(new VarInsnNode(ALOAD, 7));
-                        newInstructions.add(new MethodInsnNode(INVOKESTATIC, REGEN_HOOKS_CLASS, "handleRotations", "(Lnet/minecraft/client/model/ModelBiped;FFFFFFLnet/minecraft/entity/Entity;)V", false));
+                        newInstructions.add(new MethodInsnNode(INVOKESTATIC, REGEN_HOOKS_CLASS, "handleRotations", "(Lnet/minecraft/client/model/BipedModel;FFFFFFLnet/minecraft/entity/Entity;)V", false));
                         method.instructions.insertBefore(anode, newInstructions);
                     }
                 }
@@ -151,13 +151,13 @@ public class RegenClassTransformer implements IClassTransformer, Opcodes {
         ClassNode classNode = new ClassNode();
         ClassReader classReader = new ClassReader(basicClass);
         classReader.accept(classNode, 0);
-        String methodName = RegenerationMod.isDevEnv() ? "updateLightMap" : "func_78472_g";
+        String methodName = RegenerationMod.isDevEnv() ? "tickLightMap" : "func_78472_g";
 
-        MethodNode updateLightmap = null;
+        MethodNode tickLightmap = null;
 
         for (MethodNode mn : classNode.methods) {
             if (mn.name.toLowerCase().equals(methodName.toLowerCase())) {
-                updateLightmap = mn;
+                tickLightmap = mn;
             }
         }
 
@@ -167,26 +167,26 @@ public class RegenClassTransformer implements IClassTransformer, Opcodes {
         Float a0 = new Float("0.05");
         Float a3 = new Float("0.03");
 
-        if (updateLightmap != null) {
-            for (int i = 0; i < updateLightmap.instructions.size(); i++) {
-                AbstractInsnNode an = updateLightmap.instructions.get(i);
+        if (tickLightmap != null) {
+            for (int i = 0; i < tickLightmap.instructions.size(); i++) {
+                AbstractInsnNode an = tickLightmap.instructions.get(i);
                 if (an instanceof LdcInsnNode) {
                     LdcInsnNode lin = (LdcInsnNode) an;
 
                     if (lin.cst.equals(m0) || lin.cst.equals(m3)) {
-                        updateLightmap.instructions.insert(lin, new MethodInsnNode(Opcodes.INVOKESTATIC, REGEN_HOOKS_CLASS, "up", "(F)F", false));
+                        tickLightmap.instructions.insert(lin, new MethodInsnNode(Opcodes.INVOKESTATIC, REGEN_HOOKS_CLASS, "up", "(F)F", false));
                     } else if (lin.cst.equals(a0) || lin.cst.equals(a3)) {
-                        updateLightmap.instructions.insert(lin, new MethodInsnNode(Opcodes.INVOKESTATIC, REGEN_HOOKS_CLASS, "down", "(F)F", false));
+                        tickLightmap.instructions.insert(lin, new MethodInsnNode(Opcodes.INVOKESTATIC, REGEN_HOOKS_CLASS, "down", "(F)F", false));
                     }
                 } else if (an instanceof FieldInsnNode) {
                     FieldInsnNode fin = (FieldInsnNode) an;
 
                     if (fin.name.equals(RegenerationMod.isDevEnv() ? "gammaSetting" : "field_74333_Y")) {
-                        updateLightmap.instructions.insert(fin, new MethodInsnNode(Opcodes.INVOKESTATIC, REGEN_HOOKS_CLASS, "overrideGamma", "(F)F", false));
+                        tickLightmap.instructions.insert(fin, new MethodInsnNode(Opcodes.INVOKESTATIC, REGEN_HOOKS_CLASS, "overrideGamma", "(F)F", false));
                     }
                 } else if (an instanceof MethodInsnNode) {
                     MethodInsnNode min = (MethodInsnNode) an;
-                    if (min.name.equals(RegenerationMod.isDevEnv() ? "updateDynamicTexture" : "func_110564_a")) {
+                    if (min.name.equals(RegenerationMod.isDevEnv() ? "tickDynamicTexture" : "func_110564_a")) {
                         InsnList toInsert = new InsnList();
                         toInsert.add(new VarInsnNode(Opcodes.ALOAD, 0));
                         toInsert.add(new VarInsnNode(Opcodes.ALOAD, 0));
@@ -194,7 +194,7 @@ public class RegenClassTransformer implements IClassTransformer, Opcodes {
                         toInsert.add(new FieldInsnNode(Opcodes.GETFIELD, "net/minecraft/client/renderer/EntityRenderer", lightmapColors, "[I"));
                         toInsert.add(new MethodInsnNode(Opcodes.INVOKESTATIC, REGEN_HOOKS_CLASS, "modifyLightmap", "([I)[I", false));
                         toInsert.add(new FieldInsnNode(Opcodes.PUTFIELD, "net/minecraft/client/renderer/EntityRenderer", lightmapColors, "[I"));
-                        updateLightmap.instructions.insertBefore(min, toInsert);
+                        tickLightmap.instructions.insertBefore(min, toInsert);
                         i += 5;
                     }
                 }
@@ -216,8 +216,8 @@ public class RegenClassTransformer implements IClassTransformer, Opcodes {
 
         if (transformedName.equals("paulscode.sound.libraries.SourceLWJGLOpenAL")) {
             return transformSoundSource(data);
-        } else if (transformedName.equals("net.minecraft.client.model.ModelBiped")) {
-            return patchModelBiped(data);
+        } else if (transformedName.equals("net.minecraft.client.model.BipedModel")) {
+            return patchBipedModel(data);
         } else if (transformedName.equals("net.minecraft.client.renderer.EntityRenderer")) {
             return patchLighting(data);
         }

@@ -1,11 +1,11 @@
 package me.swirtzly.regeneration.client.rendering.layers;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import me.swirtzly.regeneration.common.item.ItemArchInterface;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.ModelPlayer;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
+import net.minecraft.client.renderer.entity.model.PlayerModel;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
@@ -19,7 +19,7 @@ public class RenderArchItem implements LayerRenderer<PlayerEntity> {
 
     private static final ResourceLocation LIGHTNING_TEXTURE = new ResourceLocation("textures/entity/creeper/creeper_armor.png");
     private final PlayerRenderer playerRenderer;
-    private ModelPlayer chargedModel = new ModelPlayer(1.0f, true);
+    private PlayerModel chargedModel = new PlayerModel(1.0f, true);
 
     public RenderArchItem(PlayerRenderer playerRenderer) {
         this.playerRenderer = playerRenderer;

@@ -9,12 +9,11 @@ import me.swirtzly.regeneration.common.item.arch.IDontStore;
 import me.swirtzly.regeneration.handlers.RegenObjects;
 import me.swirtzly.regeneration.util.ClientUtil;
 import me.swirtzly.regeneration.util.PlayerUtil;
-import net.minecraft.item.ItemGroup;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.SoundEvents;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.*;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -31,14 +30,14 @@ public class ItemFobWatch extends ItemOverrideBase implements IDontStore {
 
 
 		addPropertyOverride(new ResourceLocation("open"), (stack, worldIn, entityIn) -> {
-			if (getStackTag(stack) == null || !getStackTag(stack).hasKey("open")) {
+			if (getStackTag(stack) == null || !getStackTag(stack).contains("open")) {
 				return 0F; // Closed
 			}
 			return getOpen(stack);
 		});
 
 		addPropertyOverride(new ResourceLocation("engrave"), (stack, worldIn, entityIn) -> {
-			if (getStackTag(stack) == null || !getStackTag(stack).hasKey("engrave")) {
+			if (getStackTag(stack) == null || !getStackTag(stack).contains("engrave")) {
 				return 0F; // Default
 			}
 			return getEngrave(stack);
@@ -57,7 +56,7 @@ public class ItemFobWatch extends ItemOverrideBase implements IDontStore {
 	}
 
 	public static int getEngrave(ItemStack stack) {
-		return getStackTag(stack).getInteger("engrave");
+		return getStackTag(stack).getInt("engrave");
 	}
 
 	public static void setEngrave(ItemStack stack, int engrave) {
@@ -74,7 +73,7 @@ public class ItemFobWatch extends ItemOverrideBase implements IDontStore {
 	}
 
 	public static int getOpen(ItemStack stack) {
-		return getStackTag(stack).getInteger("open");
+		return getStackTag(stack).getInt("open");
 	}
 
 	public static void setOpen(ItemStack stack, int amount) {
@@ -92,12 +91,12 @@ public class ItemFobWatch extends ItemOverrideBase implements IDontStore {
 	}
 
 	@Override
-	public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
+	public void ontick(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
 		if (stack.getTagCompound() == null) {
 			stack.setTagCompound(new CompoundNBT());
-			stack.getTagCompound().setBoolean("live", false);
+			stack.getTagCompound().putBoolean("live", false);
 		} else {
-			stack.getTagCompound().setBoolean("live", false);
+			stack.getTagCompound().putBoolean("live", false);
 		}
 
 		if (getOpen(stack) == 1) {
@@ -106,7 +105,7 @@ public class ItemFobWatch extends ItemOverrideBase implements IDontStore {
 			}
 		}
 
-		super.onUpdate(stack, worldIn, entityIn, itemSlot, isSelected);
+		super.ontick(stack, worldIn, entityIn, itemSlot, isSelected);
 	}
 
 	@Override
@@ -178,7 +177,7 @@ public class ItemFobWatch extends ItemOverrideBase implements IDontStore {
 	}
 
 	@Override
-	public void update(EntityItemOverride itemOverride) {
+	public void tick(EntityItemOverride itemOverride) {
 		if (!itemOverride.world.isRemote) return;
 		ItemStack itemStack = itemOverride.getItem();
 		if (itemStack.getItem() == this && itemStack.getItemDamage() != RegenConfig.regenCapacity) {

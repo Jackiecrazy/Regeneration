@@ -20,7 +20,7 @@ public class TypeFiery implements IRegenType<TypeFieryRenderer> {
     private SoundEvent[] SOUNDS = new SoundEvent[]{RegenObjects.Sounds.REGENERATION_1, RegenObjects.Sounds.REGENERATION_2, RegenObjects.Sounds.REGENERATION_3, RegenObjects.Sounds.REGENERATION_4, RegenObjects.Sounds.REGENERATION_5, RegenObjects.Sounds.REGENERATION_6,};
 
     @Override
-    public void onUpdateMidRegen(PlayerEntity player, IRegeneration capability) {
+    public void ontickMidRegen(PlayerEntity player, IRegeneration capability) {
 
         player.extinguish();
 
@@ -31,16 +31,16 @@ public class TypeFiery implements IRegenType<TypeFieryRenderer> {
         if (player.world.isRemote) return;
 
         if (player.world.getBlockState(player.getPosition()).getBlock() instanceof FireBlock)
-            player.world.setBlockToAir(player.getPosition());
+            player.world.remove(player.getPosition());
 
         double x = player.posX + player.getRNG().nextGaussian() * 2;
         double y = player.posY + 0.5 + player.getRNG().nextGaussian() * 2;
         double z = player.posZ + player.getRNG().nextGaussian() * 2;
-        player.world.newExplosion(player, x, y, z, 0.1F, RegenConfig.fieryRegen, false);
+        player.world.createExplosion(player, x, y, z, 0.1F, RegenConfig.fieryRegen, false);
 
         for (BlockPos bs : BlockPos.getAllInBox(player.getPosition().north().west(), player.getPosition().south().east())) {
             if (player.world.getBlockState(bs).getBlock() instanceof FireBlock) {
-                player.world.setBlockToAir(bs);
+                player.world.remove(bs);
             }
         }
     }

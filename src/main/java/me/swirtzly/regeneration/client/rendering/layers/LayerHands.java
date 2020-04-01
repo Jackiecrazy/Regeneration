@@ -1,14 +1,14 @@
 package me.swirtzly.regeneration.client.rendering.layers;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import me.swirtzly.regeneration.client.rendering.types.TypeFieryRenderer;
 import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
 import me.swirtzly.regeneration.common.capability.IRegeneration;
 import me.swirtzly.regeneration.common.types.TypeHandler;
 import me.swirtzly.regeneration.util.PlayerUtil;
-import net.minecraft.client.model.ModelBiped;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
+import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.HandSide;
 
@@ -24,9 +24,9 @@ public class LayerHands implements LayerRenderer<PlayerEntity> {
 
         IRegeneration data = CapabilityRegeneration.getForPlayer(entitylivingbaseIn);
 
-        if (this.livingEntityRenderer.getMainModel().isChild) {
-            GlStateManager.translate(0.0F, 0.75F, 0.0F);
-            GlStateManager.scale(0.5F, 0.5F, 0.5F);
+        if (this.livingEntityRenderer.getEntityModel().isChild) {
+            GlStateManager.translatef(0.0F, 0.75F, 0.0F);
+            GlStateManager.scalef(0.5F, 0.5F, 0.5F);
         }
         if (data.areHandsGlowing()) {
             renderHand(entitylivingbaseIn, HandSide.LEFT, EnumHandRenderType.GRACE);
@@ -76,7 +76,7 @@ public class LayerHands implements LayerRenderer<PlayerEntity> {
     }
 
     protected void translateToHand(HandSide handSide) {
-        ((ModelBiped) this.livingEntityRenderer.getMainModel()).postRenderArm(0.0625F, handSide);
+        ((BipedModel) this.livingEntityRenderer.getMainModel()).postRenderArm(0.0625F, handSide);
     }
 
     public boolean shouldCombineTextures() {

@@ -13,8 +13,8 @@ import me.swirtzly.regeneration.network.NetworkHandler;
 import me.swirtzly.regeneration.util.RenderUtil;
 import micdoodle8.mods.galacticraft.api.client.tabs.TabRegistry;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
+import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
@@ -44,7 +44,7 @@ public class GuiCustomizer extends ContainerScreen {
     @Override
     public void initGui() {
         super.initGui();
-        TabRegistry.updateTabValues(guiLeft, guiTop, InventoryTabRegeneration.class);
+        TabRegistry.tickTabValues(guiLeft, guiTop, InventoryTabRegeneration.class);
         TabRegistry.addTabsToList(this.buttonList);
         int cx = (width - xSize) / 2;
         int cy = (height - ySize) / 2;
@@ -91,13 +91,13 @@ public class GuiCustomizer extends ContainerScreen {
         btnReset.enabled = true;
 
         CompoundNBT nbt = new CompoundNBT();
-        nbt.setFloat("PrimaryRed", (float) slidePrimaryRed.getValue());
-        nbt.setFloat("PrimaryGreen", (float) slidePrimaryGreen.getValue());
-        nbt.setFloat("PrimaryBlue", (float) slidePrimaryBlue.getValue());
+        nbt.putFloat("PrimaryRed", (float) slidePrimaryRed.getValue());
+        nbt.putFloat("PrimaryGreen", (float) slidePrimaryGreen.getValue());
+        nbt.putFloat("PrimaryBlue", (float) slidePrimaryBlue.getValue());
 
-        nbt.setFloat("SecondaryRed", (float) slideSecondaryRed.getValue());
-        nbt.setFloat("SecondaryGreen", (float) slideSecondaryGreen.getValue());
-        nbt.setFloat("SecondaryBlue", (float) slideSecondaryBlue.getValue());
+        nbt.putFloat("SecondaryRed", (float) slideSecondaryRed.getValue());
+        nbt.putFloat("SecondaryGreen", (float) slideSecondaryGreen.getValue());
+        nbt.putFloat("SecondaryBlue", (float) slideSecondaryBlue.getValue());
 
         NetworkHandler.INSTANCE.sendToServer(new MessageSaveStyle(nbt));
     }

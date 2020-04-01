@@ -1,5 +1,6 @@
 package me.swirtzly.regeneration.client;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import me.swirtzly.regeneration.RegenConfig;
 import me.swirtzly.regeneration.RegenerationMod;
 import me.swirtzly.regeneration.client.animation.AnimationContext;
@@ -25,30 +26,29 @@ import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.model.ModelPlayer;
-import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.renderer.entity.model.PlayerModel;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.HandSide;
-import net.minecraft.util.SoundEvents;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.event.HoverEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.client.event.sound.PlaySoundEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -60,7 +60,7 @@ import static me.swirtzly.regeneration.util.PlayerUtil.RegenState.*;
 /**
  * Created by Sub on 16/09/2018.
  */
-@Mod.EventBusSubscriber(value = Side.CLIENT, modid = RegenerationMod.MODID)
+@Mod.EventBusSubscriber(value = Dist.CLIENT, modid = RegenerationMod.MODID)
 public class ClientEventHandler {
 
     public static final ResourceLocation[] SHADERS_TEXTURES = new ResourceLocation[]{new ResourceLocation("shaders/post/notch.json"), new ResourceLocation("shaders/post/fxaa.json"), new ResourceLocation("shaders/post/art.json"), new ResourceLocation("shaders/post/bumpy.json"), new ResourceLocation("shaders/post/blobs2.json"), new ResourceLocation("shaders/post/pencil.json"), new ResourceLocation("shaders/post/color_convolve.json"), new ResourceLocation("shaders/post/deconverge.json"), new ResourceLocation("shaders/post/flip.json"), new ResourceLocation("shaders/post/invert.json"), new ResourceLocation("shaders/post/ntsc.json"), new ResourceLocation("shaders/post/outline.json"), new ResourceLocation("shaders/post/phosphor.json"), new ResourceLocation("shaders/post/scan_pincushion.json"), new ResourceLocation("shaders/post/sobel.json"), new ResourceLocation("shaders/post/bits.json"), new ResourceLocation("shaders/post/desaturate.json"), new ResourceLocation("shaders/post/green.json"), new ResourceLocation("shaders/post/blur.json"), new ResourceLocation("shaders/post/wobble.json"), new ResourceLocation("shaders/post/blobs.json"), new ResourceLocation("shaders/post/antialias.json"), new ResourceLocation("shaders/post/creeper.json"), new ResourceLocation("shaders/post/spider.json")};
@@ -87,7 +87,7 @@ public class ClientEventHandler {
     }
 
     @SubscribeEvent
-    public static void onClientUpdate(LivingEvent.LivingUpdateEvent e) {
+    public static void onClienttick(LivingEvent.LivingtickEvent e) {
         if (!(e.getEntity() instanceof PlayerEntity) || Minecraft.getInstance().player == null) return;
 
         PlayerEntity player = (PlayerEntity) e.getEntity();
@@ -120,7 +120,7 @@ public class ClientEventHandler {
 
         if (cap.getAnimationTicks() == 100 && cap.getState() == REGENERATING) {
             if (Minecraft.getInstance().player.getUniqueID().equals(cap.getPlayer().getUniqueID())) {
-                SkinChangingHandler.sendSkinUpdate(cap.getPlayer().world.rand, cap.getPlayer());
+                SkinChangingHandler.sendSkintick(cap.getPlayer().world.rand, cap.getPlayer());
             }
         }
     }
@@ -219,7 +219,7 @@ public class ClientEventHandler {
         }
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
     public static void onClientChatRecieved(ClientChatReceivedEvent e) {
         ClientPlayerEntity player = Minecraft.getInstance().player;
@@ -323,22 +323,22 @@ public class ClientEventHandler {
             }
 
             ModelBase model = event.getRenderer().getMainModel();
-            if (model instanceof ModelPlayer) {
-                ModelPlayer modelPlayer = (ModelPlayer) model;
+            if (model instanceof PlayerModel) {
+                PlayerModel PlayerModel = (PlayerModel) model;
                 if (data.hasDroppedHand()) {
                     if (data.getCutoffHand() == HandSide.RIGHT) {
-                        modelPlayer.bipedRightArmwear.isHidden = modelPlayer.bipedRightArm.isHidden = true;
+                        PlayerModel.bipedRightArmwear.isHidden = PlayerModel.bipedRightArm.isHidden = true;
                     } else {
-                        modelPlayer.bipedRightArmwear.isHidden = modelPlayer.bipedRightArm.isHidden = false;
+                        PlayerModel.bipedRightArmwear.isHidden = PlayerModel.bipedRightArm.isHidden = false;
                     }
                     if (data.getCutoffHand() == HandSide.LEFT) {
-                        modelPlayer.bipedLeftArmwear.isHidden = modelPlayer.bipedLeftArm.isHidden = true;
+                        PlayerModel.bipedLeftArmwear.isHidden = PlayerModel.bipedLeftArm.isHidden = true;
                     } else {
-                        modelPlayer.bipedLeftArmwear.isHidden = modelPlayer.bipedLeftArm.isHidden = false;
+                        PlayerModel.bipedLeftArmwear.isHidden = PlayerModel.bipedLeftArm.isHidden = false;
                     }
                 } else {
-                    modelPlayer.bipedLeftArmwear.isHidden = modelPlayer.bipedLeftArm.isHidden = false;
-                    modelPlayer.bipedRightArmwear.isHidden = modelPlayer.bipedRightArm.isHidden = false;
+                    PlayerModel.bipedLeftArmwear.isHidden = PlayerModel.bipedLeftArm.isHidden = false;
+                    PlayerModel.bipedRightArmwear.isHidden = PlayerModel.bipedRightArm.isHidden = false;
                 }
 
             }

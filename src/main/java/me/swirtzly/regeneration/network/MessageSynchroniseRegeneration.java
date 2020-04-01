@@ -36,8 +36,8 @@ public class MessageSynchroniseRegeneration implements IMessage {
 
     @Override
     public void fromBytes(ByteBuf buf) {
-        if (Minecraft.getMinecraft().player == null) return;
-        player = Minecraft.getMinecraft().player.world.getPlayerEntityByUUID(UUID.fromString(ByteBufUtils.readUTF8String(buf)));
+        if (Minecraft.getInstance().player == null) return;
+        player = Minecraft.getInstance().player.world.getPlayerEntityByUUID(UUID.fromString(ByteBufUtils.readUTF8String(buf)));
         data = ByteBufUtils.readTag(buf);
     }
 
@@ -47,7 +47,7 @@ public class MessageSynchroniseRegeneration implements IMessage {
         public IMessage onMessage(MessageSynchroniseRegeneration message, MessageContext ctx) {
             PlayerEntity player = message.player;
             if (player != null)
-                Minecraft.getMinecraft().addScheduledTask(() -> CapabilityRegeneration.getForPlayer(player).deserializeNBT(message.data));
+                Minecraft.getInstance().addScheduledTask(() -> CapabilityRegeneration.getForPlayer(player).deserializeNBT(message.data));
             return null;
         }
     }

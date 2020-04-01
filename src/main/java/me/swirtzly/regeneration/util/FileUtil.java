@@ -226,7 +226,7 @@ public class FileUtil {
     }
 
     public static ThreadDownloadImageData getDownloadImageSkin(ResourceLocation resourceLocationIn, String url) {
-        TextureManager texturemanager = Minecraft.getMinecraft().getTextureManager();
+        TextureManager texturemanager = Minecraft.getInstance().getTextureManager();
         Object object = texturemanager.getTexture(resourceLocationIn);
         if (object == null) {
             object = new ThreadDownloadImageData(null, url, DefaultPlayerSkin.getDefaultSkin(AbstractClientPlayerEntity.getOfflineUUID("")), new DownloadImageBuffer());

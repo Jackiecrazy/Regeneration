@@ -45,12 +45,12 @@ public class RegenClientHooks {
     private static int[] postShaders = new int[]{19, 18, 7, 12, 20};
 
     public static void handleShader() {
-        if (Minecraft.getMinecraft().player == null || !RegenConfig.regenerationShaders) return;
+        if (Minecraft.getInstance().player == null || !RegenConfig.regenerationShaders) return;
 
-        EntityRenderer entityRender = Minecraft.getMinecraft().entityRenderer;
+        EntityRenderer entityRender = Minecraft.getInstance().entityRenderer;
 
         if (OpenGlHelper.shadersSupported) {
-            Entity entity = Minecraft.getMinecraft().getRenderViewEntity();
+            Entity entity = Minecraft.getInstance().getRenderViewEntity();
             if (entity instanceof PlayerEntity) {
                 PlayerEntity player = (PlayerEntity) entity;
                 IRegeneration data = CapabilityRegeneration.getForPlayer(player);
@@ -79,7 +79,7 @@ public class RegenClientHooks {
     public static void resetShader(EntityRenderer entityRender) {
         // This part is the unoptimised part, it's needed to reset the players shader
         // It's just my bad ASM, but I'll look into it at a later point
-        Entity entityIn = Minecraft.getMinecraft().getRenderViewEntity();
+        Entity entityIn = Minecraft.getInstance().getRenderViewEntity();
         entityRender.stopUseShader();
 
         if (entityIn instanceof CreeperEntity) {
@@ -142,7 +142,7 @@ public class RegenClientHooks {
         }
 
         colorModeCache = 1;
-        if (Minecraft.getMinecraft().player.isPotionActive(Effects.NIGHT_VISION) && colorModeCache == 0) {
+        if (Minecraft.getInstance().player.isPotionActive(Effects.NIGHT_VISION) && colorModeCache == 0) {
             for (int i = 0; i < original.length; i++) {
                 int height = i / 16;
 
@@ -176,8 +176,8 @@ public class RegenClientHooks {
     }
 
     private static boolean enabled() {
-        if (Minecraft.getMinecraft().player != null && Minecraft.getMinecraft().getRenderViewEntity() instanceof PlayerEntity) {
-            return CapabilityRegeneration.getForPlayer((PlayerEntity) Minecraft.getMinecraft().getRenderViewEntity()).getState() == PlayerUtil.RegenState.GRACE_CRIT;
+        if (Minecraft.getInstance().player != null && Minecraft.getInstance().getRenderViewEntity() instanceof PlayerEntity) {
+            return CapabilityRegeneration.getForPlayer((PlayerEntity) Minecraft.getInstance().getRenderViewEntity()).getState() == PlayerUtil.RegenState.GRACE_CRIT;
         }
         return false;
     }

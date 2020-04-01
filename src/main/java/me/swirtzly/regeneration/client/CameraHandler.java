@@ -31,7 +31,7 @@ public class CameraHandler {
     @SubscribeEvent
     public static void onView(EntityViewRenderEvent.CameraSetup event) {
 
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
         ClientPlayerEntity player = mc.player;
         GameSettings gameSettings = mc.gameSettings;
 

@@ -2,7 +2,7 @@ package me.swirtzly.regeneration.client.rendering.entity;
 
 import me.swirtzly.regeneration.util.RenderUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.entity.Entity;
@@ -24,7 +24,7 @@ public class RenderLindos extends EntityRenderer<Entity> {
     @Override
     public void doRender(Entity entity, double x, double y, double z, float entityYaw, float partialTicks) {
         GlStateManager.pushMatrix();
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
         Random rand = entity.world.rand;
         float f = 0.1F;
         for (int j = 0; j < 2; j++) {

@@ -10,7 +10,7 @@ import micdoodle8.mods.galacticraft.api.client.tabs.TabRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -56,7 +56,7 @@ public class GuiArchInterface extends ContainerScreen {
 
         if (button.id == 98) {
             NetworkHandler.INSTANCE.sendToServer(new MessageUseArch());
-            Minecraft.getMinecraft().displayGuiScreen(null);
+            Minecraft.getInstance().displayGuiScreen(null);
         }
     }
 

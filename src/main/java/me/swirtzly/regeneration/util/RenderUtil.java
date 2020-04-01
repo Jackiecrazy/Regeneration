@@ -22,7 +22,7 @@ import org.lwjgl.opengl.GL11;
 public class RenderUtil {
 
     private static final ResourceLocation VIGNETTE_TEX_PATH = new ResourceLocation(RegenerationMod.MODID, "textures/misc/vignette.png");
-    public static float renderTick = Minecraft.getMinecraft().getRenderPartialTicks();
+    public static float renderTick = Minecraft.getInstance().getRenderPartialTicks();
     private static float lastBrightnessX = OpenGlHelper.lastBrightnessX;
     private static float lastBrightnessY = OpenGlHelper.lastBrightnessY;
 
@@ -45,7 +45,7 @@ public class RenderUtil {
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bb = tessellator.getBuffer();
-        int smoothFactor = Minecraft.getMinecraft().gameSettings.ambientOcclusion;
+        int smoothFactor = Minecraft.getInstance().gameSettings.ambientOcclusion;
         int layers = 10 + smoothFactor * 20;
 
         GlStateManager.pushMatrix();
@@ -167,11 +167,11 @@ public class RenderUtil {
         GlStateManager.depthMask(false);
         GlStateManager.enableBlend();
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-        Minecraft.getMinecraft().getTextureManager().bindTexture(VIGNETTE_TEX_PATH);
+        Minecraft.getInstance().getTextureManager().bindTexture(VIGNETTE_TEX_PATH);
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
 
-        ScaledResolution scaledRes = new ScaledResolution(Minecraft.getMinecraft());
+        ScaledResolution scaledRes = new ScaledResolution(Minecraft.getInstance());
         int z = -89; // below the HUD
         bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
         bufferbuilder.pos(0, scaledRes.getScaledHeight(), z).tex(0, 1).endVertex();
@@ -211,7 +211,7 @@ public class RenderUtil {
         GlStateManager.glLightModel(2899, RenderHelper.setColorBuffer(0.75F, 0.75F, 0.75F, 1F));
         GlStateManager.scale(38 * scale, 34 * scale, 38 * scale);
         GlStateManager.scale(-1, 1, 1);
-        model.render(Minecraft.getMinecraft().player, 0, 0, Minecraft.getMinecraft().player.ticksExisted, 0, 0, 0.0625f);
+        model.render(Minecraft.getInstance().player, 0, 0, Minecraft.getInstance().player.ticksExisted, 0, 0, 0.0625f);
         RenderHelper.disableStandardItemLighting();
         GlStateManager.disableBlend();
         GlStateManager.disableDepth();

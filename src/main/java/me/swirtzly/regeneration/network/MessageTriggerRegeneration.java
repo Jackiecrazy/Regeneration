@@ -32,7 +32,7 @@ public class MessageTriggerRegeneration implements IMessage {
     @Override
     public void fromBytes(ByteBuf buf) {
         int dim = buf.readInt();
-        player = FMLCommonHandler.instance().getMinecraftServerInstance().getWorld(dim).getPlayerEntityByUUID(UUID.fromString(ByteBufUtils.readUTF8String(buf)));
+        player = FMLCommonHandler.instance().getInstanceServerInstance().getWorld(dim).getPlayerEntityByUUID(UUID.fromString(ByteBufUtils.readUTF8String(buf)));
     }
 
     public static class Handler implements IMessageHandler<MessageTriggerRegeneration, IMessage> {

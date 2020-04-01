@@ -5,7 +5,7 @@ import me.swirtzly.regeneration.client.gui.parts.HIJContainer;
 import me.swirtzly.regeneration.common.tiles.TileEntityHandInJar;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
@@ -21,7 +21,7 @@ public class GuiHij extends ContainerScreen {
     private final TileEntityHandInJar jar;
 
     public GuiHij(IInventory playerInv, IInventory handInv, TileEntityHandInJar jar) {
-        super(new HIJContainer(playerInv, handInv, Minecraft.getMinecraft().player));
+        super(new HIJContainer(playerInv, handInv, Minecraft.getInstance().player));
         this.handInventory = handInv;
         this.allowUserInput = false;
         this.ySize = 133;

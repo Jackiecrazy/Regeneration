@@ -126,13 +126,13 @@ public class GuiCustomizer extends ContainerScreen {
 
             onChangeSliderValue(null);
         } else if (button.id == btnBack.id) {
-            Minecraft.getMinecraft().player.openGui(RegenerationMod.INSTANCE, GuiPreferences.ID, Minecraft.getMinecraft().world, 0, 0, 0);
+            Minecraft.getInstance().player.openGui(RegenerationMod.INSTANCE, GuiPreferences.ID, Minecraft.getInstance().world, 0, 0, 0);
         }
     }
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-        Minecraft.getMinecraft().getTextureManager().bindTexture(background);
+        Minecraft.getInstance().getTextureManager().bindTexture(background);
         drawTexturedModalRect(guiLeft, guiTop, 0, 0, 256, 173);
 
         int cx = (width - xSize) / 2;
@@ -154,7 +154,7 @@ public class GuiCustomizer extends ContainerScreen {
         length = mc.fontRenderer.getStringWidth(str);
         fontRenderer.drawString(str, cx + 131 - length / 2, cy + 49, RenderUtil.calculateColorBrightness(secondaryColor) > 0.179 ? 0x0 : 0xFFFFFF);
 
-        drawCenteredString(Minecraft.getMinecraft().fontRenderer, new TranslationTextComponent("regeneration.gui.color_gui").getUnformattedText(), width / 2, height / 2 - 80, Color.WHITE.getRGB());
+        drawCenteredString(Minecraft.getInstance().fontRenderer, new TranslationTextComponent("regeneration.gui.color_gui").getUnformattedText(), width / 2, height / 2 - 80, Color.WHITE.getRGB());
 
     }
 

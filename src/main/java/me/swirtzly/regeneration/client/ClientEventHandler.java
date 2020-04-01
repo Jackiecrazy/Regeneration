@@ -26,7 +26,7 @@ import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelPlayer;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
 import net.minecraft.potion.Effects;
@@ -69,8 +69,8 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public static void onColorFog(EntityViewRenderEvent.RenderFogEvent.FogColors e) {
-        if (Minecraft.getMinecraft().getRenderViewEntity() instanceof PlayerEntity) {
-            IRegeneration data = CapabilityRegeneration.getForPlayer(Minecraft.getMinecraft().player);
+        if (Minecraft.getInstance().getRenderViewEntity() instanceof PlayerEntity) {
+            IRegeneration data = CapabilityRegeneration.getForPlayer(Minecraft.getInstance().player);
             if (data.getType() == TypeHandler.RegenType.LAY_FADE && data.getState() == REGENERATING) {
                 e.setRed((float) data.getPrimaryColor().x);
                 e.setGreen((float) data.getPrimaryColor().y);
@@ -82,23 +82,23 @@ public class ClientEventHandler {
     @SubscribeEvent
     public static void onAction(GuiScreenEvent.ActionPerformedEvent event) {
         if (event.getButton() instanceof InventoryTabRegeneration) {
-            Minecraft.getMinecraft().displayGuiScreen(new GuiPreferences());
+            Minecraft.getInstance().displayGuiScreen(new GuiPreferences());
         }
     }
 
     @SubscribeEvent
     public static void onClientUpdate(LivingEvent.LivingUpdateEvent e) {
-        if (!(e.getEntity() instanceof PlayerEntity) || Minecraft.getMinecraft().player == null) return;
+        if (!(e.getEntity() instanceof PlayerEntity) || Minecraft.getInstance().player == null) return;
 
         PlayerEntity player = (PlayerEntity) e.getEntity();
-        UUID clientUUID = Minecraft.getMinecraft().player.getUniqueID();
+        UUID clientUUID = Minecraft.getInstance().player.getUniqueID();
         IRegeneration cap = CapabilityRegeneration.getForPlayer(player);
 
         // Horrible Sound repairs
-        Minecraft.getMinecraft().addScheduledTask(() -> {
+        Minecraft.getInstance().addScheduledTask(() -> {
             if (player.ticksExisted == 50) {
                 if (SIDE != null) {
-                    SIDE = Minecraft.getMinecraft().gameSettings.mainHand;
+                    SIDE = Minecraft.getInstance().gameSettings.mainHand;
                 }
 
                 if (cap.areHandsGlowing()) {
@@ -119,7 +119,7 @@ public class ClientEventHandler {
         });
 
         if (cap.getAnimationTicks() == 100 && cap.getState() == REGENERATING) {
-            if (Minecraft.getMinecraft().player.getUniqueID().equals(cap.getPlayer().getUniqueID())) {
+            if (Minecraft.getInstance().player.getUniqueID().equals(cap.getPlayer().getUniqueID())) {
                 SkinChangingHandler.sendSkinUpdate(cap.getPlayer().world.rand, cap.getPlayer());
             }
         }
@@ -145,7 +145,7 @@ public class ClientEventHandler {
     public static void onRenderGui(RenderGameOverlayEvent.Post event) {
         if (event.getType() != RenderGameOverlayEvent.ElementType.ALL) return;
 
-        ClientPlayerEntity player = Minecraft.getMinecraft().player;
+        ClientPlayerEntity player = Minecraft.getInstance().player;
         IRegeneration cap = CapabilityRegeneration.getForPlayer(player);
 
         switch (cap.getState()) {
@@ -177,7 +177,7 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public static void onPlaySound(PlaySoundEvent e) {
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.world == null) return;
 
         if (e.getName().equals("entity.generic.explode")) {
@@ -190,7 +190,7 @@ public class ClientEventHandler {
                 }
             });
 
-            if (CapabilityRegeneration.getForPlayer(Minecraft.getMinecraft().player).getState() == REGENERATING) {
+            if (CapabilityRegeneration.getForPlayer(Minecraft.getInstance().player).getState() == REGENERATING) {
                 e.setResultSound(sound);
             }
         }
@@ -199,8 +199,8 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public static void onSetupFogDensity(EntityViewRenderEvent.RenderFogEvent.FogDensity event) {
-        if (Minecraft.getMinecraft().getRenderViewEntity() instanceof PlayerEntity) {
-            PlayerEntity player = (PlayerEntity) Minecraft.getMinecraft().getRenderViewEntity();
+        if (Minecraft.getInstance().getRenderViewEntity() instanceof PlayerEntity) {
+            PlayerEntity player = (PlayerEntity) Minecraft.getInstance().getRenderViewEntity();
             IRegeneration data = CapabilityRegeneration.getForPlayer(player);
 
             if (data.getState() == GRACE_CRIT) {
@@ -213,7 +213,7 @@ public class ClientEventHandler {
             if (data.getType() == TypeHandler.RegenType.LAY_FADE && data.getAnimationTicks() > 0) {
                 GlStateManager.setFog(GlStateManager.FogMode.EXP);
                 event.setCanceled(true);
-                float opacity = MathHelper.clamp(MathHelper.sin((player.ticksExisted + Minecraft.getMinecraft().getRenderPartialTicks()) / 10F) * 0.1F + 0.1F, 0.11F, 1F);
+                float opacity = MathHelper.clamp(MathHelper.sin((player.ticksExisted + Minecraft.getInstance().getRenderPartialTicks()) / 10F) * 0.1F + 0.1F, 0.11F, 1F);
                 event.setDensity(opacity);
             }
         }
@@ -222,7 +222,7 @@ public class ClientEventHandler {
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public static void onClientChatRecieved(ClientChatReceivedEvent e) {
-        ClientPlayerEntity player = Minecraft.getMinecraft().player;
+        ClientPlayerEntity player = Minecraft.getInstance().player;
         if (e.getType() != ChatType.CHAT) return;
         if (CapabilityRegeneration.getForPlayer(player).getState() != POST) return;
 
@@ -266,7 +266,7 @@ public class ClientEventHandler {
     public static void onDeath(LivingDeathEvent e) {
         if (e.getEntityLiving() instanceof PlayerEntity) {
             PlayerEntity player = (PlayerEntity) e.getEntityLiving();
-            if (player.getUniqueID().equals(Minecraft.getMinecraft().player.getUniqueID())) {
+            if (player.getUniqueID().equals(Minecraft.getInstance().player.getUniqueID())) {
                 ClientUtil.sendSkinResetPacket();
             }
         }
@@ -275,8 +275,8 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public static void onRenderHand(RenderHandEvent e) {
-        Minecraft mc = Minecraft.getMinecraft();
-        ClientPlayerEntity player = Minecraft.getMinecraft().player;
+        Minecraft mc = Minecraft.getInstance();
+        ClientPlayerEntity player = Minecraft.getInstance().player;
 
         float factor = 0.2F;
         if (player.getHeldItemMainhand().getItem() != Items.AIR || mc.gameSettings.thirdPersonView > 0) return;
@@ -361,12 +361,12 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public static void onRenderGameOverlayPre(RenderGameOverlayEvent.Pre e) {
-        IRegeneration data = CapabilityRegeneration.getForPlayer(Minecraft.getMinecraft().player);
+        IRegeneration data = CapabilityRegeneration.getForPlayer(Minecraft.getInstance().player);
         if (RegenConfig.coolCustomBarThings) {
             if (data.getRegenerationsLeft() > 0 && data.getState() != ALIVE) {
                 if (e.getType() == RenderGameOverlayEvent.ElementType.HOTBAR) {
                     GlStateManager.pushMatrix();
-                    Minecraft mc = Minecraft.getMinecraft();
+                    Minecraft mc = Minecraft.getInstance();
                     mc.getTextureManager().bindTexture(TEX);
                     float regensProgress = (float) data.getRegenerationsLeft() / RegenConfig.regenCapacity;
                     mc.ingameGUI.drawTexturedModalRect(e.getResolution().getScaledWidth() / 2 - 91, e.getResolution().getScaledHeight() - 86, 0, 0, 182, 5);
@@ -391,7 +391,7 @@ public class ClientEventHandler {
 
 
     public static void drawStringWithOutline(String string, int posX, int posY, int fontColor, int outlineColor) {
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
         mc.fontRenderer.drawString(string, posX + 1, posY, outlineColor);
         mc.fontRenderer.drawString(string, posX - 1, posY, outlineColor);
         mc.fontRenderer.drawString(string, posX, posY + 1, outlineColor);

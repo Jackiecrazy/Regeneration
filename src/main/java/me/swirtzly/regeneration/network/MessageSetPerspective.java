@@ -37,11 +37,11 @@ public class MessageSetPerspective implements IMessage {
     public static class Handler implements IMessageHandler<MessageSetPerspective, IMessage> {
         @Override
         public IMessage onMessage(MessageSetPerspective message, MessageContext ctx) {
-            Minecraft.getMinecraft().addScheduledTask(() -> {
-                if (Minecraft.getMinecraft().getRenderViewEntity().getUniqueID() == Minecraft.getMinecraft().player.getUniqueID()) {
+            Minecraft.getInstance().addScheduledTask(() -> {
+                if (Minecraft.getInstance().getRenderViewEntity().getUniqueID() == Minecraft.getInstance().player.getUniqueID()) {
                     if (RegenConfig.changePerspective) {
-                        if (message.resetPitch) Minecraft.getMinecraft().player.rotationPitch = 0;
-                        Minecraft.getMinecraft().gameSettings.thirdPersonView = message.thirdperson ? 2 : 0;
+                        if (message.resetPitch) Minecraft.getInstance().player.rotationPitch = 0;
+                        Minecraft.getInstance().gameSettings.thirdPersonView = message.thirdperson ? 2 : 0;
                     }
                 }
             });

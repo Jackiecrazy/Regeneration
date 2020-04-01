@@ -21,12 +21,12 @@ public class LCCoreBarEntry implements IAbilityBarProvider, IAbilityBarEntry {
 
     @Override
     public boolean isActive() {
-        return CapabilityRegeneration.getForPlayer(Minecraft.getMinecraft().player).getState().isGraceful();
+        return CapabilityRegeneration.getForPlayer(Minecraft.getInstance().player).getState().isGraceful();
     }
 
     @Override
     public void onButtonPress() {
-        ClientPlayerEntity player = Minecraft.getMinecraft().player;
+        ClientPlayerEntity player = Minecraft.getInstance().player;
         if (CapabilityRegeneration.getForPlayer(player).getState().isGraceful()) {
             NetworkHandler.INSTANCE.sendToServer(new MessageTriggerRegeneration(player));
         }
@@ -60,7 +60,7 @@ public class LCCoreBarEntry implements IAbilityBarProvider, IAbilityBarEntry {
 
     @Override
     public Vec3d getCooldownColor() {
-        ClientPlayerEntity player = Minecraft.getMinecraft().player;
+        ClientPlayerEntity player = Minecraft.getInstance().player;
         return CapabilityRegeneration.getForPlayer(player).getPrimaryColor();
     }
 

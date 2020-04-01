@@ -1,12 +1,11 @@
 package me.swirtzly.regeneration.client.rendering.entity;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import me.swirtzly.regeneration.RegenConfig;
 import me.swirtzly.regeneration.common.entity.EntityItemOverride;
 import me.swirtzly.regeneration.handlers.RegenObjects;
 import me.swirtzly.regeneration.util.RenderUtil;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
+import net.minecraft.client.Minecraft;;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.entity.Entity;
@@ -15,7 +14,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TranslationTextComponent;
 
-import javax.annotation.Nullable;
 import java.util.Random;
 
 public class RenderItemOverride extends EntityRenderer<EntityItemOverride> {
@@ -50,7 +48,7 @@ public class RenderItemOverride extends EntityRenderer<EntityItemOverride> {
     @Override
     public void doRender(EntityItemOverride entity, double x, double y, double z, float entityYaw, float partialTicks) {
         if (entity.getItem().isEmpty()) return;
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
         float f = 0.2f;
         Random rand = entity.world.rand;
 
@@ -72,7 +70,7 @@ public class RenderItemOverride extends EntityRenderer<EntityItemOverride> {
                 GlStateManager.pushMatrix();
                 GlStateManager.translate(0, 0.4F, 0);
                 GlStateManager.scale(0.60F, 0.60F, 0.60F);
-                this.renderLivingLabel(entity, new TranslationTextComponent("right.click", Minecraft.getMinecraft().gameSettings.keyBindUseItem.getDisplayName()).getUnformattedComponentText(), x, y + 0.4 + offset, z, 46);
+                this.renderLivingLabel(entity, new TranslationTextComponent("right.click", Minecraft.getInstance().gameSettings.keyBindUseItem.getDisplayName()).getUnformattedComponentText(), x, y + 0.4 + offset, z, 46);
                 GlStateManager.popMatrix();
             }
         }
@@ -81,7 +79,7 @@ public class RenderItemOverride extends EntityRenderer<EntityItemOverride> {
 
         GlStateManager.translate(x, y + 0.17F, z);
         GlStateManager.rotate(-entity.rotationYaw, 0, 1, 0);
-        Minecraft.getMinecraft().getRenderItem().renderItem(entity.getItem(), ItemCameraTransforms.TransformType.GROUND);
+        Minecraft.getInstance().getRenderItem().renderItem(entity.getItem(), ItemCameraTransforms.TransformType.GROUND);
         GlStateManager.popMatrix();
     }
 	

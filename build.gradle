@@ -10,7 +10,6 @@ buildscript {
 }
 
 plugins {
-    id 'com.github.johnrengelman.shadow' version '4.0.4'
     id 'java'
 }
 
@@ -31,10 +30,6 @@ configurations {
 
 
 repositories {
-    maven {
-        url = "https://dark-roleplay.net/files/maven_fril/"
-    }
-
     maven { url 'https://jitpack.io' }
 }
 
@@ -99,7 +94,7 @@ minecraft {
 
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.14.4-28.0.45'
+    minecraft 'net.minecraftforge:forge:1.14.4-28.2.3'
     compile fg.deobf("com.gitlab.Spectre0987:TardisMod-1-14:master-SNAPSHOT")
 }
 
@@ -114,26 +109,5 @@ jar {
                 "Implementation-Vendor" :"Swirtzly",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
-    }
-}
-
-artifacts{
-    archives shadowJar
-}
-
-shadowJar {
-    dependencies {
-        include(dependency('org.jsoup:.*'))
-    }
-
-    relocate 'org.jsoup', 'me.swirtzly.jsoup'
-
-    classifier '' // Replace the default JAR
-}
-
-reobf {
-    shadowJar {
-        dependsOn createMcpToSrg
-        mappings = createMcpToSrg.output
     }
 }

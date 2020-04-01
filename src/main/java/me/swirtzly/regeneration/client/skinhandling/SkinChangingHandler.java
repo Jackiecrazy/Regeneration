@@ -89,7 +89,7 @@ public class SkinChangingHandler {
     }
 
     public static void sendSkinUpdate(Random random, PlayerEntity player) {
-        if (Minecraft.getMinecraft().player.getUniqueID() != player.getUniqueID()) // Not our Player
+        if (Minecraft.getInstance().player.getUniqueID() != player.getUniqueID()) // Not our Player
             return;
 
         IRegeneration cap = CapabilityRegeneration.getForPlayer(player);
@@ -156,7 +156,7 @@ public class SkinChangingHandler {
             bufferedImage = ClientUtil.ImageFixer.convertSkinTo64x64(bufferedImage);
             if (bufferedImage != null) {
                 DynamicTexture tex = new DynamicTexture(bufferedImage);
-                ResourceLocation location = Minecraft.getMinecraft().getTextureManager().getDynamicTextureLocation(player.getName().toLowerCase() + "_skin_" + System.currentTimeMillis(), tex);
+                ResourceLocation location = Minecraft.getInstance().getTextureManager().getDynamicTextureLocation(player.getName().toLowerCase() + "_skin_" + System.currentTimeMillis(), tex);
                 RegenerationMod.LOG.warn("Generating Skin file for " + player.getName() + " || " + location);
                 skinData.setTextureLocation(location);
             }
@@ -176,7 +176,7 @@ public class SkinChangingHandler {
                 return DefaultPlayerSkin.getDefaultSkinLegacy();
             }
             if (bufferedImage != null) {
-                return Minecraft.getMinecraft().getTextureManager().getDynamicTextureLocation("gui_skin_" + System.currentTimeMillis(), new DynamicTexture(bufferedImage));
+                return Minecraft.getInstance().getTextureManager().getDynamicTextureLocation("gui_skin_" + System.currentTimeMillis(), new DynamicTexture(bufferedImage));
             } else {
                 return DefaultPlayerSkin.getDefaultSkinLegacy();
             }
@@ -195,13 +195,13 @@ public class SkinChangingHandler {
      * @throws IOException
      */
     private static ResourceLocation getMojangSkin(AbstractClientPlayerEntity player) {
-        Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> map = Minecraft.getMinecraft().getSkinManager().loadSkinFromCache(player.getGameProfile());
+        Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> map = Minecraft.getInstance().getSkinManager().loadSkinFromCache(player.getGameProfile());
         if (map.isEmpty()) {
-            map = Minecraft.getMinecraft().getSessionService().getTextures(Minecraft.getMinecraft().getSessionService().fillProfileProperties(player.getGameProfile(), false), false);
+            map = Minecraft.getInstance().getSessionService().getTextures(Minecraft.getInstance().getSessionService().fillProfileProperties(player.getGameProfile(), false), false);
         }
         if (map.containsKey(MinecraftProfileTexture.Type.SKIN)) {
             MinecraftProfileTexture profile = map.get(MinecraftProfileTexture.Type.SKIN);
-            File dir = new File((File) ObfuscationReflectionHelper.getPrivateValue(SkinManager.class, Minecraft.getMinecraft().getSkinManager(), 2), profile.getHash().substring(0, 2));
+            File dir = new File((File) ObfuscationReflectionHelper.getPrivateValue(SkinManager.class, Minecraft.getInstance().getSkinManager(), 2), profile.getHash().substring(0, 2));
             File file = new File(dir, profile.getHash());
             if (file.exists()) file.delete();
             ResourceLocation location = new ResourceLocation("skins/" + profile.getHash());
@@ -213,7 +213,7 @@ public class SkinChangingHandler {
     }
 
     private static ITextureObject loadTexture(File file, ResourceLocation resource, ResourceLocation def, String par1Str, AbstractClientPlayerEntity player) {
-        TextureManager texturemanager = Minecraft.getMinecraft().getTextureManager();
+        TextureManager texturemanager = Minecraft.getInstance().getTextureManager();
         ITextureObject object = texturemanager.getTexture(resource);
         if (object == null) {
             object = new ImageDownloadAlt(file, par1Str, def, new ImageBufferDownloadAlt(true));
@@ -247,9 +247,9 @@ public class SkinChangingHandler {
     }
 
     public static SkinInfo.SkinType getSkinType(PlayerEntity player, boolean forceMojang) {
-        Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> map = Minecraft.getMinecraft().getSkinManager().loadSkinFromCache(player.getGameProfile());
+        Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> map = Minecraft.getInstance().getSkinManager().loadSkinFromCache(player.getGameProfile());
         if (map.isEmpty()) {
-            map = Minecraft.getMinecraft().getSessionService().getTextures(Minecraft.getMinecraft().getSessionService().fillProfileProperties(player.getGameProfile(), false), false);
+            map = Minecraft.getInstance().getSessionService().getTextures(Minecraft.getInstance().getSessionService().fillProfileProperties(player.getGameProfile(), false), false);
         }
         MinecraftProfileTexture profile = map.get(MinecraftProfileTexture.Type.SKIN);
 
@@ -283,7 +283,7 @@ public class SkinChangingHandler {
 
     @SubscribeEvent
     public void clickTick(TickEvent.ClientTickEvent e) {
-        if (Minecraft.getMinecraft().world == null) {
+        if (Minecraft.getInstance().world == null) {
             PlayerDataPool.wipeAllData();
         }
     }

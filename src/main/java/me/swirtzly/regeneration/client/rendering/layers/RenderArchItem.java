@@ -3,7 +3,7 @@ package me.swirtzly.regeneration.client.rendering.layers;
 import me.swirtzly.regeneration.common.item.ItemArchInterface;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelPlayer;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.entity.player.PlayerEntity;
@@ -37,7 +37,7 @@ public class RenderArchItem implements LayerRenderer<PlayerEntity> {
             //  GlStateManager.scale(0.3, 0.3, 0.3);
             //   GlStateManager.rotate(180, 1, 0, 0);
             //   GlStateManager.rotate(180, 0, 1, 0);
-            //   Minecraft.getMinecraft().getRenderItem().renderItem(itemStored, ItemCameraTransforms.TransformType.FIXED);
+            //   Minecraft.getInstance().getRenderItem().renderItem(itemStored, ItemCameraTransforms.TransformType.FIXED);
             //  GlStateManager.popMatrix();
 
             if (entitylivingbaseIn.world.isBlockPowered(entitylivingbaseIn.getPosition())) {
@@ -54,9 +54,9 @@ public class RenderArchItem implements LayerRenderer<PlayerEntity> {
                 GlStateManager.disableLighting();
                 GlStateManager.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE);
                 this.chargedModel.setModelAttributes(this.playerRenderer.getMainModel());
-                Minecraft.getMinecraft().entityRenderer.setupFogColor(true);
+                Minecraft.getInstance().entityRenderer.setupFogColor(true);
                 this.chargedModel.render(entitylivingbaseIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
-                Minecraft.getMinecraft().entityRenderer.setupFogColor(false);
+                Minecraft.getInstance().entityRenderer.setupFogColor(false);
                 GlStateManager.matrixMode(5890);
                 GlStateManager.loadIdentity();
                 GlStateManager.matrixMode(5888);

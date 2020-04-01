@@ -22,7 +22,7 @@ public class InventoryTabArch extends AbstractTab {
 
     @Override
     public void onTabClicked() {
-        ClientPlayerEntity player = Minecraft.getMinecraft().player;
+        ClientPlayerEntity player = Minecraft.getInstance().player;
         if (player.getItemStackFromSlot(EquipmentSlotType.HEAD).getItem() instanceof ItemArchInterface) {
             NetworkHandler.INSTANCE.sendToServer(new MessageOpenArch());
         }
@@ -30,7 +30,7 @@ public class InventoryTabArch extends AbstractTab {
 
     @Override
     public boolean shouldAddToList() {
-        ClientPlayerEntity player = Minecraft.getMinecraft().player;
+        ClientPlayerEntity player = Minecraft.getInstance().player;
         return player.getItemStackFromSlot(EquipmentSlotType.HEAD).getItem() instanceof ItemArchInterface;
     }
 }

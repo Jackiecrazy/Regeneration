@@ -8,7 +8,7 @@ import me.swirtzly.regeneration.util.PlayerUtil;
 import me.swirtzly.regeneration.util.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelPlayer;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.entity.player.PlayerEntity;
@@ -36,7 +36,7 @@ public class LayerRegeneration implements LayerRenderer<PlayerEntity> {
         Vec3d primaryColor = handler.getPrimaryColor();
         Vec3d secondaryColor = handler.getSecondaryColor();
 
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
         Random rand = player.world.rand;
         float factor = 0.2F;
 

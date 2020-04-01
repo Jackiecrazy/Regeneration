@@ -40,9 +40,9 @@ public class Trending {
         if (System.currentTimeMillis() - attr >= 86400000 || Objects.requireNonNull(USER_ALEX.list()).length == 0) {
             for (int i = 0; i < 5; i++) {
                 try {
-                    String url = "https://namemc.com/minecraft-skins/profile/" + Minecraft.getMinecraft().getSession().getPlayerID() + "?page=" + i;
+                    String url = "https://namemc.com/minecraft-skins/profile/" + Minecraft.getInstance().getSession().getPlayerID() + "?page=" + i;
                     for (String skin : getSkins(url)) {
-                        FileUtil.downloadAsPng(new URL(skin), Minecraft.getMinecraft().getSession().getUsername() + "_" + System.currentTimeMillis(), USER_ALEX, USER_STEVE);
+                        FileUtil.downloadAsPng(new URL(skin), Minecraft.getInstance().getSession().getUsername() + "_" + System.currentTimeMillis(), USER_ALEX, USER_STEVE);
                     }
                 } catch (Exception e) {
                     System.out.println(e.getMessage());

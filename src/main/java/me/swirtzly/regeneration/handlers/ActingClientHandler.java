@@ -41,9 +41,9 @@ class ActingClientHandler implements IActingHandler {
     public void onRegenFinish(IRegeneration cap) {
         ClientUtil.createToast(new TranslationTextComponent("regeneration.toast.regenerated"), new TranslationTextComponent("regeneration.toast.regenerations_left", cap.getRegenerationsLeft()));
 
-        if (RegenConfig.changeHand && cap.getPlayer().getUniqueID() == Minecraft.getMinecraft().player.getUniqueID()) {
-            Minecraft.getMinecraft().gameSettings.mainHand = RegenUtil.randomEnum(HandSide.class);
-            Minecraft.getMinecraft().gameSettings.sendSettingsToServer();
+        if (RegenConfig.changeHand && cap.getPlayer().getUniqueID() == Minecraft.getInstance().player.getUniqueID()) {
+            Minecraft.getInstance().gameSettings.mainHand = RegenUtil.randomEnum(HandSide.class);
+            Minecraft.getInstance().gameSettings.sendSettingsToServer();
         }
 
         RegenClientHooks.handleShader();

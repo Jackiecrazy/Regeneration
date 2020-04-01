@@ -44,12 +44,12 @@ public class RegenKeyBinds {
     }
 
     public static void handleGeneralInputs(InputUpdateEvent e) {
-        PlayerEntity player = Minecraft.getMinecraft().player;
+        PlayerEntity player = Minecraft.getInstance().player;
 
-        if (player == null || Minecraft.getMinecraft().currentScreen != null) return;
+        if (player == null || Minecraft.getInstance().currentScreen != null) return;
 
         // If Lucraft isn't installed, we get our stuff
-        if (Minecraft.getMinecraft().currentScreen == null && !EnumCompatModids.LCCORE.isLoaded()) {
+        if (Minecraft.getInstance().currentScreen == null && !EnumCompatModids.LCCORE.isLoaded()) {
             ClientUtil.keyBind = RegenKeyBinds.getRegenerateNowDisplayName();
         }
 
@@ -63,7 +63,7 @@ public class RegenKeyBinds {
             NetworkHandler.INSTANCE.sendToServer(new MessageTriggerForcedRegen());
         }
 
-        IRegeneration cap = CapabilityRegeneration.getForPlayer(Minecraft.getMinecraft().player);
+        IRegeneration cap = CapabilityRegeneration.getForPlayer(Minecraft.getInstance().player);
         if (cap.getState() == REGENERATING || cap.isSyncingToJar()) { // locking user
             MovementInput moveType = e.getMovementInput();
             moveType.rightKeyDown = false;

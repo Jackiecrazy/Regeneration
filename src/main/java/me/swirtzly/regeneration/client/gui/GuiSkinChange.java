@@ -16,7 +16,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.client.config.GuiButtonExt;
@@ -38,8 +38,8 @@ public class GuiSkinChange extends ContainerScreen {
     public static final int ID = 3;
     private static final ResourceLocation background = new ResourceLocation(RegenerationMod.MODID, "textures/gui/customizer_background_small.png");
     public static boolean isAlex = true;
-    private static ResourceLocation PLAYER_TEXTURE = Minecraft.getMinecraft().player.getLocationSkin();
-    private static SkinChangingHandler.EnumChoices choices = CapabilityRegeneration.getForPlayer(Minecraft.getMinecraft().player).getPreferredModel();
+    private static ResourceLocation PLAYER_TEXTURE = Minecraft.getInstance().player.getLocationSkin();
+    private static SkinChangingHandler.EnumChoices choices = CapabilityRegeneration.getForPlayer(Minecraft.getInstance().player).getPreferredModel();
     private static List<File> skins = FileUtil.listAllSkins(choices);
     public int posX;
     public int posY;
@@ -58,7 +58,7 @@ public class GuiSkinChange extends ContainerScreen {
         super(new BlankContainer());
         xSize = 176;
         ySize = 186;
-        choices = CapabilityRegeneration.getForPlayer(Minecraft.getMinecraft().player).getPreferredModel();
+        choices = CapabilityRegeneration.getForPlayer(Minecraft.getInstance().player).getPreferredModel();
         skins = FileUtil.listAllSkins(choices);
         if (skins.size() > 0) {
             PLAYER_TEXTURE = SkinChangingHandler.createGuiTexture(skins.get(0));
@@ -106,13 +106,13 @@ public class GuiSkinChange extends ContainerScreen {
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-        Minecraft.getMinecraft().getTextureManager().bindTexture(background);
+        Minecraft.getInstance().getTextureManager().bindTexture(background);
         drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
         GlStateManager.pushMatrix();
-        Minecraft.getMinecraft().getTextureManager().bindTexture(PLAYER_TEXTURE);
+        Minecraft.getInstance().getTextureManager().bindTexture(PLAYER_TEXTURE);
         playerModelAlex.isChild = false;
         playerModelSteve.isChild = false;
-        float rotation = Minecraft.getMinecraft().player.ticksExisted * 2;
+        float rotation = Minecraft.getInstance().player.ticksExisted * 2;
         if (isAlex) {
             drawModelToGui(playerModelAlex, width / 2, height / 2 - 45, 1.0f, rotation);
         } else {
@@ -120,8 +120,8 @@ public class GuiSkinChange extends ContainerScreen {
         }
         GlStateManager.popMatrix();
 
-        drawCenteredString(Minecraft.getMinecraft().fontRenderer, new TranslationTextComponent("regeneration.gui.next_incarnation").getUnformattedText(), width / 2, height / 2 - 80, Color.WHITE.getRGB());
-        drawCenteredString(Minecraft.getMinecraft().fontRenderer, skinName, width / 2, height / 2 + 15, Color.WHITE.getRGB());
+        drawCenteredString(Minecraft.getInstance().fontRenderer, new TranslationTextComponent("regeneration.gui.next_incarnation").getUnformattedText(), width / 2, height / 2 - 80, Color.WHITE.getRGB());
+        drawCenteredString(Minecraft.getInstance().fontRenderer, skinName, width / 2, height / 2 + 15, Color.WHITE.getRGB());
     }
 
     @Override
@@ -142,7 +142,7 @@ public class GuiSkinChange extends ContainerScreen {
         super.actionPerformed(button);
         switch (button.id) {
             case 66:
-                Minecraft.getMinecraft().player.openGui(RegenerationMod.INSTANCE, GuiPreferences.ID, Minecraft.getMinecraft().world, 0, 0, 0);
+                Minecraft.getInstance().player.openGui(RegenerationMod.INSTANCE, GuiPreferences.ID, Minecraft.getInstance().world, 0, 0, 0);
                 break;
             case 88:
                 NetworkHandler.INSTANCE.sendToServer(new MessageNextSkin(skinData, isAlex));
@@ -156,7 +156,7 @@ public class GuiSkinChange extends ContainerScreen {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                Minecraft.getMinecraft().displayGuiScreen(null);
+                Minecraft.getInstance().displayGuiScreen(null);
                 break;
         }
 

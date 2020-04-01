@@ -3,7 +3,7 @@ package me.swirtzly.regeneration.client.rendering.entity;
 import me.swirtzly.regeneration.RegenerationMod;
 import me.swirtzly.regeneration.common.entity.EntityWatcher;
 import net.minecraft.client.model.ModelPlayer;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.util.ResourceLocation;

@@ -23,7 +23,7 @@ public class InventoryTabRegeneration extends AbstractTab {
 
     @Override
     public boolean shouldAddToList() {
-        return Minecraft.getMinecraft().player != null && CapabilityRegeneration.getForPlayer(Minecraft.getMinecraft().player).getRegenerationsLeft() > 0;
+        return Minecraft.getInstance().player != null && CapabilityRegeneration.getForPlayer(Minecraft.getInstance().player).getRegenerationsLeft() > 0;
     }
 	
 }

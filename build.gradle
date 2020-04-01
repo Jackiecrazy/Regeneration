@@ -34,6 +34,8 @@ repositories {
     maven {
         url = "https://dark-roleplay.net/files/maven_fril/"
     }
+
+    maven { url 'https://jitpack.io' }
 }
 
 minecraft {
@@ -98,11 +100,7 @@ minecraft {
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.14.4-28.0.45'
-    compile 'org.jsoup:jsoup:1.11.3'
-    include 'org.jsoup:jsoup:1.11.3'
-
- //   compile 'me.swirtzly:animate-me:1.14.4-1.2.0'
- //   include 'me.swirtzly:animate-me:1.14.4-1.2.0'
+    compile fg.deobf("com.gitlab.Spectre0987:TardisMod-1-14:master-SNAPSHOT")
 }
 
 jar {

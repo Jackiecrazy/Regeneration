@@ -1,83 +1,107 @@
 package me.swirtzly.regeneration.util;
 
 import me.swirtzly.regeneration.RegenConfig;
+import me.swirtzly.regeneration.common.capability.CapabilityRegeneration;
+import me.swirtzly.regeneration.common.capability.IRegeneration;
+import me.swirtzly.regeneration.common.tiles.TileEntityHandInJar;
 import me.swirtzly.regeneration.handlers.RegenObjects;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.block.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.SwordItem;
+import net.minecraft.item.ToolItem;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import java.util.Random;
 import java.util.UUID;
 
 public class RegenUtil {
-	
-	private static Random rand = new Random();
-	
-	public static boolean isSlimSkin(UUID playerUUID) {
-		return (playerUUID.hashCode() & 1) == 1;
-	}
-	
-	public static <T extends Enum<?>> T randomEnum(Class<T> clazz) {
-		int x = rand.nextInt(clazz.getEnumConstants().length);
-		return clazz.getEnumConstants()[x];
-	}
-	
-	public static float randFloat(float min, float max) {
-		return rand.nextFloat() * (max - min) + min;
-	}
-	
-	public static void genCrater(World world, BlockPos pos, int radius) {
-		for (int x = pos.getX() - radius; x < pos.getX() + radius; ++x) {
-			for (int y = pos.getY() - radius; y < pos.getY() + radius; ++y) {
-				for (int z = pos.getZ() - radius; z < pos.getZ() + radius; ++z) {
-					double squareDistance = Math.pow(x - pos.getX(), 2) + Math.pow(y - pos.getY(), 2) + Math.pow(z - pos.getZ(), 2);
-					if (squareDistance <= Math.pow(radius, 2)) {
-						BlockState block = world.getBlockState(new BlockPos(x, y, z));
-						
-						if (block.getBlock() != Blocks.BEDROCK && block.getBlockHardness(world, new BlockPos(x, y, z)) < 3.0F) {
-							
-							if (!world.isRemote) {
-								
-								if (world.getTileEntity(new BlockPos(x, y, z)) != null) {
-									TileEntity tileEntity = world.getTileEntity(new BlockPos(x, y, z));
-									if (tileEntity instanceof IInventory) {
-										InventoryHelper.dropInventoryItems(world, pos, (IInventory) tileEntity);
-										world.updateComparatorOutputLevel(pos, block.getBlock());
-									}
-								}
-								
-								InventoryHelper.spawnItemStack(world, x, y, z, new ItemStack(block.getBlock()));
-							}
-							world.setBlockState(new BlockPos(x, y, z), Blocks.AIR.getDefaultState());
-						}
-					}
-				}
-			}
-		}
-	}
-	
-	public static void regenerationExplosion(PlayerEntity player) {
-		explodeKnockback(player, player.world, player.getPosition(), RegenConfig.COMMON.regenerativeKnockback.get(), RegenConfig.COMMON.regenKnockbackRange.get());
-		explodeKill(player, player.world, player.getPosition(), RegenConfig.COMMON.regenerativeKillRange.get());
-	}
 
-    // Constants
-    public static String NO_SKIN = "no_skin";
+    private static Random rand = new Random();
+
+    public static boolean isSlimSkin(UUID playerUUID) {
+        return (playerUUID.hashCode() & 1) == 1;
+    }
+
+    public static <T extends Enum<?>> T randomEnum(Class<T> clazz) {
+        int x = rand.nextInt(clazz.getEnumConstants().length);
+        return clazz.getEnumConstants()[x];
+    }
+
+    public static float randFloat(float min, float max) {
+        return rand.nextFloat() * (max - min) + min;
+    }
+
+    public static void genCrater(World world, BlockPos pos, int radius) {
+        for (int x = pos.getX() - radius; x < pos.getX() + radius; ++x) {
+            for (int y = pos.getY() - radius; y < pos.getY() + radius; ++y) {
+                for (int z = pos.getZ() - radius; z < pos.getZ() + radius; ++z) {
+                    double squareDistance = Math.pow(x - pos.getX(), 2) + Math.pow(y - pos.getY(), 2) + Math.pow(z - pos.getZ(), 2);
+                    if (squareDistance <= Math.pow(radius, 2)) {
+                        BlockState block = world.getBlockState(new BlockPos(x, y, z));
+
+                        if (block.getBlock() != Blocks.BEDROCK && block.getBlockHardness(world, new BlockPos(x, y, z)) < 3.0F) {
+
+                            if (!world.isRemote) {
+
+                                if (world.getTileEntity(new BlockPos(x, y, z)) != null) {
+                                    TileEntity tileEntity = world.getTileEntity(new BlockPos(x, y, z));
+                                    if (tileEntity instanceof IInventory) {
+                                        InventoryHelper.dropInventoryItems(world, pos, (IInventory) tileEntity);
+                                        world.updateComparatorOutputLevel(pos, block.getBlock());
+                                    }
+                                }
+
+                                InventoryHelper.spawnItemStack(world, x, y, z, new ItemStack(block.getBlock()));
+                            }
+                            world.setBlockState(new BlockPos(x, y, z), Blocks.AIR.getDefaultState());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public static void regenerationExplosion(PlayerEntity player) {
+        explodeKnockback(player, player.world, player.getPosition(), RegenConfig.onRegen.regenerativeKnockback, RegenConfig.onRegen.regenerativeKnockbackRange);
+        explodeKill(player, player.world, player.getPosition(), RegenConfig.onRegen.regenerativeKillRange);
+    }
+
+    public static void explodeKnockback(Entity exploder, World world, BlockPos pos, float knockback, int range) {
+        world.getEntitiesWithinAABBExcludingEntity(exploder, getReach(pos, range)).forEach(entity -> {
+            if (entity instanceof LivingEntity && !exploder.isDead) {
+                LivingEntity victim = (LivingEntity) entity;
+
+                if (entity instanceof PlayerEntity && !RegenConfig.onRegen.regenerationKnocksbackPlayers || !victim.isNonBoss())
+                    return;
+
+                float densMod = world.getBlockDensity(new Vec3d(pos), entity.getEntityBoundingBox());
+
+                int xr, zr;
+                xr = (int) -(victim.posX - exploder.posX);
+                zr = (int) -(victim.posZ - exploder.posZ);
+
+                victim.knockBack(exploder, knockback * densMod, xr, zr);
+            }
+        });
+    }
 
     public static void explodeKill(Entity exploder, World world, BlockPos pos, int range) {
         world.getEntitiesWithinAABBExcludingEntity(exploder, getReach(pos, range)).forEach(entity -> {
-            if ((entity instanceof CreatureEntity && entity.isNonBoss()) || (entity instanceof PlayerEntity)) // && RegenConfig.COMMON.regenerationKillsPlayers))
-                entity.attackEntityFrom(RegenObjects.REGEN_DMG_ENERGY_EXPLOSION, Float.MAX_VALUE);
+            if ((entity instanceof CreatureEntity && entity.isNonBoss()) || (entity instanceof PlayerEntity && RegenConfig.onRegen.regenerationKillsPlayers))
+                entity.attackEntityFrom(RegenObjects.REGEN_DMG_ENERGY_EXPLOSION, 4);
         });
     }
 
@@ -85,43 +109,48 @@ public class RegenUtil {
         return new AxisAlignedBB(pos.up(range).north(range).west(range), pos.down(range).south(range).east(range));
     }
 
-    public static void explodeKnockback(Entity exploder, World world, BlockPos pos, double knockback, int range) {
-		world.getEntitiesWithinAABBExcludingEntity(exploder, getReach(pos, range)).forEach(entity -> {
-			if (entity instanceof LivingEntity && exploder.isAlive()) {
-				LivingEntity victim = (LivingEntity) entity;
+    public static void resetNextSkin(PlayerEntity player) {
+        IRegeneration data = CapabilityRegeneration.getForPlayer(player);
+        data.setNextSkin("NONE");
+        data.synchronise();
+    }
 
-                if (entity instanceof PlayerEntity && !RegenConfig.COMMON.regenerationKnocksbackPlayers.get() || !victim.isNonBoss())
-                    return;
+    public static SoundEvent getRandomSound(SoundEvent[] soundEvents, Random random) {
+        return soundEvents[random.nextInt(soundEvents.length)];
+    }
 
-                // float densMod = world.getBlockDensity(new Vec3d(pos), entity.getBoundingBox());
-				
-				float densMod = 1;
+    public static boolean isSharp(ItemStack stack) {
+        return stack.getItem() instanceof ToolItem || stack.getItem() instanceof SwordItem;
+    }
 
-                int xr, zr;
-				xr = (int) -(victim.posX - exploder.posX);
-				zr = (int) -(victim.posZ - exploder.posZ);
+    public static RayTraceResult getPosLookingAt(Entity entity) {
+        Vec3d lookVec = entity.getLookVec();
+        double distance = 10;
+        for (int i = 0; i < distance * 2; i++) {
+            float scale = i / 2F;
+            Vec3d pos = entity.getPositionVector().add(0, entity.getEyeHeight(), 0).add(lookVec.scale(scale));
 
-                victim.knockBack(exploder, (float) (knockback * densMod), xr, zr);
+            if (entity.world.isBlockFullCube(new BlockPos(pos)) && !entity.world.isAirBlock(new BlockPos(pos))) {
+                return new RayTraceResult(pos, null);
+            } else {
+                Vec3d min = pos.add(0.25F, 0.25F, 0.25F);
+                Vec3d max = pos.add(-0.25F, -0.25F, -0.25F);
+                for (Entity e : entity.world.getEntitiesWithinAABBExcludingEntity(entity, new AxisAlignedBB(min.x, min.y, min.z, max.x, max.y, max.z))) {
+                    return new RayTraceResult(e);
+                }
             }
-		});
-	}
+        }
+        return new RayTraceResult(entity.getPositionVector().add(0, entity.getEyeHeight(), 0).add(lookVec.scale(distance)), null);
+    }
 
-    public interface IEnum<E extends Enum<E>> {
-		int ordinal();
+    public static TileEntityHandInJar getContainer(RayTraceResult result, World world) {
+        if (result.typeOfHit == RayTraceResult.Type.BLOCK) {
+            BlockPos pos = result.getBlockPos();
+            if (world.getTileEntity(pos) instanceof TileEntityHandInJar) {
+                return (TileEntityHandInJar) world.getTileEntity(pos);
+            }
+        }
+        return null;
+    }
 
-        default E next() {
-			E[] ies = this.getAllValues();
-			return this.ordinal() != ies.length - 1 ? ies[this.ordinal() + 1] : null;
-		}
-
-        default E previous() {
-			return this.ordinal() != 0 ? this.getAllValues()[this.ordinal() - 1] : null;
-		}
-
-        @SuppressWarnings("unchecked")
-		default E[] getAllValues() {
-			IEnum[] ies = this.getClass().getEnumConstants();
-			return (E[]) ies;
-		}
-	}
 }

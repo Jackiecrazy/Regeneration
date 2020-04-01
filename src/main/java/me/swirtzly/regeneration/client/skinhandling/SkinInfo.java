@@ -1,48 +1,50 @@
 package me.swirtzly.regeneration.client.skinhandling;
 
 import net.minecraft.client.resources.DefaultPlayerSkin;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 
 public class SkinInfo {
-	
-	private final SkinType skintype;
-    private final ResourceLocation TEXTURE_LOCATION;
-    private final PlayerEntity PLAYER;
 
-    public SkinInfo(PlayerEntity playerEntity, ResourceLocation resourceLocation, SkinType skinType) {
-		this.skintype = skinType;
-        this.TEXTURE_LOCATION = resourceLocation;
-        this.PLAYER = playerEntity;
-    }
+	private SkinType skintype = SkinType.ALEX;
+	private ResourceLocation textureLocation = DefaultPlayerSkin.getDefaultSkinLegacy();
+	private boolean update = false;
 
-    public ResourceLocation getTextureLocation() {
-        if (TEXTURE_LOCATION != null) {
-            return TEXTURE_LOCATION;
-		}
-		return DefaultPlayerSkin.getDefaultSkinLegacy();
+	public SkinType getSkintype() {
+		return skintype;
 	}
 
-    public SkinType getSkintype() {
-		if (skintype != null) {
-			return skintype;
-		}
-		return SkinType.ALEX;
+	public SkinInfo setSkintype(SkinType skintype) {
+		this.skintype = skintype;
+		return this;
 	}
 
-    public PlayerEntity getPlayer() {
-        return PLAYER;
-    }
-	
+	public ResourceLocation getTextureLocation() {
+		return textureLocation;
+	}
+
+	public SkinInfo setTextureLocation(ResourceLocation textureLocation) {
+		this.textureLocation = textureLocation;
+		return this;
+	}
+
+	public boolean isUpdateRequired() {
+		return update;
+	}
+
+	public SkinInfo setUpdateRequired(boolean update) {
+		this.update = update;
+		return this;
+	}
+
 	public enum SkinType {
 		ALEX("slim"), STEVE("default");
-		
+
 		private final String type;
-		
+
 		SkinType(String type) {
 			this.type = type;
 		}
-		
+
 		public String getMojangType() {
 			return type;
 		}
